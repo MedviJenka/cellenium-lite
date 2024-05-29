@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+
+  allure-server:
+    image: frankescobar/allure-docker-service
+    volumes:
+      - ./allure-results:/app/allure-results
+    environment:
+      CHECK_RESULTS_EVERY_SECONDS: 10
+      KEEP_HISTORY: 1
+      ANALYTICS: 1
+      SECURITY: 0
+    ports:
+      - "4040:4040"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+
+    command: >
+      pytest -v --alluredir=allure-results &&
+      allure generate allure-results --clean -o allure-results &&
+      allure serve 
+
+    depends_on:
+      - allure-server
