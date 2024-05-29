@@ -1,4 +1,4 @@
-from infrastrucrture.run.suite_runner import SuiteRunner
+from infrastructure.run.suite_runner import SuiteRunner
 
 
 def test_run_suite() -> None:

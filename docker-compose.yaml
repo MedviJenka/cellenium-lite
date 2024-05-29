@@ -2,6 +2,70 @@ version: '3'
 
 services:
 
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - C:/Users/medvi/Downloads/credentials_1.json:/app/credentials_1.json
+    command: >
+      pytest -v --alluredir=allure-results &&
+      allure generate allure-results --clean -o allure-results &&
+      allure serve
+    depends_on:
+      - allure-server
+    environment:
+      - API_KEY=${API_KEY}
+
+  test_button:
+    extends:
+      service: app
+    volumes:
+      - ./tests/test_button:/app/tests/test_button
+    depends_on:
+      - allure-server
+
+  test_button_1:
+    extends:
+      service: app
+    volumes:
+      - ./tests/test_button_1:/app/tests/test_button_1
+    command: > 
+      pytest -v --alluredir=allure-results ./tests/test_button
+    depends_on:
+      - allure-server
+
+  test_button_2:
+    extends:
+      service: app
+    volumes:
+      - ./tests/test_button_2:/app/tests/test_button_2
+    command: >
+        pytest -v --alluredir=allure-results ./tests/test_button_2
+    depends_on:
+      - allure-server
+
+  test_button_3:
+    extends:
+      service: app
+    volumes:
+      - ./tests/test_button_3:/app/tests/test_button_3
+    command: >
+      pytest -v --alluredir=allure-results ./tests/test_button_2
+    depends_on:
+      - allure-server
+
+  test_button_4:
+    extends:
+      service: app
+    volumes:
+      - ./tests/test_button_4:/app/tests/test_button_4
+    command: >
+      pytest -v --alluredir=allure-results ./tests/test_button_2
+    depends_on:
+      - allure-server
+
   allure-server:
     image: frankescobar/allure-docker-service
     volumes:
@@ -11,20 +75,6 @@ services:
       KEEP_HISTORY: 1
       ANALYTICS: 1
       SECURITY: 0
+
     ports:
       - "4040:4040"
-
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - .:/app
-
-    command: >
-      pytest -v --alluredir=allure-results &&
-      allure generate allure-results --clean -o allure-results &&
-      allure serve 
-
-    depends_on:
-      - allure-server
