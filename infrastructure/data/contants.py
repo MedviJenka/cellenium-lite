@@ -11,7 +11,7 @@ CONFIG_PATH = fr'{GLOBAL_PATH}\core\static\utils\config.ini'
 TEST_LIST = fr'{GLOBAL_PATH}\core\utils\data\test_list.json'
 SCREENSHOTS = fr'{GLOBAL_PATH}\core\utils\data\screenshots\reports'
 JENKINS = fr'{GLOBAL_PATH}\jenkins\jenkins.war'
-LOGS = fr'C:\Users\medvi\OneDrive\Desktop\cellenium-lite\logs\data.log'
+LOGS = fr'{GLOBAL_PATH}\logs\data.log'
 REPORTS = fr'{TESTS}\_reports'
 PAGE_BASE = fr'{TESTS}\_data\page_base.xlsx'
 TEST_SUITE = fr'{TESTS}\_data\test_suite.xlsx'
@@ -19,11 +19,11 @@ PLAYER_DATA = fr'{GLOBAL_PATH}\app\player\data.json'
 IMAGE_COMPARE_DATA = fr'{GLOBAL_PATH}\core\tools\image_compare\data.json'
 COOKIES = fr'{GLOBAL_PATH}\core\infrastructure\constants\data\cookies.json'
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-API_KEY = fr'{GLOBAL_PATH}\key.ini'
+CONFIG = fr'{GLOBAL_PATH}\config.ini'
 
 # ---------------- [ ADD CREDENTIALS PATH FROM GOOGLE GCP ] ---------------------
 
-GOOGLE_SHEET_JSON = r"C:\Users\medvi\Downloads\credentials_1.json"
+GOOGLE_SHEET_JSON = r"C:\Users\evgenyp\Downloads\credentials_1.json"
 
 # -------------------------------------------------------------------------------
 

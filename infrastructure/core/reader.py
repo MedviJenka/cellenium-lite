@@ -1,5 +1,4 @@
 import gspread
-import configparser
 from functools import lru_cache
 from dataclasses import dataclass
 from google.oauth2.service_account import Credentials
