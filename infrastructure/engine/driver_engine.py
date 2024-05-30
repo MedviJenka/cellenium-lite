@@ -12,7 +12,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from infrastructure.core.logger import Logger
 from infrastructure.core.reader import get_name, get_locator, get_type
 from infrastructure.data.enums import Type
-from infrastructure.manager.driver_manager import DriverManager
+from infrastructure.manager.driver import DriverManager
 
 
 warnings.filterwarnings('ignore')

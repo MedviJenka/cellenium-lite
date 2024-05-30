@@ -1,8 +1,5 @@
-import openpyxl as openpyxl
 from enum import Enum
-from typing import Optional
 from selenium.webdriver.common.by import By
-from infrastructure.data.contants import TEST_SUITE
 
 
 class Type(Enum):
@@ -12,9 +9,3 @@ class Type(Enum):
     CSS = By.CSS_SELECTOR
     XPATH = By.XPATH
     TEXT = By.LINK_TEXT
-
-
-# class Workbook(Enum):
-#     report: bool = False
-#     workbook: openpyxl.Workbook = openpyxl.load_workbook(TEST_SUITE)
-#     multiprocessing: Optional[int] = None

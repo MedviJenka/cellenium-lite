@@ -3,7 +3,7 @@ import json
 from configparser import ConfigParser
 from infrastructure.core.executor import Executor
 from infrastructure.core.logger import Logger
-from infrastructure.data.contants import API_KEY
+from infrastructure.data.contants import CONFIG
 
 
 log = Logger()
@@ -16,7 +16,7 @@ class GenerateDockerComposeBuild(Executor):
 
     @property
     def get_config(self) -> str:
-        self.config.read(API_KEY)
+        self.config.read(CONFIG)
         json_file_path = self.config.get('API', 'API_KEY')
         return json_file_path
 
