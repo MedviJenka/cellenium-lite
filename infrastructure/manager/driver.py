@@ -1,7 +1,7 @@
 from typing import Optional
 from dataclasses import dataclass
 from selenium import webdriver
-from infrastructure.manager.service_manager import ServiceManager
+from infrastructure.manager.service import ServiceManager
 
 
 @dataclass

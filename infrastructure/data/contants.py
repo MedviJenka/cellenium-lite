@@ -23,7 +23,7 @@ CONFIG = fr'{GLOBAL_PATH}\config.ini'
 
 # ---------------- [ ADD CREDENTIALS PATH FROM GOOGLE GCP ] ---------------------
 
-GOOGLE_SHEET_JSON = r"C:\Users\evgenyp\Downloads\credentials_1.json"
+GOOGLE_SHEET_JSON = r"/app/credentials.json"
 
 # -------------------------------------------------------------------------------
 
