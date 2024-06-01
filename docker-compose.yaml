@@ -3,21 +3,23 @@ version: '2.27'
 services:
 
   app:
+
     build:
       context: .
       dockerfile: Dockerfile
+
     depends_on:
       - allure-server
+
     volumes:
       - .:/app
 
-    ports:
-      - "45000-45009:80"
+    command: >
+      pytest -v --alluredir=allure-results
+      allure generate allure-results --clean -o allure-results &&
+      allure serve
 
   test_1:
-    extends:
-      service:
-        app
     depends_on:
       - app
       - allure-server
@@ -27,8 +29,6 @@ services:
       - ./tests/test_1:/tests/test_1
     command: >
       pytest -v --alluredir=allure-results
-      allure generate allure-results --clean -o allure-results &&
-      allure serve
     ports:
       - "4050:80"
 
