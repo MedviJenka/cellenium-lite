@@ -1,5 +1,8 @@
 version: '3'
 
+volumes:
+  shared:
+
 services:
 
   app:
@@ -8,9 +11,11 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - allure-server
+    entrypoint: ["./environment/init_credentials.sh"]
     volumes:
       - .:/app
-      - /C/Users/evgenyp/Downloads/credentials_1.json:/app/credentials.json
+      - shared:/app/credentials
+
     command: >
       pytest -v --alluredir=allure-results 
       allure generate allure-results --clean -o allure-results &&
@@ -31,7 +36,7 @@ services:
     build:
       context: .
     volumes:
-      - ./tests/test_1:/app/tests/test_2
+      - ./tests/test_2:/app/tests/test_2
     depends_on:
       - app
       - allure-server
