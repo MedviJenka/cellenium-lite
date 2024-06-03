@@ -21,11 +21,12 @@ COOKIES = fr'{GLOBAL_PATH}\core\infrastructure\constants\data\cookies.json'
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 CONFIG = fr'{GLOBAL_PATH}\config.ini'
 
+
 # ---------------- [ ADD CREDENTIALS PATH FROM GOOGLE GCP ] ---------------------
 
-GOOGLE_SHEET_JSON = r"/app/credentials.json"
+GOOGLE_SHEET_JSON = r"/app/environment/_json/credentials.json"
 
-# -------------------------------------------------------------------------------
+# ---------------- [ IMPORTANT: add this file to git ignore ] -------------------
 
 
 class Authorization:

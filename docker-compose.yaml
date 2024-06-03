@@ -1,7 +1,4 @@
-version: '3'
-
-volumes:
-  shared:
+version: '2.27'
 
 services:
 
@@ -11,41 +8,59 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - allure-server
-    entrypoint: ["./environment/init_credentials.sh"]
     volumes:
       - .:/app
-      - shared:/app/credentials
-
+      - /c/Users/evgenyp/Downloads/credentials_1.json:/app/credentials_1.json
     command: >
-      pytest -v --alluredir=allure-results 
-      allure generate allure-results --clean -o allure-results &&
-      allure serve
+      bash -c "allure generate allure-results --clean -o allure-results && allure serve allure-results"
 
-  test_1:
+  container-1:
+    depends_on:
+      - app
+      - allure-server
     build:
       context: .
     volumes:
       - ./tests/test_1:/app/tests/test_1
+    command: >
+      pytest -v   
+
+  container-2:
     depends_on:
       - app
       - allure-server
-    command: >
-      pytest -v --alluredir=allure-results 
-
-  test_2:
     build:
       context: .
     volumes:
       - ./tests/test_2:/app/tests/test_2
+    command: >
+      pytest -v
+
+  container-3:
     depends_on:
       - app
       - allure-server
+    build:
+      context: .
+    volumes:
+      - ./tests/test_3:/app/tests/test_3
     command: >
-      pytest -v --alluredir=allure-results  
+      pytest -v 
 
+  container-4:
+    depends_on:
+      - app
+      - allure-server
+    build:
+      context: .
+    volumes:
+      - ./tests/test_4:/app/tests/test_4
+    command: >
+      pytest -v 
+        
 
   allure-server:
-    image: frankescobar/allure-docker-service
+    image: frankescobar/allure-docker-service:latest
     volumes:
       - ./allure-results:/app/allure-results
     environment:
@@ -53,6 +68,5 @@ services:
       KEEP_HISTORY: 1
       ANALYTICS: 1
       SECURITY: 0
-
     ports:
       - "4040:4040"

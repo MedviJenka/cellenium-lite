@@ -73,3 +73,4 @@ def get_type(sheet_name: str, value: str) -> str:
 
 def get_action(sheet_name: str, value: str) -> str:
     return get_row_data(sheet_name=sheet_name, value=value)['action']
+
