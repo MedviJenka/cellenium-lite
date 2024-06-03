@@ -1,36 +1,60 @@
-version: '2.27'
+version: '3.0'
 
 services:
 
   app:
-
     build:
       context: .
       dockerfile: Dockerfile
-
     depends_on:
       - allure-server
-
     volumes:
       - .:/app
-
+      - ${CREDENTIALS}:/app/credentials.json
     command: >
-      allure generate allure-results --clean -o allure-results &&
-      allure serve
+      bash -c "allure generate allure-results --clean -o allure-results && allure serve"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: '512M'
+        reservations:
+          cpus: '0.25'
+          memory: '256M'
 
-  test_1:
+
+  test-base:
+    build:
+      context: .
     depends_on:
       - app
       - allure-server
-    build:
-      context: .
-    volumes:
-      - ./tests/test_1:/tests/test_1
     command: >
-      pytest -v --alluredir=allure-results
-    ports:
-      - "4050:80"
+      pytest -n auto
 
+  container-1:
+    extends:
+      service: test-base
+    volumes:
+      - ./tests/test_1:/app/tests/test_1
+
+  container-2:
+    extends:
+      service: test-base
+    volumes:
+      - ./tests/test_2:/app/tests/test_2
+
+  container-3:
+    extends:
+      service: test-base
+    volumes:
+      - ./tests/test_3:/app/tests/test_3
+
+  container-4:
+    extends:
+      service: test-base
+    volumes:
+      - ./tests/test_4:/app/tests/test_4
 
   allure-server:
     image: frankescobar/allure-docker-service:latest
@@ -41,6 +65,5 @@ services:
       KEEP_HISTORY: 1
       ANALYTICS: 1
       SECURITY: 0
-
     ports:
       - "4040:4040"

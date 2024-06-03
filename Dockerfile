@@ -10,6 +10,7 @@ RUN apt-get update && \
     apt-get update && \
     apt-get install -y google-chrome-stable vim
 
+RUN ln -s /opt/allure-2.13.9/bin/allure /usr/bin/allure
 COPY . /app
-
 RUN pip install --upgrade pip && pip install -r requirements.txt
+ENV PATH="/opt/allure-2.13.9/bin:${PATH}"
