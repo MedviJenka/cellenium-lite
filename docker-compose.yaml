@@ -15,7 +15,6 @@ services:
       - .:/app
 
     command: >
-      pytest -v --alluredir=allure-results
       allure generate allure-results --clean -o allure-results &&
       allure serve
 
