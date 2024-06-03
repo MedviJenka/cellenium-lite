@@ -12,52 +12,40 @@ services:
       - .:/app
       - /c/Users/evgenyp/Downloads/credentials_1.json:/app/credentials_1.json
     command: >
-      bash -c "allure generate allure-results --clean -o allure-results && allure serve allure-results"
+      bash -c "pytest allure generate allure-results --clean -o allure-results && allure serve allure-results"
+
+  test-base:
+    build:
+      context: .
+    depends_on:
+      - app
+      - allure-server
+    command: >
+      pytest -n auto
 
   container-1:
-    depends_on:
-      - app
-      - allure-server
-    build:
-      context: .
+    extends:
+      service: test-base
     volumes:
       - ./tests/test_1:/app/tests/test_1
-    command: >
-      pytest -v   
 
   container-2:
-    depends_on:
-      - app
-      - allure-server
-    build:
-      context: .
+    extends:
+      service: test-base
     volumes:
       - ./tests/test_2:/app/tests/test_2
-    command: >
-      pytest -v
 
   container-3:
-    depends_on:
-      - app
-      - allure-server
-    build:
-      context: .
+    extends:
+      service: test-base
     volumes:
       - ./tests/test_3:/app/tests/test_3
-    command: >
-      pytest -v 
 
   container-4:
-    depends_on:
-      - app
-      - allure-server
-    build:
-      context: .
+    extends:
+      service: test-base
     volumes:
       - ./tests/test_4:/app/tests/test_4
-    command: >
-      pytest -v 
-        
 
   allure-server:
     image: frankescobar/allure-docker-service:latest
