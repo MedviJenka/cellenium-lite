@@ -2,7 +2,7 @@ import gspread
 from functools import lru_cache
 from dataclasses import dataclass
 from google.oauth2.service_account import Credentials
-from infrastructure.data.contants import GOOGLE_SHEET_JSON, SCOPES
+from infrastructure.data.constants import GOOGLE_SHEET_JSON, SCOPES
 
 
 @dataclass

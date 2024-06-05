@@ -2,7 +2,7 @@ import requests
 from dataclasses import dataclass
 from typing import Optional
 from infrastructure.core.logger import Logger
-from infrastructure.data.contants import Authorization
+from infrastructure.data.constants import Authorization
 
 
 log = Logger()
