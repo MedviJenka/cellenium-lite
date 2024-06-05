@@ -10,7 +10,7 @@ from infrastructure.data.constants import SCOPES
 class GoogleAPIAuth:
 
     sheet_id: str = '1HiBBUWKS_wheb3ANqCGVtOCpZPCFuN3KSae0hZOD0QE'
-    credentials = get_env(value='CREDENTIALS')
+    credentials = get_env(value='GOOGLE_API')
 
     def __post_init__(self) -> None:
         self.credentials = Credentials.from_service_account_file(filename=self.credentials, scopes=SCOPES)

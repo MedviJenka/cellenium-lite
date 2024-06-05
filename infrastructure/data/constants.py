@@ -11,7 +11,7 @@ TESTS = fr'{GLOBAL_PATH}\tests'
 LOGS = fr'{GLOBAL_PATH}\logs\data.log'
 TEST_SUITE = fr'{TESTS}\_data\test_suite.xlsx'
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-GOOGLE_SHEET_JSON = get_env(value='CREDENTIALS')
+GOOGLE_SHEET_JSON = get_env(value='GOOGLE_API')
 
 
 class Authorization:
