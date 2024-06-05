@@ -11,21 +11,30 @@ services:
       - ${CREDENTIALS}:/app/environment/_json/credentials.json
     depends_on:
       - container-1
+      - container-2
       - allure-server
-    command:
-      bash -c "pytest && allure generate allure-results --clean -o allure-results && allure serve"
-
-  main_container:
-    build:
-      context: .
+    command: >
+      bash -c "allure serve"
 
   container-1:
+      build:
+        context: .
+      volumes:
+        - .:/app
+      ports:
+        - ${PORT}
+      command: >
+        bash -c "pytest tests/test_1 -n ${PARALLEL} && allure generate allure-results --clean -o allure-results"
+
+  container-2:
     build:
       context: .
     volumes:
-      - ./tests:/app/tests
-    command: > 
-      pytest tests/test_1
+      - .:/app
+    ports:
+      - ${PORT}
+    command: >
+      bash -c "pytest tests/test_2 -n ${PARALLEL} && allure generate allure-results --clean -o allure-results" 
 
   allure-server:
     image: frankescobar/allure-docker-service:latest

@@ -18,5 +18,5 @@ RUN wget https://github.com/allure-framework/allure2/releases/download/2.13.8/al
     ln -s /opt/allure-2.13.8/bin/allure /usr/bin/allure
 
 COPY . /app
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip install --upgrade pip && pip install -r --no-cache-dir requirements.txt
 ENV PATH="/opt/allure-2.13.9/bin:${PATH}"

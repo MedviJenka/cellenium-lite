@@ -2,16 +2,18 @@ import gspread
 from functools import lru_cache
 from dataclasses import dataclass
 from google.oauth2.service_account import Credentials
-from infrastructure.data.constants import GOOGLE_SHEET_JSON, SCOPES
+from infrastructure.core.methods import get_env
+from infrastructure.data.constants import SCOPES
 
 
 @dataclass
 class GoogleAPIAuth:
 
     sheet_id: str = '1HiBBUWKS_wheb3ANqCGVtOCpZPCFuN3KSae0hZOD0QE'
+    credentials = get_env(value='CREDENTIALS')
 
     def __post_init__(self) -> None:
-        self.credentials = Credentials.from_service_account_file(filename=GOOGLE_SHEET_JSON, scopes=SCOPES)
+        self.credentials = Credentials.from_service_account_file(filename=self.credentials, scopes=SCOPES)
         self.client = gspread.authorize(self.credentials)
 
     def __hash__(self) -> hash:
