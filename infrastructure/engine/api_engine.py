@@ -17,9 +17,12 @@ class GoogleAPIAuth:
     credentials: str = None
 
     def __post_init__(self) -> None:
-        # if no linux environment (means there is no container) detected
+
+        # if no linux environment (means there is no container) detected use local windows path
         if os.getenv('CONTAINER', 'false') == 'false':
             self.credentials = linux_to_windows_path_convert('LOCAL_CREDENTIALS')
+
+        # else, use linux path
         elif os.getenv('CONTAINER', 'true') == 'true':
             self.credentials = get_env(key='LOCAL_CREDENTIALS')
 
@@ -89,5 +92,6 @@ def get_type(sheet_name: str, value: str) -> str:
 
 def get_action(sheet_name: str, value: str) -> str:
     return get_row_data(sheet_name=sheet_name, value=value)['action']
+
 
 print(get_type('Google', 'button'))
