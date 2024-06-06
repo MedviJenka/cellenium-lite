@@ -8,13 +8,15 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/app
-      - ${CREDENTIALS}:/app/environment/_json/credentials.json
+      - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
     depends_on:
       - container-1
       - container-2
       - allure-server
+    environment:
+      - CONTAINER=1
     command: >
-      bash -c "allure serve"
+      bash -c "allure generate allure-results --clean -o allure-results allure serve"
 
   container-1:
       build:
@@ -23,8 +25,13 @@ services:
         - .:/app
       ports:
         - ${PORT}
+      healthcheck:
+        test: [ "CMD-SHELL", "curl -f http://localhost:${PORT} || exit 1" ]
+        interval: 30s
+        timeout: 10s
+        retries: 5
       command: >
-        bash -c "pytest tests/test_1 -n ${PARALLEL} && allure generate allure-results --clean -o allure-results"
+        bash -c "pytest tests/test_1 -n ${PARALLEL}"
 
   container-2:
     build:

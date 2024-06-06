@@ -1,20 +1,30 @@
+import os
 import gspread
 from functools import lru_cache
 from dataclasses import dataclass
 from google.oauth2.service_account import Credentials
-from infrastructure.core.methods import get_env
+from infrastructure.core.logger import Logger
 from infrastructure.data.constants import SCOPES
+from infrastructure.manager.config_manager import linux_to_windows_path_convert, get_env
+
+log = Logger()
 
 
 @dataclass
 class GoogleAPIAuth:
 
     sheet_id: str = '1HiBBUWKS_wheb3ANqCGVtOCpZPCFuN3KSae0hZOD0QE'
-    credentials = get_env(value='GOOGLE_API')
+    credentials: str = None
 
     def __post_init__(self) -> None:
-        self.credentials = Credentials.from_service_account_file(filename=self.credentials, scopes=SCOPES)
-        self.client = gspread.authorize(self.credentials)
+        # if no linux environment (means there is no container) detected
+        if os.getenv('CONTAINER', 'false') == 'false':
+            self.credentials = linux_to_windows_path_convert('LOCAL_CREDENTIALS')
+        elif os.getenv('CONTAINER', 'true') == 'true':
+            self.credentials = get_env(key='LOCAL_CREDENTIALS')
+
+        service_account = Credentials.from_service_account_file(filename=self.credentials, scopes=SCOPES)
+        self.client = gspread.authorize(service_account)
 
     def __hash__(self) -> hash:
         return hash((self.sheet_id, tuple(SCOPES)))
@@ -35,11 +45,15 @@ class GoogleAPIAuth:
 def __read_google_sheet(sheet_name: str, value: str, api: GoogleAPIAuth) -> dict:
 
     sheet = api.get_cached_sheet(sheet_name)
+    log.level.info(sheet)
     all_rows = sheet.get_all_values()
+    log.level.info(all_rows)
     headers = all_rows[0]
+    log.level.info(headers)
 
     for row in all_rows[1:]:
         row_dict = dict(zip(headers, row))
+        log.level.info(row_dict)
         if row_dict['name'] == value:
             return row_dict
 
@@ -75,3 +89,5 @@ def get_type(sheet_name: str, value: str) -> str:
 
 def get_action(sheet_name: str, value: str) -> str:
     return get_row_data(sheet_name=sheet_name, value=value)['action']
+
+print(get_type('Google', 'button'))
