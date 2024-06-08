@@ -1,4 +1,0 @@
-INFO |  Thursday | 06/06/2024 | 17:37:14 | <Worksheet 'Google' id:0> | Function: __read_google_sheet | Line: 51
-INFO |  Thursday | 06/06/2024 | 17:37:14 | [['name', 'locator', 'type', 'actions', 'image'], ['button', 'NAME', 'btnK', '', ''], ['search', 'NAME', 'q', '', '']] | Function: __read_google_sheet | Line: 53
-INFO |  Thursday | 06/06/2024 | 17:37:14 | ['name', 'locator', 'type', 'actions', 'image'] | Function: __read_google_sheet | Line: 55
-INFO |  Thursday | 06/06/2024 | 17:37:14 | {'name': 'button', 'locator': 'NAME', 'type': 'btnK', 'actions': '', 'image': ''} | Function: __read_google_sheet | Line: 59

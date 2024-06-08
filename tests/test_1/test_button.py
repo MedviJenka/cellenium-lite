@@ -1,5 +1,5 @@
 from time import sleep
-from infrastructure.engine.driver_engine import DriverEngine
+from core.infrastructure.engine import DriverEngine
 
 
 class TestTitle:
@@ -13,4 +13,3 @@ class TestTitle:
         self.engine.get_element('button').click()
         self.engine.teardown()
         assert title == 'Google'
-        sleep(5)
