@@ -9,8 +9,8 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - .:/core
-      - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
+      - ./core:/core
+      - ${LOCAL_CREDENTIALS}:/${CONTAINER_CREDENTIALS}
 
 #  tests:
 #      build:
