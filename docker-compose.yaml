@@ -10,7 +10,7 @@ services:
       - "8080:80"
     volumes:
       - ./core:/core
-      - ${LOCAL_CREDENTIALS}:/${CONTAINER_CREDENTIALS}
+      - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
 
 #  tests:
 #      build:
