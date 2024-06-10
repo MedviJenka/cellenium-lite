@@ -6,7 +6,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 @dataclass
 class ServiceManager:
-
     chrome = ChromeDriverManager()
     options: Options = Options()
     service: Service = Service(executable_path=chrome.install())
