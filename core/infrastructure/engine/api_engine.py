@@ -1,11 +1,10 @@
-import os
 import gspread
 from functools import lru_cache
 from dataclasses import dataclass
 from google.oauth2.service_account import Credentials
 from core.infrastructure.core.logger import Logger
 from core.infrastructure.data.constants import SCOPES
-from infrastructure.manager.config_manager import linux_to_windows_path_convert, get_env
+from core.infrastructure.manager.config_manager import get_env
 
 
 log = Logger()
@@ -18,15 +17,7 @@ class GoogleAPIAuth:
     credentials: str = None
 
     def __post_init__(self) -> None:
-
-        # if no linux environment (means there is no container) detected use local windows path
-        if os.getenv('CONTAINER', 'false') == 'false':
-            self.credentials = linux_to_windows_path_convert('CONTAINER_CREDENTIALS')
-
-        # else, use linux path
-        elif os.getenv('CONTAINER', 'true') == 'true':
-            self.credentials = get_env(key='LOCAL_CREDENTIALS')
-
+        self.credentials = get_env('LOCAL_CREDENTIALS')
         service_account = Credentials.from_service_account_file(filename=self.credentials, scopes=SCOPES)
         self.client = gspread.authorize(service_account)
 
@@ -94,6 +85,3 @@ def get_type(sheet_name: str, value: str) -> str:
 
 def get_action(sheet_name: str, value: str) -> str:
     return get_row_data(sheet_name=sheet_name, value=value)['action']
-
-
-print(get_type('Google', 'button'))

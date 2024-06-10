@@ -2,7 +2,7 @@ import time
 from time import time
 from time import sleep
 from functools import wraps
-from infrastructure.core.exceptions import NegativeIntegerException
+from core.infrastructure.core.exceptions import NegativeIntegerException
 from core.infrastructure.engine import log
 
 
