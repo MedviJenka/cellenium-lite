@@ -2,8 +2,11 @@ import time
 from time import time
 from time import sleep
 from functools import wraps
-from core.infrastructure.core.exceptions import NegativeIntegerException
-from core.infrastructure.engine import log
+from core.infrastructure.modules.exceptions import NegativeIntegerException
+from core.infrastructure.modules.logger import Logger
+
+
+log = Logger()
 
 
 def memoize(function: callable) -> wraps:
@@ -29,7 +32,7 @@ def measure_execution_time(func: callable) -> callable:
         start = time()
         func()
         end = time() - start
-        log(text=f'function run took {end:.3f} sec')
+        log.level.info(text=f'function run took {end:.3f} sec')
         print(f'function run took {end:.3f} sec')
 
     return wrapper
@@ -49,10 +52,10 @@ def negative(exception_type: Exception(any)):
     def decorator(func) -> callable:
         def wrapper(*args: any, **kwargs: any) -> None:
             try:
-                log(text=f"{func.__name__} raised {exception_type.__name__}")
+                log.level.info(text=f"{func.__name__} raised {exception_type.__name__}")
                 func(*args, **kwargs)
             except exception_type:
-                log(text=f"{func.__name__} did not raise {exception_type.__name__}")
+                log.level.info(text=f"{func.__name__} did not raise {exception_type.__name__}")
                 return
             raise AssertionError(f"{func.__name__} did not raise {exception_type.__name__}")
 

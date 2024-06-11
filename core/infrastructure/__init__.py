@@ -1,6 +1,6 @@
 __all__ = [
     'data',
-    'core',
+    'modules',
     'engine',
     'run',
     'manager'

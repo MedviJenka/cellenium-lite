@@ -9,7 +9,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
-from core.infrastructure.core.logger import Logger
+from core.infrastructure.modules.logger import Logger
 from core.infrastructure.data.enums import Type
 from core.infrastructure.engine.api_engine import get_name, get_locator, get_type
 from core.infrastructure.manager.driver import DriverManager

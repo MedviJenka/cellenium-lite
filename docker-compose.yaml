@@ -1,4 +1,4 @@
-version: '3.0'
+version: '3.9'
 
 services:
 
@@ -16,7 +16,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./core:/core
+      - ./modules:/modules
       - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
 
   tests:
@@ -30,6 +30,7 @@ services:
         - ./core:/core
         - ./tests:/tests
       ports:
+        - "8888:88"
         - ${PORT}
       healthcheck:
         test: [ "CMD-SHELL", "curl -f http://localhost:${PORT} || exit 1" ]

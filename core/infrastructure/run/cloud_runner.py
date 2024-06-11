@@ -1,8 +1,8 @@
 # import os
 # from dataclasses import dataclass
-# from infrastructure.core.executor import Executor
-# from infrastructure.core.logger import Logger
-# from infrastructure.core.reader import GoogleAPIAuth
+# from infrastructure.modules.executor import Executor
+# from infrastructure.modules.logger import Logger
+# from infrastructure.modules.reader import GoogleAPIAuth
 # from infrastructure.data.contants import TESTS, REPORTS
 #
 # log = Logger()

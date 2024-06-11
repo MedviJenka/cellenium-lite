@@ -1,7 +1,7 @@
 from typing import Optional
 from dataclasses import dataclass
 from selenium import webdriver
-from core.infrastructure.manager.config_manager import get_env
+from core.infrastructure.manager.config import get_env
 from core.infrastructure.manager.service import ServiceManager
 from contextlib import closing
 import socket
