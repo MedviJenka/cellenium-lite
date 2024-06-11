@@ -5,7 +5,7 @@ import os
 abstract_dir = os.path.dirname(os.path.abspath(__file__))
 
 
-GLOBAL_PATH = abstract_dir.split('infrastructure')[0][:-1]
+GLOBAL_PATH = abstract_dir.split('core')[0][:-1]
 TESTS = fr'{GLOBAL_PATH}\tests'
 LOGS = fr'{GLOBAL_PATH}\logs\data.log'
 TEST_SUITE = fr'{TESTS}\_data\test_suite.xlsx'
@@ -21,3 +21,8 @@ class Authorization:
         "Content-Type": "application/json",
         "Authorization": TOKEN
     }
+
+
+print(abstract_dir)
+print(GLOBAL_PATH)
+print(LOGS)

@@ -1,5 +1,4 @@
-from time import sleep
-from playwright_refactoring.engine.driver_engine import DriverEngine
+from core.engine.driver_engine import DriverEngine
 
 
 class TestTitle:
@@ -10,5 +9,5 @@ class TestTitle:
         self.engine.get_web("https://www.google.com")
         title = self.engine.driver.title()
         assert title == 'Google'
-        self.engine.driver.locator('name').click('btnK')
-    sleep(4)
+        self.engine.get_element('search').fill('cats')
+        self.engine.get_element('button').click()

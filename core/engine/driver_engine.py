@@ -1,10 +1,9 @@
 import warnings
 from typing import Optional
 from dataclasses import dataclass
-from core.infrastructure.modules.logger import Logger
-from core.infrastructure.data.enums import Type
-from core.infrastructure.engine.api_engine import get_name, get_locator, get_type
-from playwright_refactoring.manager.driver import DriverManager
+from core.modules.logger import Logger
+from core.engine.api_engine import get_name, get_locator, get_type
+from core.manager.driver import DriverManager
 
 
 warnings.filterwarnings('ignore')
@@ -21,15 +20,14 @@ class DriverEngine(DriverManager):
         self.driver.goto(web_link)
         log.level.info(f'webdriver used: \n{self.driver} \n started: \n {web_link}')
 
-    def get_element(self, name: str, seconds=10) -> any:
+    def get_element(self, name: str) -> any:
 
         element_name, element_type, element_locator = self.__get_element_properties(sheet_name=self.screen, value=name)
         output = f'element name: {element_name} | elements locator: {element_locator} | element type: {element_type}'
 
         try:
-            if element_type in Type.__members__:
-                log.level.info(output)
-                return self.driver.find_element(Type[element_type].value, element_locator)
+            log.level.info(output)
+            return self.driver.locator(f'[{element_locator}={element_type}]')
 
         except Exception as e:
             raise e
@@ -42,4 +40,4 @@ class DriverEngine(DriverManager):
         element_name = get_name(**kwargs)
         element_locator = get_locator(**kwargs)
         element_type = get_type(**kwargs)
-        return element_name, element_locator, element_type
+        return element_name, element_type, element_locator,

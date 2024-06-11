@@ -2,9 +2,9 @@ import gspread
 from functools import lru_cache
 from dataclasses import dataclass
 from google.oauth2.service_account import Credentials
-from core.infrastructure.modules.logger import Logger
-from core.infrastructure.data.constants import SCOPES
-from core.infrastructure.manager.config import get_env
+from core.modules.logger import Logger
+from core.data.constants import SCOPES
+from core.manager.config import get_env
 
 
 log = Logger()
