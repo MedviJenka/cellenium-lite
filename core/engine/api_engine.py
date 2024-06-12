@@ -1,11 +1,11 @@
+import os
 import gspread
 from functools import lru_cache
 from dataclasses import dataclass
 from google.oauth2.service_account import Credentials
 from core.modules.logger import Logger
 from core.data.constants import SCOPES
-from core.manager.config import get_env
-
+from core.manager.config import get_env, windows_to_linux_path_convert
 
 log = Logger()
 
@@ -17,9 +17,16 @@ class GoogleAPIAuth:
     credentials: str = None
 
     def __post_init__(self) -> None:
-        self.credentials = get_env('LOCAL_CREDENTIALS')
+        self.credentials = self.__is_env_windows()
         service_account = Credentials.from_service_account_file(filename=self.credentials, scopes=SCOPES)
         self.client = gspread.authorize(service_account)
+
+    @staticmethod
+    def __is_env_windows() -> str:
+        if os.name == 'nt':  # 'nt' indicates Windows
+            return get_env('LOCAL_CREDENTIALS')
+        else:
+            return get_env('CONTAINER_CREDENTIALS')
 
     def __hash__(self) -> hash:
         return hash((self.sheet_id, tuple(SCOPES)))

@@ -10,4 +10,3 @@ class TestTitle:
         title = self.engine.driver.title()
         assert title == 'Google'
         self.engine.get_element('search').fill('cats')
-        self.engine.get_element('button').click()

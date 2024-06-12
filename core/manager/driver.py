@@ -15,10 +15,10 @@ class DriverManager:
     """
 
     headless: Optional[bool] = True
+    play = sync_playwright().start()
+    chrome = play.chromium.launch(headless=headless)
 
     def __post_init__(self) -> None:
-        self.play = sync_playwright().start()
-        self.chrome = self.play.chromium.launch(headless=self.headless)
         self.driver = self.chrome.new_page()
 
     def __del__(self) -> None:

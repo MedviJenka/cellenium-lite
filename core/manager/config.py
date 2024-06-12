@@ -7,7 +7,7 @@ def get_env(key: str) -> str:
     return os.getenv(key)
 
 
-def linux_to_windows_path_convert(key: str) -> str:
+def windows_to_linux_path_convert(key: str) -> str:
     path = get_env(key)
-    path = path.replace('/c/', 'c:/')
+    path = path.replace('c:/', '/c/')
     return path

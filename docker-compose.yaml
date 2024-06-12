@@ -2,35 +2,31 @@ version: '3.9'
 
 services:
 
-  base:
+  cellenium:
     build:
+      context: .
       dockerfile: Dockerfile
-    image: base
+    volumes:
+      - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
 
   core:
     build:
-      context: .
-      dockerfile: core/Dockerfile
+      context: ./core
+      dockerfile: Dockerfile
     depends_on:
-      - base
-    ports:
-      - "8080:80"
+      - cellenium
     volumes:
-      - ./modules:/modules
-      - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
+      - ./core:/core
 
   tests:
       build:
-        dockerfile: tests/Dockerfile
-        context: .
+        context: ./tests
       depends_on:
         - core
         - allure-server
       volumes:
-        - ./core:/core
         - ./tests:/tests
       ports:
-        - "8888:88"
         - ${PORT}
       healthcheck:
         test: [ "CMD-SHELL", "curl -f http://localhost:${PORT} || exit 1" ]

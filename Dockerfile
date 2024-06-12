@@ -1,7 +1,10 @@
 ARG VERSION=3.12.2
+
 FROM python:${VERSION}
 
-WORKDIR /base
+WORKDIR /cellenium
+
+COPY . /cellenium
 
 # Install Chrome
 RUN apt-get update && \
@@ -14,6 +17,9 @@ RUN apt-get update && \
 # Download and install Allure
 RUN wget https://github.com/allure-framework/allure2/releases/download/2.13.9/allure-2.13.9.zip -O /tmp/allure.zip && \
     unzip /tmp/allure.zip -d /opt/ && \
-    ln -s /opt/allure-2.13.9/bin/allure /usr/bin/allure
+    ln -s /opt/allure-2.13.9/bin/allure /usr/bin/allure && \
+    apt-get update
+
+RUN pip install --upgrade pip && pip install -r requirements.txt && playwright install
 
 ENV PATH="/opt/allure-2.13.9/bin:${PATH}"

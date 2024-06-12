@@ -1,4 +1,4 @@
-INFO |  Tuesday | 11/06/2024 | 18:39:06 | <Worksheet 'Google' id:0> | Function: __read_google_sheet | Line: 46
-INFO |  Tuesday | 11/06/2024 | 18:39:06 | [['name', 'locator', 'type', 'actions', 'image'], ['button', 'NAME', 'btnK', '', ''], ['search', 'NAME', 'q', '', '']] | Function: __read_google_sheet | Line: 47
-INFO |  Tuesday | 11/06/2024 | 18:39:06 | ['name', 'locator', 'type', 'actions', 'image'] | Function: __read_google_sheet | Line: 48
-INFO |  Tuesday | 11/06/2024 | 18:39:06 | {'name': 'button', 'locator': 'NAME', 'type': 'btnK', 'actions': '', 'image': ''} | Function: __read_google_sheet | Line: 52
+INFO |  Wednesday | 12/06/2024 | 12:55:59 | <Worksheet 'Google' id:0> | Function: __read_google_sheet | Line: 46
+INFO |  Wednesday | 12/06/2024 | 12:55:59 | [['name', 'locator', 'type', 'actions', 'image'], ['button', 'NAME', 'btnK', '', ''], ['search', 'NAME', 'q', '', '']] | Function: __read_google_sheet | Line: 47
+INFO |  Wednesday | 12/06/2024 | 12:55:59 | ['name', 'locator', 'type', 'actions', 'image'] | Function: __read_google_sheet | Line: 48
+INFO |  Wednesday | 12/06/2024 | 12:55:59 | {'name': 'button', 'locator': 'NAME', 'type': 'btnK', 'actions': '', 'image': ''} | Function: __read_google_sheet | Line: 52
