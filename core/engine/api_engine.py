@@ -26,6 +26,7 @@ class GoogleAPIAuth:
         if os.name == 'nt':  # 'nt' indicates Windows
             return get_env('LOCAL_CREDENTIALS')
         else:
+            # return windows_to_linux_path_convert('LOCAL_CREDENTIALS')
             return get_env('CONTAINER_CREDENTIALS')
 
     def __hash__(self) -> hash:
