@@ -6,50 +6,38 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    volumes:
-      - shared:/cellenium
-    restart: on-failure
-    ports:
-      - ${CELLENIUM_PORT}
-    healthcheck:
-      test: ['CMD', 'python --version']
-      interval: 10s
-      retries: 10
-
-  core:
-    build:
-      context: .
     depends_on:
-      cellenium:
+      allure-server:
         condition: service_started
     volumes:
       - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
     ports:
       - ${CORE_PORT}
+    healthcheck:
+      test: [ "CMD-SHELL", "python --version || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     restart: on-failure
 
-  tests:
-      build:
-        context: .
-      depends_on:
-        core:
-          condition: service_healthy
-        allure-server:
-          condition: service_started
-      ports:
-        - ${TEST_PORT}
-      environment:
-        - DEBUG=true
-      command: >
-        bash -c "pytest -n ${PARALLEL} && allure generate allure-results --clean -o allure-results && allure serve"
-      volumes:
-        - shared:/tests
-      healthcheck:
-        test: [ "CMD-SHELL", "curl -f http://localhost:${PORT} || exit 1" ]
-        interval: 30s
-        timeout: 10s
-        retries: 5
-      restart: on-failure
+  test_1:
+    build:
+      context: ./tests/test_1
+    depends_on:
+      allure-server:
+        condition: service_started
+      cellenium:
+        condition: service_healthy
+    ports:
+      - ${TEST_PORT}
+    command: >
+      bash -c "pytest -n ${PARALLEL} && allure generate allure-results --clean -o allure-results && allure serve"
+    healthcheck:
+      test: [ "CMD-SHELL", "python --version || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: on-failure
 
   allure-server:
     image: frankescobar/allure-docker-service:latest
@@ -67,6 +55,3 @@ services:
       interval: 10s
       retries: 6
     restart: on-failure
-
-volumes:
-  shared:
