@@ -1,6 +1,6 @@
 ARG VERSION=3.12.2
 
-FROM python:${VERSION}
+FROM python:${VERSION} AS Build
 
 WORKDIR /cellenium
 
