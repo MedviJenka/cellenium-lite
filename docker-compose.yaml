@@ -19,7 +19,6 @@ services:
       retries: 2
     command: >
       bash -c "pytest -n ${PARALLEL} && allure generate allure-results --clean -o allure-results && allure serve"
-
     deploy:
       resources:
         limits:
@@ -41,7 +40,7 @@ services:
       interval: 10s
       retries: 6
     restart: on-failure
-    depends_on:
-      - cellenium
-#      cellenium:
-#        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'

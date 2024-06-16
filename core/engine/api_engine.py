@@ -5,7 +5,8 @@ from dataclasses import dataclass
 from google.oauth2.service_account import Credentials
 from core.modules.logger import Logger
 from core.data.constants import SCOPES
-from core.manager.config import get_env, windows_to_linux_path_convert
+from core.manager.config import get_env
+
 
 log = Logger()
 
