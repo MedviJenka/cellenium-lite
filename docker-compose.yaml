@@ -2,20 +2,28 @@ version: '3.9'
 
 services:
 
-  test_1:
+  cellenium:
     build:
       context: .
-      dockerfile: Dockerfile
     env_file:
       - '.env'
     volumes:
       - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
-      - ./tests/test_1:/tests/test_1
       - ./allure-results:/allure-results
       - ./allure-reports:/allure-reports
-    command: >
-      bash -c "pytest -n ${PARALLEL} --alluredir=allure-results"
     restart: on-failure
+
+  test_1:
+    extends:
+      service: cellenium
+    command: >
+      bash -c "pytest ./tests/test_1 -n ${PARALLEL} --alluredir=allure-results"
+
+  test_2:
+    extends:
+      service: cellenium
+    command: >
+      bash -c "pytest ./tests/test_2 -n ${PARALLEL} --alluredir=allure-results"
 
   allure-server:
     image: frankescobar/allure-docker-service:latest
@@ -37,8 +45,10 @@ services:
     depends_on:
       test_1:
         condition: service_completed_successfully
+      test_2:
+        condition: service_completed_successfully
     command: >
-       bash -c "allure generate /allure-results --clean -o /allure-reports && allure serve"
+       bash -c "allure generate allure-results --clean -o allure-reports && allure serve"
 
 volumes:
   shared:
