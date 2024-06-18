@@ -9,13 +9,11 @@ services:
     env_file:
       - '.env'
     volumes:
-      - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
-      - shared:/usr/java
-      - ./allure-results:/allure-results
+      - ./cellenium:/shared
     ports:
-      - ${CORE_PORT}
+      - ${APP_PORT}
     healthcheck:
-      test: [ "CMD-SHELL", "python --version || exit 1" ]
+      test: ["CMD-SHELL", "python --version || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 2
@@ -24,22 +22,33 @@ services:
         limits:
           cpus: '2'
     command: >
-      bash -c "pytest -n ${PARALLEL} --alluredir=allure-results &&
-               allure generate allure-results --clean -o allure-results &&
-               allure serve"
+      bash -c "allure generate allure-results --clean -o allure-results && allure serve"
     depends_on:
-      - java
-      - allure-server
+      test_1:
+        condition: service_completed_successfully
+    restart: on-failure
 
-  java:
-    image: ibmjava:jre
+  test_1:
+    build:
+      context: .
+    env_file:
+      - '.env'
     volumes:
-      - shared:/bin/jre
+      - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
+      - ./tests/test_1:/cellenium/tests/test_1
+      - ./allure-results:/allure-results
+    depends_on:
+      allure-server:
+        condition: service_healthy
+    command: >
+      pytest -v --alluredir=allure-results
+    restart: on-failure
 
   allure-server:
     image: frankescobar/allure-docker-service:latest
     volumes:
       - ./allure-results:/allure-results
+      - ./allure-reports:/allure-reports
     environment:
       CHECK_RESULTS_EVERY_SECONDS: 10
       KEEP_HISTORY: 1
@@ -48,16 +57,12 @@ services:
     ports:
       - ${ALLURE_PORT}
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:4040" ]
+      test: ["CMD-SHELL", "curl -f http://localhost:4040 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
     restart: on-failure
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
 
 volumes:
   shared:
