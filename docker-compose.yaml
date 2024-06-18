@@ -6,12 +6,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    depends_on:
-      - allure-server
     env_file:
       - '.env'
     volumes:
       - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
+      - shared:/usr/java
+      - ./allure-results:/allure-results
     ports:
       - ${CORE_PORT}
     healthcheck:
@@ -19,16 +19,22 @@ services:
       interval: 30s
       timeout: 10s
       retries: 2
-    command: >
-      bash -c "pytest -n ${PARALLEL} -v --alluredir=allure-results && allure generate allure-results --clean -o allure-results && allure serve"
-
     deploy:
       resources:
         limits:
           cpus: '2'
+    command: >
+      bash -c "pytest -n ${PARALLEL} --alluredir=allure-results &&
+               allure generate allure-results --clean -o allure-results &&
+               allure serve"
+    depends_on:
+      - java
+      - allure-server
 
-  corretto:
-    image: amazoncorretto:latest
+  java:
+    image: ibmjava:jre
+    volumes:
+      - shared:/bin/jre
 
   allure-server:
     image: frankescobar/allure-docker-service:latest
@@ -42,9 +48,11 @@ services:
     ports:
       - ${ALLURE_PORT}
     healthcheck:
-      test: ["CMD", "allure --version || exit 1"]
-      interval: 10s
-      retries: 6
+      test: [ "CMD", "curl", "-f", "http://localhost:4040" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     restart: on-failure
     deploy:
       resources:
