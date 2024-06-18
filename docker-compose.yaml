@@ -2,16 +2,28 @@ version: '3.9'
 
 services:
 
-  cellenium:
+  test_1:
     build:
       context: .
       dockerfile: Dockerfile
     env_file:
       - '.env'
     volumes:
-      - ./cellenium:/shared
+      - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
+      - ./tests/test_1:/tests/test_1
+      - ./allure-results:/allure-results
+      - ./allure-reports:/allure-reports
+    command: >
+      bash -c "pytest -n ${PARALLEL} --alluredir=allure-results"
+    restart: on-failure
+
+  allure-server:
+    image: frankescobar/allure-docker-service:latest
+    volumes:
+      - ./allure-results:/allure-results
+      - ./allure-reports:/allure-reports
     ports:
-      - ${APP_PORT}
+      - ${ALLURE_PORT}
     healthcheck:
       test: ["CMD-SHELL", "python --version || exit 1"]
       interval: 30s
@@ -21,48 +33,12 @@ services:
       resources:
         limits:
           cpus: '2'
-    command: >
-      bash -c "allure generate allure-results --clean -o allure-results && allure serve"
+    restart: on-failure
     depends_on:
       test_1:
         condition: service_completed_successfully
-    restart: on-failure
-
-  test_1:
-    build:
-      context: .
-    env_file:
-      - '.env'
-    volumes:
-      - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
-      - ./tests/test_1:/cellenium/tests/test_1
-      - ./allure-results:/allure-results
-    depends_on:
-      allure-server:
-        condition: service_healthy
     command: >
-      pytest -v --alluredir=allure-results
-    restart: on-failure
-
-  allure-server:
-    image: frankescobar/allure-docker-service:latest
-    volumes:
-      - ./allure-results:/allure-results
-      - ./allure-reports:/allure-reports
-    environment:
-      CHECK_RESULTS_EVERY_SECONDS: 10
-      KEEP_HISTORY: 1
-      ANALYTICS: 1
-      SECURITY: 0
-    ports:
-      - ${ALLURE_PORT}
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:4040 || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-    restart: on-failure
+       bash -c "allure generate /allure-results --clean -o /allure-reports && allure serve"
 
 volumes:
   shared:
