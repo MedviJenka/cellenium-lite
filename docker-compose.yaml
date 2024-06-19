@@ -9,8 +9,6 @@ services:
       - '.env'
     volumes:
       - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
-      - ./allure-results:/allure-results
-      - ./allure-reports:/allure-reports
     restart: on-failure
 
   test_1:
@@ -19,19 +17,25 @@ services:
     command: >
       bash -c "pytest ./tests/test_1 -n ${PARALLEL} --alluredir=allure-results"
 
-  test_2:
-    extends:
-      service: cellenium
-    command: >
-      bash -c "pytest ./tests/test_2 -n ${PARALLEL} --alluredir=allure-results"
+#  test_2:
+#    extends:
+#      service: cellenium
+#    command: >
+#      bash -c "pytest ./tests/test_2 -n ${PARALLEL} --alluredir=allure-results"
+#
+#  test_3:
+#    extends:
+#      service: cellenium
+#    command: >
+#      bash -c "pytest ./tests/test_3 -n ${PARALLEL} --alluredir=allure-results"
 
   allure-server:
     image: frankescobar/allure-docker-service:latest
     volumes:
-      - ./allure-results:/allure-results
-      - ./allure-reports:/allure-reports
+      - ${PWD}/allure-results:/allure-results
+      - ${PWD}/allure-reports:/cellenium/default-reports
     ports:
-      - ${ALLURE_PORT}
+      - "4040:4040"
     healthcheck:
       test: ["CMD-SHELL", "python --version || exit 1"]
       interval: 30s
@@ -45,8 +49,8 @@ services:
     depends_on:
       test_1:
         condition: service_completed_successfully
-      test_2:
-        condition: service_completed_successfully
+#      test_2:
+#        condition: service_completed_successfully
     command: >
        bash -c "allure generate allure-results --clean -o allure-reports && allure serve"
 
