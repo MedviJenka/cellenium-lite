@@ -5,17 +5,25 @@ services:
   cellenium:
     build:
       context: .
+    ports:
+      - ${CELLENIUM_PORT}
     env_file:
       - '.env'
     volumes:
       - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
+      - ./allure-results:/cellenium/tests/allure-results
+      - ./allure-reports:/cellenium/tests/allure-reports
     restart: on-failure
 
   test_1:
     extends:
       service: cellenium
+    ports:
+      - ${TEST_PORTS}
     command: >
-      bash -c "pytest ./tests/test_1 -n ${PARALLEL} --alluredir=allure-results"
+      bash -c "pytest tests/test_1 -n ${PARALLEL} --alluredir=/tests/reports"
+
+
 
 #  test_2:
 #    extends:
@@ -30,29 +38,34 @@ services:
 #      bash -c "pytest ./tests/test_3 -n ${PARALLEL} --alluredir=allure-results"
 
   allure-server:
-    image: frankescobar/allure-docker-service:latest
+    depends_on:
+      - test_1
+    image: frankescobar/allure-docker-service
     volumes:
-      - ${PWD}/allure-results:/allure-results
-      - ${PWD}/allure-reports:/cellenium/default-reports
+      - ./allure-results:/cellenium/tests/allure-results
+      - ./allure-reports:/cellenium/tests/allure-reports
     ports:
-      - "4040:4040"
+      - ${ALLURE_PORT}
+      - ${ALLURE_DOCKER_SERVICE_API_PORT}
+    environment:
+      CHECK_RESULTS_EVERY_SECONDS: 1
+      KEEP_HISTORY: 1
+      KEEP_HISTORY_LATEST: 25
     healthcheck:
-      test: ["CMD-SHELL", "python --version || exit 1"]
+      test: curl --fail http://localhost:${ALLURE_DOCKER_SERVICE_API_PORT} || echo 'Health check failed'
       interval: 30s
       timeout: 10s
-      retries: 2
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
+      retries: 5
     restart: on-failure
-    depends_on:
-      test_1:
-        condition: service_completed_successfully
-#      test_2:
-#        condition: service_completed_successfully
-    command: >
-       bash -c "allure generate allure-results --clean -o allure-reports && allure serve"
+#    healthcheck:
+#      test: ["CMD-SHELL", "python --version || exit 1"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 2
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '2'
 
 volumes:
   shared:
