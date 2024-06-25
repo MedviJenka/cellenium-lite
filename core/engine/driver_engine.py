@@ -26,11 +26,13 @@ class DriverEngine(DriverManager):
 
         element_name, element_type, element_locator = self.__get_element_properties(sheet_name=self.screen, value=name)
         output = f'element name: {element_name} | elements locator: {element_locator} | element type: {element_type}'
+        screenshot_path = fr'{IMAGES}/{name}.png'
 
         try:
             log.level.info(output)
             if screenshot:
-                self.driver.locator(f'[{element_locator}={element_type}]').screenshot(path=fr'{IMAGES}/{name}.png')
+                self.driver.locator(f'[{element_locator}={element_type}]').screenshot(path=f'{screenshot_path}')
+                log.level.info(f'screen shot success: {screenshot_path}')
             return self.driver.locator(f'[{element_locator}={element_type}]')
 
         except Exception as e:

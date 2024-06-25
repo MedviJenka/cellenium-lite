@@ -1,36 +1,65 @@
-import openai
-from PIL import Image
-import io
+import base64
+import requests
+from dataclasses import dataclass
+from core.manager.reader import read_json
 
 
-# Set up your OpenAI API key
-openai.api_key = 'your_openai_api_key'
+@dataclass
+class Binny:
 
-# Function to convert an image to a byte array
-def image_to_byte_array(image: Image) -> bytes:
-    img_byte_arr = io.BytesIO()
-    image.save(img_byte_arr, format='PNG')
-    return img_byte_arr.getvalue()
+    api_key = read_json(env_key='GPT_API')
+    image_path: str
+    max_tokens: int = 300
 
-# Open an image file
-image_path = 'path_to_your_image.png'
-image = Image.open(image_path)
+    def __encode_image(self) -> base64:
+        with open(self.image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode('utf-8')
 
-# Convert the image to a byte array
-image_bytes = image_to_byte_array(image)
+    @property
+    def base64_image(self) -> None:
+        return self.__encode_image()
 
-# Optionally, describe the image
-image_description = "A description of the image goes here."
+    def execute(self, prompt: str) -> None:
+        headers = {
+          "Content-Type": "application/json",
+          "Authorization": f"Bearer {self.api_key}"
+        }
 
-# Create a prompt for GPT-4
-prompt = f"Analyze the following image: {image_description}"
+        payload = {
+          "model": "gpt-4o",
+          "messages": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": prompt
+                },
+                {
+                  "type": "image_url",
+                  "image_url": {
+                    "url": f"data:image/jpeg;base64,{self.base64_image}"
+                  }
+                }
+              ]
+            }
+          ],
+          "max_tokens": self.max_tokens
+        }
 
-# Call GPT-4 with the prompt
-response = openai.Completion.create(
-    engine="text-davinci-003",
-    prompt=prompt,
-    max_tokens=150
-)
+        outcome = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+        response = outcome.json()['choices'][0]['message']['content']
+        print(response)
+        return response
 
-# Print the response from GPT-4
-print(response.choices[0].text.strip())
+
+def test_user_is_displayed() -> None:
+    bini = Binny(image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\core\data\images\img.png")
+    response = bini.execute(prompt='is Efrat Lang displayed? and do you see any abnormalities?')
+    assert 'Yes' in response
+
+
+def test_count_rows() -> None:
+    bini = Binny(image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\core\data\images\img_1.png")
+    response = bini.execute(prompt='count all the rows that starts with blue play button')
+    assert '10' in response
