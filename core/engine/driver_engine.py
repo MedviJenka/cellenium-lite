@@ -1,6 +1,8 @@
 import warnings
+from datetime import datetime
 from typing import Optional
 from dataclasses import dataclass
+from core.data.constants import IMAGES
 from core.modules.logger import Logger
 from core.engine.api_engine import get_name, get_locator, get_type
 from core.manager.driver import DriverManager
@@ -20,20 +22,29 @@ class DriverEngine(DriverManager):
         self.driver.goto(web_link)
         log.level.info(f'webdriver used: \n{self.driver} \n started: \n {web_link}')
 
-    def get_element(self, name: str) -> any:
+    def get_element(self, name: str, screenshot: Optional[bool] = False) -> any:
 
         element_name, element_type, element_locator = self.__get_element_properties(sheet_name=self.screen, value=name)
         output = f'element name: {element_name} | elements locator: {element_locator} | element type: {element_type}'
 
         try:
             log.level.info(output)
+            if screenshot:
+                self.driver.locator(f'[{element_locator}={element_type}]').screenshot(path=fr'{IMAGES}/{name}.png')
             return self.driver.locator(f'[{element_locator}={element_type}]')
 
         except Exception as e:
             raise e
 
-    def get_screenshot(self, path: str) -> None:
-        self.driver.screenshot(path=f'{path}.png')
+    def take_screenshot(self, name: Optional[str] = None) -> None:
+
+        now = datetime.now()
+        time = now.strftime('%d%m%Y%H%M')
+        image_path = fr'{IMAGES}/{time}.png'
+        self.driver.screenshot(path=image_path)
+
+        if name:
+            self.driver.screenshot(path=fr'{IMAGES}/{name}.png')
 
     @staticmethod
     def __get_element_properties(**kwargs) -> tuple:

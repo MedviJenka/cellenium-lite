@@ -9,7 +9,8 @@ class TestTitle:
         self.engine.get_web("https://www.google.com")
         title = self.engine.driver.title()
         assert title == 'Google'
-        self.engine.get_element('search').fill('cats')
+        self.engine.get_element(name='search').fill('cats')
+        self.engine.get_element(name='search', screenshot=True)
 
 
 class TestSTLogin:

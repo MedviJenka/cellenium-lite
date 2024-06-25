@@ -1,8 +1,8 @@
 import requests
 from dataclasses import dataclass
 from typing import Optional
-from core.infrastructure.modules.logger import Logger
-from core.infrastructure.data.constants import Authorization
+from core.data.auth import Authorization
+from core.modules.logger import Logger
 
 
 log = Logger()
