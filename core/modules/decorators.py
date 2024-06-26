@@ -1,9 +1,9 @@
 import time
-from time import time
-from time import sleep
+from time import time, sleep
+from typing import Callable, Any
 from functools import wraps
-from core.infrastructure.modules.exceptions import NegativeIntegerException
-from core.infrastructure.modules.logger import Logger
+from core.modules.exceptions import NegativeException
+from core.modules.logger import Logger
 
 
 log = Logger()
@@ -38,25 +38,27 @@ def measure_execution_time(func: callable) -> callable:
     return wrapper
 
 
-def negative(exception_type: Exception(any)):
-
+def negative(exception_type: Exception(any)) -> Callable:
     """
-    This decorator function takes in a function as an argument
-    and returns a new function that wraps the original function.
+    This decorator function takes in an exception type as an argument
+    and returns a decorator that wraps the original function.
     When the new function is called, it calls the original
-    function with the same arguments and catches any AssertionError that might be raised.
-    If an AssertionError is caught, it prints out the error message and then re-raises the exception.
+    function with the same arguments and catches any specified exception that might be raised.
+    If the specified exception is caught, it logs the error message.
+    If the specified exception is not raised, it raises an AssertionError.
 
+    :param exception_type: The type of exception to catch.
+    :return: A decorator function.
     """
 
-    def decorator(func) -> callable:
-        def wrapper(*args: any, **kwargs: any) -> None:
+    def decorator(func: Callable) -> Callable:
+        def wrapper(*args: Any, **kwargs: Any) -> None:
             try:
-                log.level.info(text=f"{func.__name__} raised {exception_type.__name__}")
                 func(*args, **kwargs)
-            except exception_type:
-                log.level.info(text=f"{func.__name__} did not raise {exception_type.__name__}")
+            except exception_type as e:
+                log.level.info(f"{func.__name__} raised {exception_type.__name__}, {e}")
                 return
+            log.level.info(f"{func.__name__} did not raise {exception_type.__name__}")
             raise AssertionError(f"{func.__name__} did not raise {exception_type.__name__}")
 
         return wrapper
@@ -64,10 +66,15 @@ def negative(exception_type: Exception(any)):
     return decorator
 
 
+@negative(Exception)
+def test() -> None:
+    raise ValueError("This is a test")
+
+
 def retry(retries: int = 3, delay: float = 1) -> callable:
 
     if retries < 1 or delay <= 0:
-        raise NegativeIntegerException(f'Are you high, mate? Positive numbers only, your number is: {retries}')
+        raise NegativeException(f'Are you high, mate? Positive numbers only, your number is: {retries}')
 
     def decorator(func: callable) -> callable:
 
