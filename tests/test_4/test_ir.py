@@ -1,7 +1,8 @@
-from core.engine.ai_engine import Bini
+from core.modules.ai_utils import AIUtils
+from core.modules.decorators import negative
 
 
-bini = Bini()
+bini = AIUtils(max_tokens=500)
 
 
 def test_user_is_displayed() -> None:
@@ -32,10 +33,18 @@ def test_outgoing_calls_under_external_p2p() -> None:
     assert '3' or 'Three' in response
 
 
+@negative(Exception)
+def test_outgoing_calls_under_external_p2p() -> None:
+    response = bini.image(
+        image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\core\data\images\img_3.png",
+        prompt='how many Outgoing" has the call type "External p2p, return answer in integer')
+    assert 0 in response
+
+
 def test_count_rows() -> None:
     response = bini.image(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\core\data\images\img_1.png",
-        prompt='count all the rows that starts with blue play button on the left, expected result is 10')
+        prompt='count all the rows that starts with blue play button on the left, expected result is 10, return hole answer with integer at the end')
     assert 'Passed' in response
 
 
@@ -43,3 +52,53 @@ def test_no_rows() -> None:
     response = bini.image(image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\core\data\images\img_2.png",
                           prompt='are there any rows?, expected is: No Rows')
     assert 'Passed' in response
+
+
+def call_duration_in_specific_row(duration: str, row: int) -> None:
+    response = bini.image(
+        image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\core\data\images\img_3.png",
+        prompt=f'list all rows with circle icons, under call duration header locate the {duration} and row number: {row}, return me the full time answer')
+    assert duration in response
+
+
+def test_call_duration_in_specific_row_1() -> None:
+    call_duration_in_specific_row(duration='00:04:44', row=1)
+
+
+def test_call_duration_in_specific_row_2() -> None:
+    call_duration_in_specific_row(duration='00:00:30', row=2)
+
+
+def test_call_duration_in_specific_row_3() -> None:
+    call_duration_in_specific_row(duration='00:02:26', row=3)
+
+
+def test_call_duration_in_specific_row_4() -> None:
+    call_duration_in_specific_row(duration='00:01:54', row=4)
+
+
+def test_call_duration_in_specific_row_5() -> None:
+    call_duration_in_specific_row(duration='00:01:54', row=5)
+
+
+def test_complex_metadata_validations() -> None:
+    image = r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\core\data\images\img_11.png'
+    bini.validate_call_metadata_for_each_row(image=image,
+                                             row=1,
+                                             start_time='11:52:10',
+                                             direction=None,
+                                             release_cause='Normal',
+                                             call_expiration='Jun 25, 2025',
+                                             recording_type='Audio')
+
+
+@negative(Exception)
+def test_complex_metadata_validations_negative() -> None:
+    image = r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\core\data\images\img_11.png'
+    bini.validate_call_metadata_for_each_row(image=image,
+                                             row=1,
+                                             start_time='11:52:00',
+                                             direction=None,
+                                             release_cause='Normal',
+                                             call_expiration='Jun 25, 2024',
+                                             recording_type='Audio')

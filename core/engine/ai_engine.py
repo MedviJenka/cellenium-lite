@@ -1,7 +1,8 @@
 import base64
 import requests
+from PIL import Image
+from openai import OpenAI
 from dataclasses import dataclass
-from typing import Optional
 from core.manager.reader import read_json
 
 
@@ -77,7 +78,7 @@ class Bini:
     def base64_image(self, image_path: str) -> None:
         return self.__encode_image(image_path)
 
-    def image(self, image_path: str, prompt: str) -> str:
+    def image(self, image_path: str, prompt: str) -> any:
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}"
@@ -94,8 +95,8 @@ class Bini:
                         "will be uploaded to you. after each session you will return Passed or Fail"
                         "*IMPORTANT!!*"
                         "* calendar dates will be always presented in day/month/year format"
-                        "* always type 'Passed' if you determined what was written in the prompt"
-                        "* always type 'Fail' if you could not find, indentify or determine something"},
+                        "* always return 'Passed' if you determined and located what was written in the prompt"
+                        "* always return 'Fail' if you could not find, indentify or determine something"},
                 {
                     "role": "user",
                     "content": [
@@ -118,13 +119,133 @@ class Bini:
 
         outcome = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
         response = outcome.json()['choices'][0]['message']['content']
+        price = self.calculate_token_cost(image=image_path, price_per_1000_tokens=0.003, detail='high')
+        print(f'PRICE PARE IMAGE: {price}$')
         print(response)
+
         return response
 
-    def compare_images(self,
-                       figma_image: str,
-                       screenshot: str,
-                       ignore: Optional[str] = None,
-                       skip_if_failed: Optional[bool] = False
-                       ) -> None:
-        ...
+    def generate_image(self, screenshot: str) -> any:
+
+        client = OpenAI(api_key=self.api_key)
+        response = client.images.edit(model="dall-e-2",
+                                      image=open(screenshot, "rb"),
+                                      mask=open(screenshot, "rb"),
+                                      prompt="mark the difference between 2 images that u compared before",
+                                      n=1,
+                                      size="1024x1024")
+        image_url = response.data[0].url
+        return image_url
+
+    @staticmethod
+    def __get_image_dimensions(image: str) -> (int, int):
+        with Image.open(image) as img:
+            width, height = img.size
+        return [width, height]
+
+    def calculate_token_cost(self, image: str, detail: str, price_per_1000_tokens: float) -> float:
+
+        width = self.__get_image_dimensions(image)[0]
+        height = self.__get_image_dimensions(image)[1]
+
+        if detail == "low":
+            token_cost = 85
+
+        elif detail == "high":
+            # Scale to fit within 2048 x 2048 while maintaining aspect ratio
+            if width > 2048 or height > 2048:
+                aspect_ratio = width / height
+                if aspect_ratio > 1:
+                    width = 2048
+                    height = int(2048 / aspect_ratio)
+                else:
+                    height = 2048
+                    width = int(2048 * aspect_ratio)
+
+            # Scale such that the shortest side is 768px long
+            if width < height:
+                scale_factor = 768 / width
+            else:
+                scale_factor = 768 / height
+
+            width = int(width * scale_factor)
+            height = int(height * scale_factor)
+
+            # Calculate the number of 512px squares
+            num_squares = (width // 512) * (height // 512)
+
+            # Calculate the total token cost
+            token_cost = 170 * num_squares + 85
+
+        else:
+            raise ValueError("Invalid detail level. Choose 'low' or 'high'.")
+
+        # Calculate the cost in dollars
+        cost_in_dollars = (token_cost / 1000) * price_per_1000_tokens
+        return cost_in_dollars
+
+    # def compare_images(self,
+    #                    prompt: str,
+    #                    figma_image: str,
+    #                    screenshot: str,
+    #                    ignore: Optional[str] = None,
+    #                    skip_if_failed: Optional[bool] = False
+    #                    ) -> str:
+    #     headers = {
+    #         "Content-Type": "application/json",
+    #         "Authorization": f"Bearer {self.api_key}"
+    #     }
+    #
+    #     payload = {
+    #         "model": self.model,
+    #         "messages": [
+    #             {
+    #                 "role": "system",
+    #                 "content":
+    #                     "Your name is Bini and you're a professional UI/UX manager and a QA engineer."
+    #                     "from now on you will give me a very detailed and well written response of the image that "
+    #                     "will be uploaded to you. after each session you will return Passed or Fail"
+    #                     "*IMPORTANT!!*"
+    #                     "* your main goal is to compare between 2 images and sport differences and similarities"
+    #                     "* calendar dates will be always presented in day/month/year format"
+    #                     "* always type 'Passed' if you determined what was written in the prompt"
+    #                     "* always type 'Fail' if you could not find, indentify or determine something"
+    #             },
+    #             {
+    #                 "role": "user",
+    #                 "content": [
+    #                     {
+    #                         "type": "text",
+    #                         "text": prompt
+    #                     },
+    #                     {
+    #                         "type": "image_url",
+    #                         "image_url": {
+    #                             "url": f"data:image/jpeg;base64,{self.base64_image(figma_image)}",
+    #                             'details': 'high',
+    #                         }
+    #                     },
+    #                     {
+    #                         "type": "image_url",
+    #                         "image_url": {
+    #                             "url": f"data:image/jpeg;base64,{self.base64_image(screenshot)}",
+    #                             'details': 'high',
+    #                         }
+    #                     },
+    #                     {
+    #                         "type": "image_url",
+    #                         "image_url": {
+    #                             "url": f"data:image/jpeg;base64, {self.generate_image(screenshot)}",
+    #                             'details': 'high',
+    #                         }
+    #                     },
+    #                 ]
+    #             }
+    #         ],
+    #         "max_tokens": self.max_tokens
+    #     }
+    #
+    #     outcome = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+    #     response = outcome.json()['choices'][0]['message']['content']
+    #     print(response)
+    #     return response
