@@ -1,8 +1,17 @@
+from dataclasses import dataclass
 from typing import Optional
-from core.engine.ai_engine import Bini
+from bini.bini_engine import Bini
+from bini.data import PROMPT_1
+from core.manager.reader import read_json
 
 
+@dataclass
 class AIUtils(Bini):
+
+    api_key: str = read_json(env_key='GPT_API')
+    max_tokens: int = 400
+    model: str = "gpt-4o"
+    system_prompt: str = PROMPT_1
 
     def validate_call_metadata_for_each_row(self,
                                             image: str,

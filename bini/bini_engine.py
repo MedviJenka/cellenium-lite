@@ -1,9 +1,7 @@
 import base64
 import requests
 from PIL import Image
-from openai import OpenAI
 from dataclasses import dataclass
-from core.manager.reader import read_json
 
 
 @dataclass
@@ -66,19 +64,16 @@ class Bini:
 
     """
 
-    api_key: str = read_json(env_key='GPT_API')
-    max_tokens: int = 400
-    model: str = "gpt-4o"
-
-    @staticmethod
-    def __encode_image(image_path: str) -> base64:
-        with open(image_path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode('utf-8')
+    model: str
+    api_key: str
+    max_tokens: int
+    system_prompt: str
 
     def base64_image(self, image_path: str) -> None:
         return self.__encode_image(image_path)
 
     def image(self, image_path: str, prompt: str) -> any:
+
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}"
@@ -89,14 +84,8 @@ class Bini:
             "messages": [
                 {
                     "role": "system",
-                    "content":
-                        "Your name is Bini and you're a professional UI/UX manager and a QA engineer."
-                        "from now on you will give me a very detailed and well written response of the image that "
-                        "will be uploaded to you. after each session you will return Passed or Fail"
-                        "*IMPORTANT!!*"
-                        "* calendar dates will be always presented in day/month/year format"
-                        "* always return 'Passed' if you determined and located what was written in the prompt"
-                        "* always return 'Fail' if you could not find, indentify or determine something"},
+                    "content": self.system_prompt
+                },
                 {
                     "role": "user",
                     "content": [
@@ -120,28 +109,10 @@ class Bini:
         outcome = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
         response = outcome.json()['choices'][0]['message']['content']
         price = self.calculate_token_cost(image=image_path, price_per_1000_tokens=0.003, detail='high')
-        print(f'PRICE PARE IMAGE: {price}$')
+        print(f'PRICE PER IMAGE: {price}$')
         print(response)
 
         return response
-
-    def generate_image(self, screenshot: str) -> any:
-
-        client = OpenAI(api_key=self.api_key)
-        response = client.images.edit(model="dall-e-2",
-                                      image=open(screenshot, "rb"),
-                                      mask=open(screenshot, "rb"),
-                                      prompt="mark the difference between 2 images that u compared before",
-                                      n=1,
-                                      size="1024x1024")
-        image_url = response.data[0].url
-        return image_url
-
-    @staticmethod
-    def __get_image_dimensions(image: str) -> (int, int):
-        with Image.open(image) as img:
-            width, height = img.size
-        return [width, height]
 
     def calculate_token_cost(self, image: str, detail: str, price_per_1000_tokens: float) -> float:
 
@@ -183,6 +154,17 @@ class Bini:
         # Calculate the cost in dollars
         cost_in_dollars = (token_cost / 1000) * price_per_1000_tokens
         return cost_in_dollars
+
+    @staticmethod
+    def __encode_image(image_path: str) -> base64:
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode('utf-8')
+
+    @staticmethod
+    def __get_image_dimensions(image: str) -> list[int]:
+        with Image.open(image) as img:
+            width, height = img.size
+        return [width, height]
 
     # def compare_images(self,
     #                    prompt: str,

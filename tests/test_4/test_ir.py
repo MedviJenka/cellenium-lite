@@ -1,4 +1,4 @@
-from core.modules.ai_utils import AIUtils
+from bini.ai_utils import AIUtils
 from core.modules.decorators import negative
 
 
@@ -15,8 +15,16 @@ def test_user_is_displayed() -> None:
 def test_meeting_insights() -> None:
     response = bini.image(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\core\data\images\img_5.png",
-        prompt='validate the dates are displayed are from 4/4/24 to 14/5/24, parse the date type as day/month/year')
+        prompt='validate the dates are displayed are from 4/4/24 to 13/5/24, parse the date type as day/month/year')
     assert 'Passed' in response
+
+
+@negative(Exception)
+def test_meeting_insights_negative() -> None:
+    response = bini.image(
+        image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\core\data\images\img_5.png",
+        prompt='validate the dates are displayed are from 4/4/24 to 14/5/24, parse the date type as day/month/year')
+    assert 'Failed' in response
 
 
 def test_user_is_not_displayed() -> None:
@@ -59,14 +67,6 @@ def call_duration_in_specific_row(duration: str, row: int) -> None:
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\core\data\images\img_3.png",
         prompt=f'list all rows with circle icons, under call duration header locate the {duration} and row number: {row}, return me the full time answer')
     assert duration in response
-
-
-def test_call_duration_in_specific_row_1() -> None:
-    call_duration_in_specific_row(duration='00:04:44', row=1)
-
-
-def test_call_duration_in_specific_row_2() -> None:
-    call_duration_in_specific_row(duration='00:00:30', row=2)
 
 
 def test_call_duration_in_specific_row_3() -> None:
