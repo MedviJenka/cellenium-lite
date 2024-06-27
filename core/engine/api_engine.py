@@ -25,7 +25,7 @@ class GoogleAPIAuth:
     @staticmethod
     def __is_env_windows() -> str:
         if os.name == 'nt':  # 'nt' indicates Windows
-            return get_env('LOCAL_CREDENTIALS')
+            return get_env('GOOGLE_API')
         else:
             # return windows_to_linux_path_convert('LOCAL_CREDENTIALS')
             return get_env('CONTAINER_CREDENTIALS')

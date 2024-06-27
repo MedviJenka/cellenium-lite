@@ -8,7 +8,7 @@ from core.manager.reader import read_json
 @dataclass
 class AIUtils(Bini):
 
-    api_key: str = read_json(env_key='GPT_API')
+    api_key: str = read_json(env_key='GPT_API', json_key='key')
     max_tokens: int = 400
     model: str = "gpt-4o"
     system_prompt: str = PROMPT_1

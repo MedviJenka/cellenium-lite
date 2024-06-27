@@ -9,4 +9,4 @@ def read_json(env_key: str, json_key: Optional[str] = None) -> str:
         data = json.load(file)
         if json_key:
             return data[json_key]
-        return data["api"]
+        return data
