@@ -15,6 +15,7 @@ class Bini:
     api_key: str
     max_tokens: int
     system_prompt: str
+    endpoint: str
 
     def __post_init__(self):
         self.log: Logger = Logger()
@@ -61,7 +62,7 @@ class Bini:
         }
 
         start_time = time()
-        outcome = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+        outcome = requests.post(url=self.endpoint, headers=headers, json=payload)
         end_time = time()
         self.log_performance(start_time=start_time, end_time=end_time, endpoint=outcome)
         response = outcome.json()['choices'][0]['message']['content']

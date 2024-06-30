@@ -12,6 +12,7 @@ class BiniUtils(Bini):
     max_tokens: int = 400
     model: str = "gpt-4o"
     system_prompt: str = PROMPT_1
+    endpoint: str = "https://api.openai.com/v1/chat/completions"
 
     def validate_call_metadata_for_each_row(self,
                                             image: str,
@@ -68,7 +69,7 @@ class BiniUtils(Bini):
             assert call_expiration in response
 
 
-bini = BiniUtils()
+bini = BiniUtils(endpoint='https://openaiforaudc.openai.azure.com/')
 
 
 def test_user_is_displayed() -> None:

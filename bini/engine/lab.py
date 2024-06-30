@@ -6,6 +6,16 @@ from dataclasses import dataclass
 from requests import Response
 from bini.infrastructure.exceptions import BiniResponseError
 from bini.infrastructure.logger import Logger
+from openai import AzureOpenAI
+from core.manager.reader import read_json
+
+
+api_key: str = read_json(env_key='GPT_API', json_key='key')
+client = AzureOpenAI(
+    api_key=api_key,
+    api_version="2024-05-01-preview",
+    azure_endpoint="https://openaiforaudc.openai.azure.com/"
+)
 
 
 @dataclass
