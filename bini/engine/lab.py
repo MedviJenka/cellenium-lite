@@ -1,11 +1,15 @@
 import base64
 import requests
 from PIL import Image
+from time import time
 from dataclasses import dataclass
+from requests import Response
+from bini.infrastructure.exceptions import BiniResponseError
+from bini.infrastructure.logger import Logger
 
 
 @dataclass
-class Bini:
+class BiniEngine:
 
     """
     Bini Advantages:
@@ -69,6 +73,13 @@ class Bini:
     max_tokens: int
     system_prompt: str
 
+    def __post_init__(self) -> None:
+        self.log: Logger = Logger()
+
+    def log_performance(self, start_time: float, end_time: float, endpoint: Response) -> None:
+        duration = end_time - start_time
+        self.log.level.info(f"Endpoint: {endpoint}, Duration: {duration:.2f} seconds")
+
     def base64_image(self, image_path: str) -> None:
         return self.__encode_image(image_path)
 
@@ -106,13 +117,22 @@ class Bini:
             "max_tokens": self.max_tokens
         }
 
+        start_time = time()
         outcome = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+        end_time = time()
+        self.log_performance(start_time=start_time, end_time=end_time, endpoint=outcome)
         response = outcome.json()['choices'][0]['message']['content']
         price = self.calculate_token_cost(image=image_path, price_per_1000_tokens=0.003, detail='high')
-        print(f'PRICE PER IMAGE: {price}$')
-        print(response)
 
-        return response
+        try:
+            return response
+
+        except Exception as e:
+            raise BiniResponseError(outcome=outcome, response=response, exception=e)
+
+        finally:
+            print(f'PRICE PER IMAGE: {price}$')
+            print(response)
 
     def calculate_token_cost(self, image: str, detail: str, price_per_1000_tokens: float) -> float:
 

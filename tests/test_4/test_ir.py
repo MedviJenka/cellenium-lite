@@ -1,8 +1,8 @@
-from bini.ai_utils import AIUtils
+from bini.infrastructure.ai_utils import BiniUtils
 from core.modules.decorators import negative
 
 
-bini = AIUtils(max_tokens=500)
+bini = BiniUtils(max_tokens=1000)
 
 
 def test_user_is_displayed() -> None:
@@ -93,7 +93,7 @@ def test_complex_metadata_validations() -> None:
 
 
 @negative(Exception)
-def test_complex_metadata_validations_negative() -> None:
+def test_complex_metadata_validations_1() -> None:
     image = r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\core\data\images\img_11.png'
     bini.validate_call_metadata_for_each_row(image=image,
                                              row=1,
@@ -101,4 +101,16 @@ def test_complex_metadata_validations_negative() -> None:
                                              direction=None,
                                              release_cause='Normal',
                                              call_expiration='Jun 25, 2024',
+                                             recording_type='Audio')
+
+
+@negative(Exception)
+def test_complex_metadata_validations_2() -> None:
+    image = r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\core\data\images\img_11.png'
+    bini.validate_call_metadata_for_each_row(image=image,
+                                             row=1,
+                                             start_time='11:70:00',
+                                             direction=None,
+                                             release_cause='Normal',
+                                             call_expiration='Nov 25, 2023',
                                              recording_type='Audio')

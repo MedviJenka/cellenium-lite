@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from typing import Optional
-from bini.bini_engine import Bini
-from bini.data import PROMPT_1
+from bini.engine.engine import Bini
+from bini.infrastructure.data import PROMPT_1
 from core.manager.reader import read_json
 
 
 @dataclass
-class AIUtils(Bini):
+class BiniUtils(Bini):
 
     api_key: str = read_json(env_key='GPT_API', json_key='key')
     max_tokens: int = 400
@@ -35,7 +35,7 @@ class AIUtils(Bini):
         response = self.image(
             image_path=image,
             prompt=f'1. list all rows with blue circle icons and trash can icons with white triangle inside'
-                   f'2. return me detailed answer for row number: {row}')
+                   f'2. return a detailed answer for row number: {row}')
         if user_name:
             assert user_name in response
         elif duration:
@@ -66,3 +66,13 @@ class AIUtils(Bini):
             assert recording_type in response
         elif call_expiration:
             assert call_expiration in response
+
+
+bini = BiniUtils()
+
+
+def test_user_is_displayed() -> None:
+    response = bini.image(
+        image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\core\data\images\img.png",
+        prompt='Is Efrat Lang displayed on the right side of the screen? at the end type Passed if yes')
+    assert 'Passed' in response
