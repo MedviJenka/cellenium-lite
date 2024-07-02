@@ -5,14 +5,14 @@ from bini.infrastructure.data import PROMPT_1
 from core.manager.reader import read_json
 
 
+@dataclass
 class BiniUtils(Bini):
 
-    def __init__(self) -> None:
-        self.endpoint: str = 'https://openaigpt4audc.openai.azure.com'
-        self.model: str = 'bini-ai'
-        self.api_key: str = read_json('GPT_API', 'key')
-        self.version: str = '2024-02-15-preview'
-        self.system_prompt: str = PROMPT_1
+    endpoint: str = 'https://openaigpt4audc.openai.azure.com'
+    model: str = 'bini-ai'
+    api_key: str = read_json('GPT_API', 'key')
+    version: str = '2024-02-15-preview'
+    system_prompt: str = PROMPT_1
 
     def validate_call_metadata_for_each_row(self,
                                             image: str,

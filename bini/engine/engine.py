@@ -3,9 +3,6 @@ import requests
 from PIL import Image
 from dataclasses import dataclass
 
-from bini.infrastructure.data import PROMPT_1
-from core.manager.reader import read_json
-
 
 @dataclass
 class Bini:
@@ -46,10 +43,13 @@ class Bini:
     def base64_image(self, image_path: str) -> None:
         return self.__encode_image(image_path)
 
+    def cached_api_key(self) -> str:
+        return self.api_key
+
     def image(self, image_path: str, prompt: str) -> str:
         headers = {
             "Content-Type": "application/json",
-            "api-key": self.api_key,
+            "api-key": self.cached_api_key(),
         }
 
         # Payload for the request
@@ -97,4 +97,5 @@ class Bini:
         # Handle the response as needed (e.g., print or process)
         data = response.json()
         output = data['choices'][0]['message']['content']
+        print(output)
         return output
