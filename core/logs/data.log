@@ -1,3 +1,7 @@
 INFO |  Sunday | 30/06/2024 | 11:00:22 | Endpoint: <Response [200]>, Duration: 1.68 seconds | Function: log_performance | Line: 83
 INFO |  Sunday | 30/06/2024 | 19:23:02 | Endpoint: <Response [401]>, Duration: 1.08 seconds | Function: log_performance | Line: 95
 INFO |  Sunday | 30/06/2024 | 19:25:04 | Endpoint: <Response [401]>, Duration: 1.29 seconds | Function: log_performance | Line: 95
+INFO |  Tuesday | 02/07/2024 | 15:01:10 | Endpoint: <Response [401]>, Duration: 0.73 seconds | Function: log_performance | Line: 42
+INFO |  Tuesday | 02/07/2024 | 15:01:25 | Endpoint: <Response [401]>, Duration: 0.70 seconds | Function: log_performance | Line: 42
+INFO |  Tuesday | 02/07/2024 | 15:01:59 | Endpoint: <Response [401]>, Duration: 0.71 seconds | Function: log_performance | Line: 42
+INFO |  Tuesday | 02/07/2024 | 15:02:35 | Endpoint: <Response [401]>, Duration: 0.70 seconds | Function: log_performance | Line: 42

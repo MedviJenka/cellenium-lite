@@ -1,8 +1,12 @@
-import requests
 import base64
+import requests
+from PIL import Image
+from time import time
 from dataclasses import dataclass
+from requests import Response
 from bini.infrastructure.data import PROMPT_1
-from core.manager.reader import read_json
+from bini.infrastructure.exceptions import BiniResponseError
+from bini.infrastructure.logger import Logger
 
 
 @dataclass
@@ -14,7 +18,7 @@ class Bini:
         2. do we need to train a model? (because at this moment image recognition is working)
 
     :TODO:
-        1. setup openai azure ............................................. WIP
+        1. setup openai azure
         2. fine tune local module
         3. fine tune cloud module (GPU: 8GB RAM | CPU: 16GB RAM)
         4. make agents
@@ -24,73 +28,85 @@ class Bini:
 
     """
 
-    api_key: str = read_json(env_key='GPT_API', json_key='key')
-    endpoint: str = "https://openaiforaudc.openai.azure.com/"
-    max_tokens: int = 10000
-    system_prompt: str = PROMPT_1
-    deployment_name: str = 'gpt-4o-automation'
-    version: str = '2024-05-01-preview'
+    api_key: str
+    max_tokens: int
+    system_prompt: str
+    endpoint: str
+
+    def __post_init__(self):
+        self.log: Logger = Logger()
+
+    def log_performance(self, start_time: float, end_time: float, endpoint: Response) -> callable:
+        duration = end_time - start_time
+        self.log.level.info(f"Endpoint: {endpoint}, Duration: {duration:.2f} seconds")
+
+    def base64_image(self, image_path: str) -> None:
+        return self.__encode_image(image_path)
+
+    def image(self, image_path: str, prompt: str) -> any:
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": self.api_key
+        }
+
+        payload = {
+            "messages": [
+                {
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": self.system_prompt
+                        }
+                    ]
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{self.base64_image(image_path)}"
+                            }
+                        },
+                        {
+                          "type": "text",
+                          "text": prompt
+                        }
+                    ]
+                }
+            ],
+            "temperature": 0.7,
+            "top_p": 0.95,
+            "max_tokens": self.max_tokens
+        }
+
+        start_time = time()
+        outcome = requests.post(url=self.endpoint, headers=headers, json=payload)
+        end_time = time()
+        self.log_performance(start_time=start_time, end_time=end_time, endpoint=outcome)
+        response = outcome.json()
+
+        try:
+            print(response)
+            return response
+
+        except Exception as e:
+            raise BiniResponseError(outcome=outcome, response=response, exception=e)
 
     @staticmethod
     def __encode_image(image_path: str) -> base64:
         with open(image_path, "rb") as image_file:
             return base64.b64encode(image_file.read()).decode('utf-8')
 
-    def base64_image(self, image_path: str) -> base64:
-        return self.__encode_image(image_path)
-
-    def image(self, image: str) -> None:
-
-        endpoint = f"{self.endpoint}/openai/deployments/{self.deployment_name}/completions?api-version={self.version}"
-
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.api_key}"
-        }
-
-        payload = {
-            "model": self.deployment_name,
-            "messages": [
-                {
-                    "role": "system",
-                    "content": 'hi'
-                },
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": PROMPT_1
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:image/jpeg;base64,{self.base64_image(image_path=image)}",
-                                'details': 'high',
-                            }
-                        }
-                    ]
-                }
-            ],
-            "max_tokens": self.max_tokens,
-            "extensions": {
-                "name": "image-analysis",
-                "parameters": {
-                    "image_quality": "high"
-                }
-            },
-        }
-
-        try:
-            outcome = requests.post(url=endpoint, headers=headers, json=payload)
-            response = outcome.json()
-
-        except requests.RequestException as e:
-            raise SystemExit(f'failed to make request {e}')
-
-        print(response)
+    @staticmethod
+    def __get_image_dimensions(image: str) -> list[int]:
+        with Image.open(image) as img:
+            width, height = img.size
+        return [width, height]
 
 
-bini = Bini()
+bini = Bini(api_key="0fb09f54b13949ebbb258a70e14e3f05", max_tokens=10000, system_prompt=PROMPT_1, endpoint="https://openaigpt4audc.openai.azure.com/openai/deployments/bini-ai/chat/completions?api-version=2024-02-15-preview")
 if __name__ == '__main__':
-    bini.image(image=r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img.png')
+    bini.image(r'C:/Users/evgenyp/PycharmProjects/cellenium-lite/bini/core/data/images/img.png', 'describe me what you see')
