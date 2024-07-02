@@ -11,6 +11,22 @@ from bini.infrastructure.logger import Logger
 @dataclass
 class Bini:
 
+    """
+    questions:
+        1. do we need a local model?
+        2. do we need to train a model? (because at this moment image recognition is working)
+
+    :TODO:
+        1. setup openai azure
+        2. fine tune local module
+        3. fine tune cloud module (GPU: 8GB RAM | CPU: 16GB RAM)
+        4. make agents
+
+        IMPORTANT:
+            evaluation: never send and get the data from the user, always make a gateway to a prompt.
+
+    """
+
     model: str
     api_key: str
     max_tokens: int
