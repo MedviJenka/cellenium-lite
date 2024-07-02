@@ -1,11 +1,10 @@
 import base64
 import requests
 from PIL import Image
-from time import time
 from dataclasses import dataclass
-from requests import Response
-from bini.infrastructure.exceptions import BiniResponseError
-from bini.infrastructure.logger import Logger
+
+from bini.infrastructure.data import PROMPT_1
+from core.manager.reader import read_json
 
 
 @dataclass
@@ -17,7 +16,7 @@ class Bini:
         2. do we need to train a model? (because at this moment image recognition is working)
 
     :TODO:
-        1. setup openai azure
+        1. setup openai azure ............................................... DONE
         2. fine tune local module
         3. fine tune cloud module (GPU: 8GB RAM | CPU: 16GB RAM)
         4. make agents
@@ -27,121 +26,75 @@ class Bini:
 
     """
 
+    endpoint: str
     model: str
     api_key: str
-    max_tokens: int
+    version: str
     system_prompt: str
-    endpoint: str
-
-    def __post_init__(self):
-        self.log: Logger = Logger()
-
-    def log_performance(self, start_time: float, end_time: float, endpoint: Response) -> callable:
-        duration = end_time - start_time
-        self.log.level.info(f"Endpoint: {endpoint}, Duration: {duration:.2f} seconds")
-
-    def base64_image(self, image_path: str) -> None:
-        return self.__encode_image(image_path)
-
-    def image(self, image_path: str, prompt: str) -> any:
-
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.api_key}"
-        }
-
-        payload = {
-            "model": self.model,
-            "messages": [
-                {
-                    "role": "system",
-                    "content": self.system_prompt
-                },
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": prompt
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:image/jpeg;base64,{self.base64_image(image_path)}",
-                                'details': 'high',
-                            }
-                        }
-                    ]
-                }
-            ],
-            "max_tokens": self.max_tokens
-        }
-
-        start_time = time()
-        outcome = requests.post(url=self.endpoint, headers=headers, json=payload)
-        end_time = time()
-        self.log_performance(start_time=start_time, end_time=end_time, endpoint=outcome)
-        response = outcome.json()['choices'][0]['message']['content']
-        price = self.calculate_token_cost(image=image_path, price_per_1000_tokens=0.003, detail='high')
-
-        try:
-            return response
-
-        except Exception as e:
-            raise BiniResponseError(outcome=outcome, response=response, exception=e)
-
-        finally:
-            print(f'PRICE PER IMAGE: {price}$')
-            print(response)
-
-    def calculate_token_cost(self, image: str, detail: str, price_per_1000_tokens: float) -> float:
-
-        width = self.__get_image_dimensions(image)[0]
-        height = self.__get_image_dimensions(image)[1]
-
-        if detail == "low":
-            token_cost = 85
-
-        elif detail == "high":
-            # Scale to fit within 2048 x 2048 while maintaining aspect ratio
-            if width > 2048 or height > 2048:
-                aspect_ratio = width / height
-                if aspect_ratio > 1:
-                    width = 2048
-                    height = int(2048 / aspect_ratio)
-                else:
-                    height = 2048
-                    width = int(2048 * aspect_ratio)
-
-            # Scale such that the shortest side is 768px long
-            if width < height:
-                scale_factor = 768 / width
-            else:
-                scale_factor = 768 / height
-
-            width = int(width * scale_factor)
-            height = int(height * scale_factor)
-
-            # Calculate the number of 512px squares
-            num_squares = (width // 512) * (height // 512)
-
-            # Calculate the total token cost
-            token_cost = 170 * num_squares + 85
-
-        else:
-            raise ValueError("Invalid detail level. Choose 'low' or 'high'.")
-
-        # Calculate the cost in dollars
-        cost_in_dollars = (token_cost / 1000) * price_per_1000_tokens
-        return cost_in_dollars
 
     @staticmethod
     def __encode_image(image_path: str) -> base64:
         with open(image_path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode('utf-8')
+            return base64.b64encode(image_file.read()).decode('ascii')  # or utf-8
 
     @staticmethod
     def __get_image_dimensions(image: str) -> list[int]:
         with Image.open(image) as img:
             width, height = img.size
         return [width, height]
+
+    def base64_image(self, image_path: str) -> None:
+        return self.__encode_image(image_path)
+
+    def image(self, image_path: str, prompt: str) -> str:
+        headers = {
+            "Content-Type": "application/json",
+            "api-key": self.api_key,
+        }
+
+        # Payload for the request
+        payload = {
+            "messages": [
+                {
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": self.system_prompt
+                        }
+                    ]
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{self.base64_image(image_path)}"
+                            }
+                        },
+                        {
+                            "type": "text",
+                            "text": prompt
+                        }
+                    ]
+                }
+            ],
+            "temperature": 0.7,
+            "top_p": 0.95,
+            "max_tokens": 800
+        }
+
+        endpoint = f"{self.endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
+
+        # Send request
+        try:
+            response = requests.post(url=endpoint, headers=headers, json=payload)
+            response.raise_for_status()  # Will raise an HTTPError if the HTTP request returned an unsuccessful status code
+        except requests.RequestException as e:
+            raise SystemExit(f"Failed to make the request. Error: {e}")
+
+        # Handle the response as needed (e.g., print or process)
+        data = response.json()
+        output = data['choices'][0]['message']['content']
+        return output

@@ -1,13 +1,33 @@
 import base64
 import requests
 from PIL import Image
+from bini.infrastructure.data import PROMPT_1
 from core.manager.reader import read_json
 from dataclasses import dataclass
 
 
 @dataclass
 class Bini:
+
+    """
+    questions:
+        1. do we need a local model?
+        2. do we need to train a model? (because at this moment image recognition is working)
+
+    :TODO:
+        1. setup openai azure ............................................... DONE
+        2. fine tune local module
+        3. fine tune cloud module (GPU: 8GB RAM | CPU: 16GB RAM)
+        4. make agents
+
+        IMPORTANT:
+            evaluation: never send and get the data from the user, always make a gateway to a prompt.
+
+    """
+    endpoint: str = 'https://openaigpt4audc.openai.azure.com'
+    model: str = 'bini-ai'
     api_key: str = read_json('GPT_API', 'key')
+    version: str = '2024-02-15-preview'
 
     @staticmethod
     def __encode_image(image_path: str) -> base64:
@@ -23,7 +43,7 @@ class Bini:
     def base64_image(self, image_path: str) -> None:
         return self.__encode_image(image_path)
 
-    def image(self, image: str) -> str:
+    def image(self, image: str, prompt: str) -> str:
         headers = {
             "Content-Type": "application/json",
             "api-key": self.api_key,
@@ -37,7 +57,7 @@ class Bini:
                     "content": [
                         {
                             "type": "text",
-                            "text": "You are an AI assistant that helps people find information."
+                            "text": PROMPT_1
                         }
                     ]
                 },
@@ -52,7 +72,7 @@ class Bini:
                         },
                         {
                             "type": "text",
-                            "text": "descibe me this image"
+                            "text": prompt
                         }
                     ]
                 }
@@ -62,7 +82,7 @@ class Bini:
             "max_tokens": 800
         }
 
-        endpoint = "https://openaigpt4audc.openai.azure.com/openai/deployments/bini-ai/chat/completions?api-version=2024-02-15-preview"
+        endpoint = f"{self.endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
 
         # Send request
         try:
@@ -74,8 +94,9 @@ class Bini:
         # Handle the response as needed (e.g., print or process)
         data = response.json()
         print(data['choices'][0]['message']['content'])
+        return data
 
 
 bini = Bini()
 if __name__ == '__main__':
-    bini.image(image=r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img.png')
+    bini.image(image=r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img.png', prompt='describe me what you see')
