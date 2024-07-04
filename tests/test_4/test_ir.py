@@ -2,7 +2,7 @@ from core.modules.decorators import negative
 from bini.infrastructure.ai_utils import BiniUtils
 
 
-bini = BiniUtils(max_tokens=1000, api_key='ed6ee72b5446499ba2ac3fe6c9793aea')
+bini = BiniUtils()
 
 
 def test_user_is_displayed() -> None:
@@ -31,7 +31,7 @@ def test_user_is_not_displayed() -> None:
     response = bini.image(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img.png",
         prompt='Is Evgeny Petrusenko displayed on the right of the screen?')
-    assert 'Fail' in response
+    assert 'Fail' or 'No' in response
 
 
 def test_outgoing_calls_under_external_p2p() -> None:

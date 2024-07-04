@@ -3,13 +3,14 @@ from typing import Optional
 from bini.engine.engine import Bini
 from bini.infrastructure.data import PROMPT_1
 from core.manager.reader import read_json
+from time import sleep
 
 
 @dataclass
 class BiniUtils(Bini):
 
     endpoint: str = 'https://openaigpt4audc.openai.azure.com'
-    model: str = 'bini-ai'
+    model: str = 'bini'
     api_key: str = read_json('GPT_API', 'key')
     version: str = '2024-02-15-preview'
     system_prompt: str = PROMPT_1
@@ -67,13 +68,7 @@ class BiniUtils(Bini):
             assert recording_type in response
         elif call_expiration:
             assert call_expiration in response
+        sleep(3)
 
 
 bini = BiniUtils()
-
-
-def test_user_is_displayed() -> None:
-    response = bini.image(
-        image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\core\data\images\img.png",
-        prompt='Is Efrat Lang displayed on the right side of the screen? at the end type Passed if yes')
-    assert 'Passed' in response
