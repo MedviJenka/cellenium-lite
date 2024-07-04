@@ -1,7 +1,7 @@
 import warnings
-from datetime import datetime
 from typing import Optional
 from dataclasses import dataclass
+from bini.infrastructure.ai_utils import BiniUtils
 from core.data.constants import IMAGES
 from core.modules.logger import Logger
 from core.engine.api_engine import get_name, get_locator, get_type
@@ -38,15 +38,17 @@ class DriverEngine(DriverManager):
         except Exception as e:
             raise e
 
-    def take_screenshot(self, name: Optional[str] = None) -> None:
+    def take_screenshot(self, name: str, prompt: Optional[str] = None) -> None:
 
-        now = datetime.now()
-        time = now.strftime('%d%m%Y%H%M')
-        image_path = fr'{IMAGES}/{time}.png'
-        self.driver.screenshot(path=image_path)
+        bini = BiniUtils()
+        image = fr'{IMAGES}\{name}.png'
 
-        if name:
-            self.driver.screenshot(path=fr'{IMAGES}/{name}.png')
+        if prompt:
+            print(f'image path: {image}')
+            self.driver.screenshot(path=image)
+            bini.image(image_path=image, prompt=prompt)
+
+        self.driver.screenshot(path=image)
 
     @staticmethod
     def __get_element_properties(**kwargs) -> tuple:
