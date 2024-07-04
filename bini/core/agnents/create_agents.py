@@ -47,8 +47,8 @@ class GenerateAgents(Executor):
         # Evaluate with both agents via prompts
         # Print individual feedback
 
-        ui_ux_result = self.ui_ux_manager_prompt
-        qa_result = self.qa_engineer_prompt
+        ui_ux_result = self.ui_ux_manager_prompt['status']
+        qa_result = self.qa_engineer_prompt['status']
 
         # Determine overall result
         overall_result = "Passed" if ui_ux_result == "Passed" and qa_result == "Passed" else "Fail"

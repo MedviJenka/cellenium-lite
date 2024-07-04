@@ -2,13 +2,12 @@ import base64
 import requests
 from PIL import Image
 from dataclasses import dataclass
-
-from bini.infrastructure.data import PROMPT_1
+from bini.core.agnents.create_agents import GenerateAgents
 from core.manager.reader import read_json
 
 
 @dataclass
-class Bini:
+class Bini(GenerateAgents):
 
     """
     questions:
@@ -31,7 +30,6 @@ class Bini:
     model: str
     api_key: str
     version: str
-    system_prompt: str
 
     @staticmethod
     def __encode_image(image_path: str) -> base64:
@@ -64,7 +62,7 @@ class Bini:
                     "content": [
                         {
                             "type": "text",
-                            "text": self.system_prompt
+                            "text": self.execute()
                         }
                     ]
                 },
@@ -108,10 +106,8 @@ class Bini:
 bini = Bini(endpoint='https://openaigpt4audc.openai.azure.com',
             model='bini',
             api_key=read_json('GPT_API', 'key'),
-            version='2024-02-15-preview',
-            system_prompt=PROMPT_1)
+            version='2024-02-15-preview')
 
 if __name__ == '__main__':
     bini.image(image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img.png",
                prompt='Is Efrat Lang displayed on the right side of the screen? at the end type Passed if yes')
-

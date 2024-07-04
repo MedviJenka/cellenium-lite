@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
 from bini.engine.engine import Bini
-from bini.infrastructure.data import PROMPT_1
 from core.manager.reader import read_json
 from time import sleep
 
@@ -13,7 +12,6 @@ class BiniUtils(Bini):
     model: str = 'bini'
     api_key: str = read_json('GPT_API', 'key')
     version: str = '2024-02-15-preview'
-    system_prompt: str = PROMPT_1
 
     def validate_call_metadata_for_each_row(self,
                                             image: str,
