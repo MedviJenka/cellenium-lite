@@ -40,14 +40,6 @@ class Bini(Agents):
                         {
                             "type": "text",
                             "text": SYSTEM_PROMPT
-                        },
-                        {
-                            "type": "text",
-                            "text": f"QA Agent: {agent_results['qa_task_result']}"
-                        },
-                        {
-                            "type": "text",
-                            "text": f"UI Agent: {agent_results['ui_task_result']}"
                         }
                     ]
                 },
@@ -67,13 +59,19 @@ class Bini(Agents):
                         {
                             "type": "text",
                             "text": prompt
+                        },
+                        {
+                            "type": "text",
+                            "text": f"QA Agent: {agent_results['qa_task_result']}"
+                        },
+                        {
+                            "type": "text",
+                            "text": f"UI Agent: {agent_results['ui_task_result']}"
                         }
                     ]
                 }
             ],
-            "temperature": 0.7,
-            "top_p": 0.95,
-            "max_tokens": 4096
+            "temperature": 0.1,
         }
 
         endpoint = f"{self.endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
