@@ -1,11 +1,11 @@
-from dataclasses import dataclass
 from typing import Optional
+from dataclasses import dataclass
 from bini.engine.engine import Bini
 from core.manager.reader import read_json
 
 
 @dataclass
-class BiniUtils(Bini):
+class IRBiniUtils(Bini):
 
     endpoint: str = 'https://openaigpt4audc.openai.azure.com'
     model: str = 'bini'
@@ -16,7 +16,7 @@ class BiniUtils(Bini):
                                             image: str,
                                             row: int,
                                             *,
-                                            start_time: Optional[str] = None,
+                                           start_time: Optional[str] = None,
                                             answer_time: Optional[str] = None,
                                             release_time: Optional[str] = None,
                                             release_cause: Optional[str] = None,
@@ -40,7 +40,8 @@ class BiniUtils(Bini):
         elif duration:
             assert duration in response
         elif date:
-            assert date in response  # date example Jun 20, 2024
+            # Example: Jun 20, 2024
+            assert date in response
         elif direction:
             assert direction in response
         elif start_time:

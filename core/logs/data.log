@@ -5,3 +5,5 @@ INFO |  Tuesday | 02/07/2024 | 15:01:10 | Endpoint: <Response [401]>, Duration: 
 INFO |  Tuesday | 02/07/2024 | 15:01:25 | Endpoint: <Response [401]>, Duration: 0.70 seconds | Function: log_performance | Line: 42
 INFO |  Tuesday | 02/07/2024 | 15:01:59 | Endpoint: <Response [401]>, Duration: 0.71 seconds | Function: log_performance | Line: 42
 INFO |  Tuesday | 02/07/2024 | 15:02:35 | Endpoint: <Response [401]>, Duration: 0.70 seconds | Function: log_performance | Line: 42
+INFO |  Sunday | 07/07/2024 | 14:58:28 | using model: bini, version: 2024-02-15-preview | Function: __post_init__ | Line: 20
+INFO |  Sunday | 07/07/2024 | 14:59:02 | using model: bini, version: 2024-02-15-preview | Function: __post_init__ | Line: 20

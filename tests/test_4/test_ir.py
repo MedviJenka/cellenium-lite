@@ -1,8 +1,8 @@
 from core.modules.decorators import negative
-from bini.infrastructure.ai_utils import BiniUtils
+from bini.infrastructure.ai_utils import IRBiniUtils
 
 
-bini = BiniUtils()
+bini = IRBiniUtils()
 
 
 def test_user_is_displayed() -> None:
@@ -41,19 +41,19 @@ def test_outgoing_calls_under_external_p2p() -> None:
     assert '3' or 'Three' in response
 
 
-@negative(Exception)
+@negative
 def test_outgoing_calls_under_external_p2p() -> None:
     response = bini.image(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_3.png",
         prompt='how many Outgoing" has the call type "External p2p, return answer in integer')
-    assert 0 in response
+    assert '0' in response
 
 
 def test_count_rows() -> None:
     response = bini.image(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png",
         prompt='count all the rows that starts with blue play button on the left, expected result is 10, return hole answer with integer at the end')
-    assert 'Passed' in response
+    assert '10' in response
 
 
 def test_no_rows() -> None:
@@ -92,7 +92,7 @@ def test_complex_metadata_validations() -> None:
                                              recording_type='Audio')
 
 
-@negative(Exception)
+@negative
 def test_complex_metadata_validations_1() -> None:
     image = r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_11.png'
     bini.validate_call_metadata_for_each_row(image=image,
@@ -104,7 +104,7 @@ def test_complex_metadata_validations_1() -> None:
                                              recording_type='Audio')
 
 
-@negative(Exception)
+@negative
 def test_complex_metadata_validations_2() -> None:
     image = r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_11.png'
     bini.validate_call_metadata_for_each_row(image=image,
@@ -114,3 +114,18 @@ def test_complex_metadata_validations_2() -> None:
                                              release_cause='Normal',
                                              call_expiration='Nov 25, 2023',
                                              recording_type='Audio')
+
+
+@negative
+def test_user_name_displayed_in_recording_row_1() -> None:
+    bini.validate_call_metadata_for_each_row(image=r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png',
+                                             row=1,
+                                             recording_type='Audio',
+                                             user_name='st_user2')
+
+
+def test_user_name_displayed_in_recording_row_2() -> None:
+    bini.validate_call_metadata_for_each_row(image=r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png',
+                                             row=1,
+                                             recording_type='Audio',
+                                             user_name='st_user2')

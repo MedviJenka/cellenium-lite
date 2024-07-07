@@ -1,28 +1,11 @@
 import base64
 import requests
 from dataclasses import dataclass
-from bini.core.agnents.create_agents import GenerateAgents
+from bini.core.agnents.create_agents import Agents
 
 
 @dataclass
-class Bini(GenerateAgents):
-
-    """
-    questions:
-        1. do we need a local model?
-        2. do we need to train a model? (because at this moment image recognition is working)
-
-    :TODO TASKS:
-        1. setup openai azure ............................................... DONE
-        2. create agents .................................................... WIP
-
-    :IMPORTANT:
-        evaluation: never send and get the data from the user, always make a gateway to a prompt.
-
-    :TODO BUGS:
-        1. at this moment there is a token limitation, after 3 tests need to wait for new generation
-
-    """
+class Bini(Agents):
 
     endpoint: str
     model: str

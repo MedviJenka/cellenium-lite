@@ -17,11 +17,6 @@ class DriverEngine(DriverManager):
 
     screen: Optional[str] = None
 
-    def get_web(self, web_link: str) -> None:
-
-        self.driver.goto(web_link)
-        log.level.info(f'webdriver used: \n{self.driver} \n started: \n {web_link}')
-
     def get_element(self, name: str, screenshot: Optional[bool] = False) -> any:
 
         element_name, element_type, element_locator = self.__get_element_properties(sheet_name=self.screen, value=name)
