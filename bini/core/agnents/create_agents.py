@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from bini.infrastructure.data import SYSTEM_PROMPT
 from core.modules.executor import Executor
 
 
@@ -57,4 +58,4 @@ class GenerateAgents(Executor):
         return overall_result
 
     def execute(self) -> str:
-        return self.combined_evaluation
+        return f'{SYSTEM_PROMPT}*{self.combined_evaluation}'

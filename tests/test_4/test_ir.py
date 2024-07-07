@@ -19,7 +19,7 @@ def test_meeting_insights() -> None:
     assert 'Passed' in response
 
 
-@negative(Exception)
+@negative
 def test_meeting_insights_negative() -> None:
     response = bini.image(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_5.png",

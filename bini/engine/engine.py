@@ -1,9 +1,7 @@
 import base64
 import requests
-from PIL import Image
 from dataclasses import dataclass
 from bini.core.agnents.create_agents import GenerateAgents
-from core.manager.reader import read_json
 
 
 @dataclass
@@ -33,25 +31,17 @@ class Bini(GenerateAgents):
 
     @staticmethod
     def __encode_image(image_path: str) -> base64:
-        with open(image_path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode('ascii')  # or utf-8
-
-    @staticmethod
-    def __get_image_dimensions(image: str) -> list[int]:
-        with Image.open(image) as img:
-            width, height = img.size
-        return [width, height]
+        with (open(image_path, "rb") as image_file):
+            image = base64.b64encode(image_file.read())
+            return image.decode('ascii')  # or utf-8
 
     def base64_image(self, image_path: str) -> None:
         return self.__encode_image(image_path)
 
-    def cached_api_key(self) -> str:
-        return self.api_key
-
     def image(self, image_path: str, prompt: str) -> str:
         headers = {
             "Content-Type": "application/json",
-            "api-key": self.cached_api_key(),
+            "api-key": self.api_key,
         }
 
         # Payload for the request
@@ -77,7 +67,7 @@ class Bini(GenerateAgents):
                         },
                         {
                             "type": "text",
-                            "text": prompt
+                            "text": f'{prompt}'
                         }
                     ]
                 }
@@ -101,13 +91,3 @@ class Bini(GenerateAgents):
 
         except requests.RequestException as e:
             raise SystemExit(f"Failed to make the request. Error: {e}")
-
-
-bini = Bini(endpoint='https://openaigpt4audc.openai.azure.com',
-            model='bini',
-            api_key=read_json('GPT_API', 'key'),
-            version='2024-02-15-preview')
-
-if __name__ == '__main__':
-    bini.image(image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img.png",
-               prompt='Is Efrat Lang displayed on the right side of the screen? at the end type Passed if yes')

@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import Optional
 from bini.engine.engine import Bini
 from core.manager.reader import read_json
-from time import sleep
 
 
 @dataclass
@@ -66,7 +65,3 @@ class BiniUtils(Bini):
             assert recording_type in response
         elif call_expiration:
             assert call_expiration in response
-        sleep(3)
-
-
-bini = BiniUtils()

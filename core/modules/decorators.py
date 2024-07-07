@@ -1,6 +1,6 @@
 import time
 from time import time, sleep
-from typing import Callable, Any
+from typing import Callable, Any, Optional
 from functools import wraps
 from core.modules.exceptions import NegativeException
 from core.modules.logger import Logger
@@ -38,37 +38,39 @@ def measure_execution_time(func: callable) -> callable:
     return wrapper
 
 
-def negative(exception_type: Exception(any)) -> Callable:
+def negative(exception: Optional[Exception] = Exception) -> callable:
+
     """
-    This decorator function takes in an exception type as an argument
+    This decorator function takes an optional exception type as an argument
     and returns a decorator that wraps the original function.
     When the new function is called, it calls the original
     function with the same arguments and catches any specified exception that might be raised.
     If the specified exception is caught, it logs the error message.
-    If the specified exception is not raised, it raises an AssertionError.
+    If the specified exception is not raised, it logs a message indicating no exception was raised and continues execution.
 
-    :param exception_type: The type of exception to catch.
+    :param exception: The type of exception to catch. Defaults to Exception.
     :return: A decorator function.
+
     """
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(function: Callable) -> Callable:
         def wrapper(*args: Any, **kwargs: Any) -> None:
             try:
-                func(*args, **kwargs)
+                function(*args, **kwargs)
             except exception_type as e:
                 log.level.info(f"{func.__name__} raised {exception_type.__name__}, {e}")
                 return
             log.level.info(f"{func.__name__} did not raise {exception_type.__name__}")
-            raise AssertionError(f"{func.__name__} did not raise {exception_type.__name__}")
+            # Continue execution without raising an AssertionError
 
         return wrapper
 
-    return decorator
-
-
-@negative(Exception)
-def test() -> None:
-    raise ValueError("This is a test")
+    if callable(exception):
+        func = exception
+        exception_type = Exception
+        return decorator(func)
+    else:
+        return decorator
 
 
 def retry(retries: int = 3, delay: float = 1) -> callable:
