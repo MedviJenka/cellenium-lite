@@ -5,7 +5,7 @@ from bini.core.data.constants import API_KEY
 
 
 @dataclass
-class Agent:
+class AgentEngine:
 
     api_key: str
     api_version: str
@@ -22,7 +22,7 @@ class Agent:
             azure_endpoint=self.endpoint
         )
 
-    def create_assistant(self, instructions: str, model: str):
+    def call_agent(self, instructions: str, model: str):
         self.assistant = self.client.beta.assistants.create(
             instructions=instructions,
             model=model,
@@ -65,19 +65,26 @@ class Agent:
             print(self.run.status)
 
 
-# Usage example
-client = Agent(
-    api_key=API_KEY,
-    api_version="2024-02-15-preview",
-    endpoint='https://openaigpt4audc.openai.azure.com'
-)
+class CreateAgent:
 
-client.create_assistant(
-    instructions="you're a professional QA engineer, and you will validate the image that was provided to you",
-    model="bini"  # replace with model deployment name
-)
+    def __init__(self):
+        self.client = AgentEngine(
+            api_key=API_KEY,
+            api_version="2024-02-15-preview",
+            endpoint='https://openaigpt4audc.openai.azure.com'
+        )
+        self.run_agent_workflow()
 
-client.create_thread()
-client.add_user_message("validate this image:")  # Replace this with your prompt
-client.run_thread()
+    def run_agent_workflow(self):
+        self.client.call_agent(
+            instructions="You're a professional QA engineer, and you will validate the image that was provided to you.",
+            model="bini"  # replace with model deployment name
+        )
+        self.client.create_thread()
+        self.client.add_user_message("validate this image:")  # Replace this with your prompt
+        self.client.run_thread()
 
+
+# Instantiate and run the CreateAgent
+agent = CreateAgent()
+print(agent.run_agent_workflow())
