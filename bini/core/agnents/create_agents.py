@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from core.modules.executor import Executor
-from bini.infrastructure.data import SYSTEM_PROMPT
 
 
 @dataclass
@@ -12,54 +11,39 @@ class Agents(Executor):
     qa_pass_fail = "Passed" or "Failed"
 
     @property
-    def ui_ux_manager(self) -> dict:
-
-        """
-        Simulates the prompt call to the UI/UX Manager Agent.
-        Takes an image as input and returns detailed feedback and a pass/fail result.
-        """
-        # Simulated response from the prompt (replace with actual prompt call logic)
-
+    def image_visualization_agent(self) -> dict:
+        task_description = "Analyze the image and provide visual insights."
+        print(task_description)
         return {
             "ui_ux_feedback": self.ui_ux_feedback,
-            "status": self.ui_ux_pass_fail
+            "status": self.ui_ux_pass_fail,
+            "report": "Image visualization task completed."
         }
 
     @property
-    def qa_engineer(self) -> dict:
-
-        """
-        Simulates the prompt call to the QA Engineer Agent.
-        Takes an image as input and returns detailed feedback and a pass/fail result.
-        """
-        # Simulated response from the prompt (replace with actual prompt call logic)
-
-        return {
-            "qa_feedback": self.qa_feedback,
-            "status": self.qa_pass_fail
-        }
+    def qa_agent(self) -> str:
+        task_description = "Perform QA checks and provide feedback."
+        print(task_description)
+        return "QA task completed."
 
     @property
-    def combined_evaluation(self) -> str:
+    def ui_agent(self) -> str:
+        task_description = "Evaluate UI elements and provide feedback."
+        print(task_description)
+        return "UI task completed."
 
-        """
-        This function calls both the UI/UX and QA prompt functions,
-        combines their feedback, and determines the overall result.
-        """
-        # Evaluate with both agents via prompts
-        # Print individual feedback
+    def main_agent(self) -> str:
+        task_description = (f"Coordinate tasks between {self.image_visualization_agent, self.qa_agent, self.ui_agent} "
+                            f"and summarize results.")
+        print(task_description)
+        return "Main agent task completed."
 
-        ui_ux_result = self.ui_ux_manager['status']
-        qa_result = self.qa_engineer['status']
-
-        # Determine overall result
-        overall_result = "Passed" if ui_ux_result == "Passed" and qa_result == "Passed" else "Fail"
-        print("Overall Result:", overall_result)
-
-        return overall_result
-
-    def execute(self) -> str:
-        try:
-            return f'{SYSTEM_PROMPT}*{self.combined_evaluation}'
-        except Exception as e:
-            raise e
+    def execute(self) -> dict:
+        results = {
+            "image_task_result": self.image_visualization_agent,
+            "qa_task_result":  self.qa_agent,
+            "ui_task_result": self.ui_agent,
+            "main_task_result": self.main_agent()
+        }
+        print(results)
+        return results

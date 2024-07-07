@@ -129,3 +129,9 @@ def test_user_name_displayed_in_recording_row_2() -> None:
                                              row=1,
                                              recording_type='Audio',
                                              user_name='st_user2')
+
+
+def test_duration_displayed_in_recording_row() -> None:
+    bini.validate_call_metadata_for_each_row(image=r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png',
+                                             row=1,
+                                             duration='00:04:44')

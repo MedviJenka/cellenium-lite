@@ -2,6 +2,7 @@ import base64
 import requests
 from dataclasses import dataclass
 from bini.core.agnents.create_agents import Agents
+from bini.infrastructure.data import SYSTEM_PROMPT
 
 
 @dataclass
@@ -13,12 +14,12 @@ class Bini(Agents):
     version: str
 
     @staticmethod
-    def __encode_image(image_path: str) -> base64:
-        with (open(image_path, "rb") as image_file):
+    def __encode_image(image_path: str) -> str:
+        with open(image_path, "rb") as image_file:
             image = base64.b64encode(image_file.read())
-            return image.decode('ascii')  # or utf-8
+            return image.decode('ascii')  # or 'utf-8'
 
-    def base64_image(self, image_path: str) -> None:
+    def base64_image(self, image_path: str) -> str:
         return self.__encode_image(image_path)
 
     def image(self, image_path: str, prompt: str) -> str:
@@ -26,6 +27,9 @@ class Bini(Agents):
             "Content-Type": "application/json",
             "api-key": self.api_key,
         }
+
+        # Execute agents and get their results
+        agent_results = self.execute()
 
         # Payload for the request
         payload = {
@@ -35,7 +39,15 @@ class Bini(Agents):
                     "content": [
                         {
                             "type": "text",
-                            "text": self.execute()
+                            "text": SYSTEM_PROMPT
+                        },
+                        {
+                            "type": "text",
+                            "text": f"QA Agent: {agent_results['qa_task_result']}"
+                        },
+                        {
+                            "type": "text",
+                            "text": f"UI Agent: {agent_results['ui_task_result']}"
                         }
                     ]
                 },
@@ -50,7 +62,11 @@ class Bini(Agents):
                         },
                         {
                             "type": "text",
-                            "text": f'{prompt}'
+                            "text": f"Image Visualization Agent: {agent_results['image_task_result']}"
+                        },
+                        {
+                            "type": "text",
+                            "text": prompt
                         }
                     ]
                 }
@@ -67,9 +83,10 @@ class Bini(Agents):
             data = response.json()
             output = data['choices'][0]['message']['content']
 
-            print(f'tokens: {data['usage']['total_tokens']}')
+            print(f'tokens: {data["usage"]["total_tokens"]}')
             print(output)
             print(data)
+
             return output
 
         except requests.RequestException as e:

@@ -16,7 +16,7 @@ class IRBiniUtils(Bini):
                                             image: str,
                                             row: int,
                                             *,
-                                           start_time: Optional[str] = None,
+                                            start_time: Optional[str] = None,
                                             answer_time: Optional[str] = None,
                                             release_time: Optional[str] = None,
                                             release_cause: Optional[str] = None,
