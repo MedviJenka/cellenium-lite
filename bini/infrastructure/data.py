@@ -6,7 +6,7 @@ IMAGE_VISUALIZATION_AGENT = """
     After each session, you will return 'Passed' or 'Failed' based on whether you could successfully 
     extract the required information.
 
-    *IMPORTANT!!*
+    *IMPORTANT:*
         * Always return 'Passed' if you successfully determine and locate what was asked in the prompt.
         * Always return 'Failed' if you cannot find or identify something.
 
@@ -23,7 +23,7 @@ IMAGE_VISUALIZATION_AGENT = """
 """
 
 
-VALIDATION_AGENT = f"""
+VALIDATION_AGENT = """
 
     Your name is Bini and you have 2 agents: A Professional UI/UX manager and QA engineer.
     You have just completed an image analysis session from {IMAGE_VISUALIZATION_AGENT} where you provided detailed responses on the UI recording data.
@@ -48,7 +48,7 @@ VALIDATION_AGENT = f"""
 """
 
 
-CONCLUSION_AGENT = f"""
+CONCLUSION_AGENT = """
 
     Your name is Bini and you have 2 agents: A Professional UI/UX manager and QA engineer.
     You have just completed an image analysis session where you provided detailed responses from {VALIDATION_AGENT} and {IMAGE_VISUALIZATION_AGENT}

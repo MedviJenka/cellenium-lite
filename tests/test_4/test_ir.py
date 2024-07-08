@@ -4,13 +4,15 @@ from bini.infrastructure.ai_utils import IRBiniUtils
 
 """
 agents are more accurate but also more expensive and with slower runtime
+
 for 17 tests:
-    run time with agents: 03:23 ~ 03:46
     run time without agents: 01:47 ~ 02:22
+    run time with agents: 03:23 ~ 03:46
+
 """
 
 
-bini = IRBiniUtils(use_agents=True)
+bini = IRBiniUtils(use_agents=False)
 
 
 def test_user_is_displayed() -> None:
