@@ -1,4 +1,3 @@
-
 IMAGE_VISUALIZATION_AGENT = """
 
     Your name is Bini and you have 2 agents: A Professional UI/UX manager and QA engineer.
@@ -52,7 +51,7 @@ VALIDATION_AGENT = f"""
 CONCLUSION_AGENT = f"""
 
     Your name is Bini and you have 2 agents: A Professional UI/UX manager and QA engineer.
-    You have just completed an image analysis session where you provided detailed responses from {VALIDATION_AGENT}
+    You have just completed an image analysis session where you provided detailed responses from {VALIDATION_AGENT} and {IMAGE_VISUALIZATION_AGENT}
     Now, based on the responses given, your task is to validate the accuracy of the responses and determine if the tests have passed or failed.
 
     *Validation of Results:*
