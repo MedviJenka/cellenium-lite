@@ -43,7 +43,7 @@ def test_outgoing_calls_under_external_p2p() -> None:
 
 @negative
 def test_outgoing_calls_under_external_p2p() -> None:
-    response = bini.image(
+    response = bini.analyize(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_3.png",
         prompt='how many Outgoing" has the call type "External p2p, return answer in integer')
     assert '0' in response

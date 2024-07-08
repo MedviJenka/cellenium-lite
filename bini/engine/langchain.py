@@ -76,7 +76,8 @@ class CreateAgent:
 
     @staticmethod
     def get_agent_roles() -> any:
-        with open('agent_roles.json', 'r') as agents:
+        path = r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\engine\agent_roles.json'
+        with open(path, 'r') as agents:
             return json.load(agents)
 
     def run_agent_workflow(self, system_instructions: str, user_message: str):
@@ -108,8 +109,3 @@ class GenerateAgents(CreateAgent):
     def ui_agent(self):
         return self.run_agent_workflow(system_instructions=self.get_agent_roles()[2]['type'],
                                        user_message=self.get_agent_roles()[1]['prompt'])
-
-
-agent = GenerateAgents()
-if __name__ == '__main__':
-    print(agent.image_agent())
