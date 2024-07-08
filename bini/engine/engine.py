@@ -1,37 +1,37 @@
 import base64
 import requests
 from dataclasses import dataclass
-from bini.infrastructure.data import IMAGE_VISUALIZATION_PROMPT, VALIDATION_PROMPT, CONCLUSION_PROMPT
+from bini.infrastructure.data import Agents
 
 
 @dataclass
-class Bini:
+class Bini(Agents):
 
     endpoint: str
     model: str
     api_key: str
     version: str
+    temperature: float
+
+    def __post_init__(self):
+        self.endpoint = f"{self.endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
 
     @staticmethod
     def __encode_image(image_path: str) -> str:
         with open(image_path, "rb") as image_file:
             image = base64.b64encode(image_file.read())
-            return image.decode('ascii')  # or 'utf-8'
+            return image.decode('ascii')
 
-    def base64_image(self, image_path: str) -> str:
-        return self.__encode_image(image_path)
-
-    def image(self, image_path: str, prompt: str) -> str:
-
+    @property
+    def __headers(self) -> dict:
         headers = {
             "Content-Type": "application/json",
             "api-key": self.api_key,
         }
+        return headers
 
-        # Execute agents and get their results
-        # agent_results = self.execute()
+    def __payload(self, agent: str, function: callable or str) -> dict:
 
-        # Payload for the request
         payload = {
             "messages": [
                 {
@@ -39,7 +39,38 @@ class Bini:
                     "content": [
                         {
                             "type": "text",
-                            "text": IMAGE_VISUALIZATION_PROMPT
+                            "text": agent
+                        }
+                    ]
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": function
+                        }
+                    ]
+                },
+            ],
+            "temperature": self.temperature,
+        }
+
+        return payload
+
+    def base64_image(self, image_path: str) -> str:
+        return self.__encode_image(image_path)
+
+    def image_agent(self, image_path: str, prompt: str) -> str:
+
+        payload = {
+            "messages": [
+                {
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": self.image_visualization_agent
                         }
                     ]
                 },
@@ -59,13 +90,11 @@ class Bini:
                     ]
                 }
             ],
-            "temperature": 0.1,
+            "temperature": self.temperature,
         }
 
-        endpoint = f"{self.endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
-
         try:
-            response = requests.post(url=endpoint, headers=headers, json=payload)
+            response = requests.post(url=self.endpoint, headers=self.__headers, json=payload)
             data = response.json()
             output = data['choices'][0]['message']['content']
 
@@ -80,88 +109,27 @@ class Bini:
 
     def main_agent(self, image_path: str, prompt: str) -> None:
 
-        headers = {
-            "Content-Type": "application/json",
-            "api-key": self.api_key,
-        }
+        payload = self.__payload(agent=self.validation_agent, function=self.image_agent(image_path=image_path, prompt=prompt))
 
-        # Payload for the request
-        payload = {
-            "messages": [
-                {
-                    "role": "system",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": VALIDATION_PROMPT
-                        }
-                    ]
-                },
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": self.image(image_path=image_path, prompt=prompt)
-                        }
-                    ]
-                },
-            ],
-            "temperature": 0.1,
-        }
-
-        endpoint = "https://openaigpt4audc.openai.azure.com/openai/deployments/bini/chat/completions?api-version=2024-02-15-preview"
-
-        # Send request
         try:
-            response = requests.post(endpoint, headers=headers, json=payload)
+            response = requests.post(self.endpoint, headers=self.__headers, json=payload)
             data = response.json()
             output = data['choices'][0]['message']['content']
+            print(f'main agent output: {output}')
             return output
+
         except requests.RequestException as e:
             raise SystemExit(f"Failed to make the request. Error: {e}")
 
-    def analyize(self, image_path: str, prompt: str):
+    def analyze(self, image_path: str, prompt: str):
 
-        headers = {
-            "Content-Type": "application/json",
-            "api-key": self.api_key,
-        }
+        payload = self.__payload(agent=self.conclusion_agent, function=self.main_agent(image_path=image_path, prompt=prompt))
 
-        # Payload for the request
-        payload = {
-            "messages": [
-                {
-                    "role": "system",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": CONCLUSION_PROMPT
-                        }
-                    ]
-                },
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": self.main_agent(image_path=image_path, prompt=prompt)
-                        }
-                    ]
-                },
-            ],
-            "temperature": 0.1,
-        }
-
-        endpoint = "https://openaigpt4audc.openai.azure.com/openai/deployments/bini/chat/completions?api-version=2024-02-15-preview"
-
-        # Send request
         try:
-            response = requests.post(endpoint, headers=headers, json=payload)
+            response = requests.post(self.endpoint, headers=self.__headers, json=payload)
             data = response.json()
             output = data['choices'][0]['message']['content']
+            print(f'analyze agent output: {output}')
             return output
         except requests.RequestException as e:
             raise SystemExit(f"Failed to make the request. Error: {e}")
-
-

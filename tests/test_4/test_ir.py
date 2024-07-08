@@ -6,14 +6,14 @@ bini = IRBiniUtils()
 
 
 def test_user_is_displayed() -> None:
-    response = bini.image(
+    response = bini.analyze(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img.png",
         prompt='Is Efrat Lang displayed on the right side of the screen? at the end type Passed if yes')
     assert 'Passed' in response
 
 
 def test_meeting_insights() -> None:
-    response = bini.image(
+    response = bini.analyze(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_5.png",
         prompt='validate the dates are displayed are from 4/4/24 to 13/5/24, parse the date type as day/month/year')
     assert 'Passed' in response
@@ -21,21 +21,21 @@ def test_meeting_insights() -> None:
 
 @negative
 def test_meeting_insights_negative() -> None:
-    response = bini.image(
+    response = bini.analyze(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_5.png",
         prompt='validate the dates are displayed are from 4/4/24 to 14/5/24, parse the date type as day/month/year')
     assert 'Failed' in response
 
 
 def test_user_is_not_displayed() -> None:
-    response = bini.image(
+    response = bini.analyze(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img.png",
         prompt='Is Evgeny Petrusenko displayed on the right of the screen?')
     assert 'Fail' or 'No' in response
 
 
 def test_outgoing_calls_under_external_p2p() -> None:
-    response = bini.image(
+    response = bini.analyze(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_3.png",
         prompt='how many Outgoing" has the call type "External p2p')
     assert '3' or 'Three' in response
@@ -43,27 +43,27 @@ def test_outgoing_calls_under_external_p2p() -> None:
 
 @negative
 def test_outgoing_calls_under_external_p2p() -> None:
-    response = bini.analyize(
+    response = bini.analyze(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_3.png",
         prompt='how many Outgoing" has the call type "External p2p, return answer in integer')
     assert '0' in response
 
 
 def test_count_rows() -> None:
-    response = bini.image(
+    response = bini.analyze(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png",
         prompt='count all the rows that starts with blue play button on the left, expected result is 10, return hole answer with integer at the end')
     assert '10' in response
 
 
 def test_no_rows() -> None:
-    response = bini.image(image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_2.png",
-                          prompt='are there any rows?, expected is: No Rows')
+    response = bini.analyze(image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_2.png",
+                            prompt='are there any rows?, expected is: No Rows')
     assert 'Passed' in response
 
 
 def call_duration_in_specific_row(duration: str, row: int) -> None:
-    response = bini.image(
+    response = bini.analyze(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_3.png",
         prompt=f'list all rows with circle icons, under call duration header locate the {duration} and row number: {row}, return me the full time answer')
     assert duration in response
@@ -128,7 +128,15 @@ def test_user_name_displayed_in_recording_row_2() -> None:
     bini.validate_call_metadata_for_each_row(image=r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png',
                                              row=1,
                                              recording_type='Audio',
-                                             user_name='st_user2')
+                                             user_name='st_user1')
+
+
+@negative
+def test_user_name_displayed_in_recording_row_3() -> None:
+    bini.validate_call_metadata_for_each_row(image=r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png',
+                                             row=1,
+                                             recording_type='Audio',
+                                             user_name='teams_test_user')
 
 
 def test_duration_displayed_in_recording_row() -> None:
