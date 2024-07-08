@@ -1,7 +1,7 @@
 import warnings
 from typing import Optional
 from dataclasses import dataclass
-from bini.infrastructure.ai_utils import BiniUtils
+from bini.infrastructure.ai_utils import IRBiniUtils
 from core.data.constants import IMAGES
 from core.modules.logger import Logger
 from core.engine.api_engine import get_name, get_locator, get_type
@@ -16,6 +16,9 @@ log = Logger()
 class DriverEngine(DriverManager):
 
     screen: Optional[str] = None
+
+    def get_web(self, url: str) -> None:
+        self.driver.goto(url)
 
     def get_element(self, name: str, screenshot: Optional[bool] = False) -> any:
 
@@ -35,13 +38,13 @@ class DriverEngine(DriverManager):
 
     def take_screenshot(self, name: str, prompt: Optional[str] = None) -> None:
 
-        bini = BiniUtils()
+        bini = IRBiniUtils()
         image = fr'{IMAGES}\{name}.png'
 
         if prompt:
             print(f'image path: {image}')
             self.driver.screenshot(path=image)
-            bini.image(image_path=image, prompt=prompt)
+            bini.run(image_path=image, prompt=prompt)
 
         self.driver.screenshot(path=image)
 
