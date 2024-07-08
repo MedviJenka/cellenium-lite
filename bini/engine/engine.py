@@ -1,36 +1,46 @@
 import base64
 import requests
 from typing import Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from bini.infrastructure.data import Agents
 
 
 @dataclass
-class Bini(Agents):
+class Functionality:
 
-    endpoint: str
-    model: str
     api_key: str
-    version: str
     temperature: float
-
-    def __post_init__(self) -> None:
-        self.endpoint = f"{self.endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
+    endpoint: str
 
     @staticmethod
     def _encode_image(image_path: str) -> str:
+
+        """Encodes an image file to a base64 string."""
+
         with open(image_path, "rb") as image_file:
             image = base64.b64encode(image_file.read())
             return image.decode('ascii')
 
+    def get_image(self, image_path: str) -> str:
+
+        """Returns the base64 encoded string of the image."""
+
+        return self._encode_image(image_path)
+
     @property
     def _headers(self) -> dict:
+
+        """Returns the headers for the API request."""
+
         return {
             "Content-Type": "application/json",
             "api-key": self.api_key,
         }
 
     def _payload(self, agent: str, function: str) -> dict:
+
+        """Creates the payload for the API request."""
+
         return {
             "messages": [
                 {"role": "system", "content": [{"type": "text", "text": agent}]},
@@ -39,39 +49,10 @@ class Bini(Agents):
             "temperature": self.temperature,
         }
 
-    def base64_image(self, image_path: str) -> str:
-        return self._encode_image(image_path)
-
-    def image_agent(self, image_path: str, prompt: str) -> str:
-        payload = {
-            "messages": [
-                {"role": "system", "content": [{"type": "text", "text": self.image_visualization_agent}]},
-                {"role": "user", "content": [
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.base64_image(image_path)}"}},
-                    {"type": "text", "text": prompt}
-                ]}
-            ],
-            "temperature": self.temperature,
-        }
-
-        return self._make_request(payload)
-
-    def main_agent(self, image_path: str, prompt: str) -> str:
-        function_output = self.image_agent(image_path=image_path, prompt=prompt)
-        payload = self._payload(agent=self.validation_agent, function=function_output)
-        return self._make_request(payload)
-
-    def conclusion(self, image_path: str, prompt: str) -> str:
-        function_output = self.main_agent(image_path=image_path, prompt=prompt)
-        payload = self._payload(agent=self.conclusion_agent, function=function_output)
-        return self._make_request(payload)
-
-    def run(self, image_path: str, prompt: str, call_agents: Optional[bool] = False) -> str:
-        if call_agents:
-            return self.conclusion(image_path=image_path, prompt=prompt)
-        return self.image_agent(image_path=image_path, prompt=prompt)
-
     def _make_request(self, payload: dict) -> str:
+
+        """Makes the API request and returns the output."""
+
         try:
             response = requests.post(url=self.endpoint, headers=self._headers, json=payload)
             response.raise_for_status()
@@ -82,3 +63,66 @@ class Bini(Agents):
             return output
         except requests.RequestException as e:
             raise SystemExit(f"Failed to make the request. Error: {e}")
+
+
+@dataclass
+class Bini(Agents, Functionality):
+
+    model: str
+    api_key: str
+    version: str
+    temperature: float
+    image_path: str = field(init=False)
+    prompt: str = field(init=False)
+
+    def __post_init__(self) -> None:
+
+        """Initializes the Bini class with the correct endpoint."""
+
+        self.endpoint = f"{self.endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
+
+    def _set_image_and_prompt(self, image_path: str, prompt: str) -> None:
+        """Sets the image path and prompt for the instance."""
+        self.image_path = image_path
+        self.prompt = prompt
+
+    def image_agent(self) -> str:
+
+        """Processes an image with a given prompt using the image visualization agent."""
+
+        payload = {
+            "messages": [
+                {"role": "system", "content": [{"type": "text", "text": self.image_visualization_agent}]},
+                {"role": "user", "content": [
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(self.image_path)}"}},
+                    {"type": "text", "text": self.prompt}
+                ]}
+            ],
+            "temperature": self.temperature,
+        }
+        return self._make_request(payload)
+
+    def image_validation_agent(self) -> str:
+
+        """Processes the output of the image agent using the validation agent."""
+
+        function_output = self.image_agent()
+        payload = self._payload(agent=self.validation_agent, function=function_output)
+        return self._make_request(payload)
+
+    def final_validation_agent(self) -> str:
+
+        """Processes the output of the main agent using the conclusion agent."""
+
+        function_output = self.image_validation_agent()
+        payload = self._payload(agent=self.conclusion_agent, function=function_output)
+        return self._make_request(payload)
+
+    def run(self, image_path: str, prompt: str, call_agents: Optional[bool] = False) -> str:
+
+        """Runs the appropriate agents based on the call_agents flag."""
+
+        self._set_image_and_prompt(image_path=image_path, prompt=prompt)
+        if call_agents:
+            return self.final_validation_agent()
+        return self.image_agent()
