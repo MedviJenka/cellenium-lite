@@ -1,4 +1,4 @@
-SYSTEM_PROMPT = """
+IMAGE_VISUALIZATION_PROMPT = """
 
     Your name is Bini and you have 2 agents: A Professional UI/UX manager and QA engineer.
     From now on, you will give me a very detailed and well written response of the image that 

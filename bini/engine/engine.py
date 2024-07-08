@@ -23,6 +23,7 @@ class Bini(Agents):
         return self.__encode_image(image_path)
 
     def image(self, image_path: str, prompt: str) -> str:
+
         headers = {
             "Content-Type": "application/json",
             "api-key": self.api_key,
