@@ -1,16 +1,25 @@
 from typing import Optional
 from dataclasses import dataclass
+from bini.core.modules.environment import get_secured_data
 from bini.engine.engine import Bini
-from core.manager.reader import read_json
 
 
 @dataclass
 class IRBiniUtils(Bini):
 
-    endpoint: str = 'https://openaigpt4audc.openai.azure.com'
-    model: str = 'bini'
-    api_key: str = read_json('GPT_API', 'key')
-    version: str = '2024-02-15-preview'
+    """
+    agents are more accurate but also more expensive and with slower runtime
+
+    for 17 tests:
+        run time without agents: 01:47 ~ 02:22
+        run time with agents: 03:23 ~ 03:46
+
+    """
+
+    endpoint: str = get_secured_data('ENDPOINT')
+    model: str = get_secured_data('MODEL')
+    api_key: str = get_secured_data('AZURE_OPENAI_API')
+    version: str = get_secured_data('VERSION')
     temperature: float = 0.1
     use_agents: bool = False
 

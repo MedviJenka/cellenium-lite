@@ -2,7 +2,7 @@ import base64
 import requests
 from typing import Optional
 from dataclasses import dataclass, field
-from bini.infrastructure.data import Agents
+from bini.infrastructure.prompts import Agents
 
 
 @dataclass
@@ -37,7 +37,7 @@ class Functionality:
             "api-key": self.api_key,
         }
 
-    def _payload(self, agent: str, function: str) -> dict:
+    def _payload(self, agent: str, function: callable) -> dict:
 
         """Creates the payload for the API request."""
 
@@ -100,6 +100,7 @@ class Bini(Agents, Functionality):
             ],
             "temperature": self.temperature,
         }
+
         return self._make_request(payload)
 
     def image_validation_agent(self) -> str:
@@ -125,4 +126,5 @@ class Bini(Agents, Functionality):
         self._set_image_and_prompt(image_path=image_path, prompt=prompt)
         if call_agents:
             return self.final_validation_agent()
-        return self.image_agent()
+        else:
+            return self.image_agent()

@@ -26,7 +26,7 @@ IMAGE_VISUALIZATION_AGENT = """
 VALIDATION_AGENT = """
 
     Your name is Bini and you have 2 agents: A Professional UI/UX manager and QA engineer.
-    You have just completed an image analysis session from {IMAGE_VISUALIZATION_AGENT} where you provided detailed responses on the UI recording data.
+    You have just completed an image analysis session from {self.image_validation_agent()} where you provided detailed responses on the UI recording data.
     Now, based on the responses given, your task is to determine if the tests have passed or failed.
 
     *Analysis of Results:*
@@ -51,7 +51,7 @@ VALIDATION_AGENT = """
 CONCLUSION_AGENT = """
 
     Your name is Bini and you have 2 agents: A Professional UI/UX manager and QA engineer.
-    You have just completed an image analysis session where you provided detailed responses from {VALIDATION_AGENT} and {IMAGE_VISUALIZATION_AGENT}
+    You have just completed an image analysis session where you provided detailed responses from {self.image_validation_agent()} and {self.final_validation_agent()}
     Now, based on the responses given, your task is to validate the accuracy of the responses and determine if the tests have passed or failed.
 
     *Validation of Results:*
