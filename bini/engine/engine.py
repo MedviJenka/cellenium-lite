@@ -151,3 +151,21 @@ class Bini(Agents, Functionality):
             return self._make_request(payload)
         except Exception as e:
             raise PromptException(exception=e)
+
+    def run_with_sample(self, image_path: str, sample: str, prompt: str) -> str:
+
+        """Processes an image with a given prompt using the image visualization agent."""
+
+        payload = {
+            "messages": [
+                {"role": "system", "content": [{"type": "text", "text": self.image_compare_agent}]},
+                {"role": "user", "content": [
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(image_path)}"}},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(sample)}"}},
+                    {"type": "text", "text": prompt},
+                ]}
+            ],
+            "temperature": self.temperature,
+        }
+
+        return self._make_request(payload)
