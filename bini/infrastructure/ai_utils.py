@@ -78,3 +78,8 @@ class IRBiniUtils(Bini):
             assert recording_type in response
         elif call_expiration:
             assert call_expiration in response
+
+
+bini = IRBiniUtils()
+bini.image_compare(image_path=r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png',
+                   compare_to=r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_2.png')

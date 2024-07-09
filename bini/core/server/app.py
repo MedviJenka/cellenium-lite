@@ -5,6 +5,7 @@ from bini.infrastructure.logger import Logger
 
 bini = IRBiniUtils(use_agents=False)
 app = Flask(__name__)
+log = Logger()
 
 
 @app.route('/')

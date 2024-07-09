@@ -2,6 +2,8 @@ import base64
 import requests
 from typing import Optional
 from dataclasses import dataclass, field
+
+from bini.core.modules.exceptions import PromptException
 from bini.infrastructure.prompts import Agents
 
 
@@ -129,7 +131,7 @@ class Bini(Agents, Functionality):
         else:
             return self.image_agent()
 
-    def image_compare(self, image_path_1: str, image_path_2: str, prompt: str) -> str:
+    def image_compare(self, image_path: str, compare_to: str, prompt: Optional[str] = '') -> str:
 
         """Processes an image with a given prompt using the image visualization agent."""
 
@@ -137,12 +139,15 @@ class Bini(Agents, Functionality):
             "messages": [
                 {"role": "system", "content": [{"type": "text", "text": self.image_compare_agent}]},
                 {"role": "user", "content": [
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(image_path_1)}"}},
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(image_path_2)}"}},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(image_path)}"}},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(compare_to)}"}},
                     {"type": "text", "text": prompt}
                 ]}
             ],
             "temperature": self.temperature,
         }
 
-        return self._make_request(payload)
+        try:
+            return self._make_request(payload)
+        except Exception as e:
+            raise PromptException(exception=e)
