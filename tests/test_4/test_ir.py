@@ -1,14 +1,17 @@
+from bini.infrastructure.logger import Logger
 from core.modules.decorators import negative
 from bini.infrastructure.ai_utils import IRBiniUtils
 
 
 bini = IRBiniUtils(use_agents=False)
+log = Logger()
 
 
 def test_user_is_displayed() -> None:
     response = bini.run(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img.png",
         prompt='Is Efrat Lang displayed on the right side of the screen? at the end type Passed if yes')
+    log.level.info(response)
     assert 'Passed' in response
 
 
@@ -142,3 +145,18 @@ def test_duration_displayed_in_recording_row() -> None:
     bini.validate_call_metadata_for_each_row(image=r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png',
                                              row=1,
                                              duration='00:04:44')
+
+
+def test_compare_images_1() -> None:
+    response = bini.image_compare(image_path_1=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png",
+                                  image_path_2=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png",
+                                  prompt='what are the differences?')
+    assert 'Passed' in response
+
+
+@negative
+def test_compare_images_2() -> None:
+    response = bini.image_compare(image_path_1=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png",
+                                  image_path_2=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_2.png",
+                                  prompt='what are the differences?')
+    assert 'Passed' in response

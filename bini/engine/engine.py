@@ -128,3 +128,21 @@ class Bini(Agents, Functionality):
             return self.final_validation_agent()
         else:
             return self.image_agent()
+
+    def image_compare(self, image_path_1: str, image_path_2: str, prompt: str) -> str:
+
+        """Processes an image with a given prompt using the image visualization agent."""
+
+        payload = {
+            "messages": [
+                {"role": "system", "content": [{"type": "text", "text": self.image_compare_agent}]},
+                {"role": "user", "content": [
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(image_path_1)}"}},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(image_path_2)}"}},
+                    {"type": "text", "text": prompt}
+                ]}
+            ],
+            "temperature": self.temperature,
+        }
+
+        return self._make_request(payload)
