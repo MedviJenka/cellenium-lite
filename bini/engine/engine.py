@@ -121,15 +121,35 @@ class Bini(Agents, Functionality):
         payload = self._payload(agent=self.conclusion_agent, function=function_output)
         return self._make_request(payload)
 
-    def run(self, image_path: str, prompt: str, call_agents: Optional[bool] = False) -> str:
+    def run(self, image_path: str, prompt: str, call_agents: Optional[bool] = False, sample: Optional[str] = None) -> str:
 
         """Runs the appropriate agents based on the call_agents flag."""
 
         self._set_image_and_prompt(image_path=image_path, prompt=prompt)
         if call_agents:
             return self.final_validation_agent()
+        elif sample:
+            self.run_with_sample(image_path=image_path, prompt=prompt,sample=sample)
         else:
             return self.image_agent()
+
+    def run_with_sample(self, image_path: str, sample: str, prompt: str) -> str:
+
+        """Processes an image with a given prompt using the image visualization agent."""
+
+        payload = {
+            "messages": [
+                {"role": "system", "content": [{"type": "text", "text": self.sample_agent}]},
+                {"role": "user", "content": [
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(image_path)}"}},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(sample)}"}},
+                    {"type": "text", "text": prompt},
+                ]}
+            ],
+            "temperature": self.temperature,
+        }
+
+        return self._make_request(payload)
 
     def image_compare(self, image_path: str, compare_to: str, prompt: Optional[str] = '') -> str:
 
@@ -151,21 +171,3 @@ class Bini(Agents, Functionality):
             return self._make_request(payload)
         except Exception as e:
             raise PromptException(exception=e)
-
-    def run_with_sample(self, image_path: str, sample: str, prompt: str) -> str:
-
-        """Processes an image with a given prompt using the image visualization agent."""
-
-        payload = {
-            "messages": [
-                {"role": "system", "content": [{"type": "text", "text": self.image_compare_agent}]},
-                {"role": "user", "content": [
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(image_path)}"}},
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(sample)}"}},
-                    {"type": "text", "text": prompt},
-                ]}
-            ],
-            "temperature": self.temperature,
-        }
-
-        return self._make_request(payload)

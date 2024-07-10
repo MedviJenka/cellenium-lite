@@ -1,17 +1,14 @@
-from bini.infrastructure.logger import Logger
 from core.modules.decorators import negative
 from bini.infrastructure.ai_utils import IRBiniUtils
 
 
 bini = IRBiniUtils(use_agents=False)
-log = Logger()
 
 
 def test_user_is_displayed() -> None:
     response = bini.run(
         image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img.png",
         prompt='Is Efrat Lang displayed on the right side of the screen? at the end type Passed if yes')
-    log.level.info(response)
     assert 'Passed' in response
 
 
@@ -164,6 +161,6 @@ def test_compare_images_2() -> None:
 
 def test_find_icon_sample() -> None:
     response = bini.run_with_sample(image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png",
-                                            sample=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_12.png",
-                                            prompt='how many icons from sample do you see in this image?')
+                                    sample=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_12.png",
+                                    prompt='how many icons from sample do you see in this image?')
     assert '10' in response
