@@ -2,7 +2,7 @@ from core.modules.decorators import negative
 from bini.infrastructure.ai_utils import IRBiniUtils
 
 
-bini = IRBiniUtils(use_agents=False)
+bini = IRBiniUtils(call_agents=False)
 
 
 def test_user_is_displayed() -> None:
@@ -160,7 +160,8 @@ def test_compare_images_2() -> None:
 
 
 def test_find_icon_sample() -> None:
-    response = bini.run_with_sample(image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png",
-                                    sample=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_12.png",
-                                    prompt='how many icons from sample do you see in this image?')
+    response = bini.run(image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png",
+                        sample_image=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_12.png",
+                        prompt='how many icons from sample do you see in this image?')
     assert '10' in response
+    assert 'Passed' in response
