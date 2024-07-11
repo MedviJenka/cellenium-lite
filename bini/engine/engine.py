@@ -12,6 +12,18 @@ class Functionality:
     api_key: str
     temperature: float
     endpoint: str
+    image_path: str = field(init=False)
+    sample_image: str = field(default='', init=False)
+    prompt: str = field(init=False)
+
+    @property
+    def params(self) -> tuple:
+        return self.image_path, self.prompt, self.sample_image
+
+    @params.setter
+    def params(self, values: tuple[str, str, str]) -> None:
+        """Sets the image path and prompt for the instance."""
+        self.image_path, self.prompt, self.sample_image = values
 
     @staticmethod
     def _encode_image(image_path: str) -> str:
@@ -62,22 +74,10 @@ class Bini(Agents, Functionality):
     api_key: str
     version: str
     temperature: float
-    image_path: str = field(init=False)
-    sample_image: str = field(default='', init=False)
-    prompt: str = field(init=False)
 
     def __post_init__(self) -> None:
         """Initializes the Bini class with the correct endpoint."""
         self.endpoint = f"{self.endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
-
-    @property
-    def params(self) -> tuple:
-        return self.image_path, self.prompt, self.sample_image
-
-    @params.setter
-    def params(self, values: tuple[str, str, str]) -> None:
-        """Sets the image path and prompt for the instance."""
-        self.image_path, self.prompt, self.sample_image = values
 
     def image_agent(self) -> str:
 
