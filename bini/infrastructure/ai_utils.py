@@ -18,7 +18,7 @@ class IRBiniUtils(Bini):
 
     endpoint: str = get_secured_data('ENDPOINT')
     model: str = get_secured_data('MODEL')
-    api_key: str = get_secured_data('AZURE_OPENAI_API')
+    api_key: str = get_secured_data('OPENAI_API_KEY')
     version: str = get_secured_data('VERSION')
     temperature: float = 0.1
     call_agents: bool = False
