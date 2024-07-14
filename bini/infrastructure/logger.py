@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from bini.core.data.abstract_paths import BINI_LOGS
+from bini.infrastructure.abstract_paths import BINI_LOGS
 
 
 class Logger:

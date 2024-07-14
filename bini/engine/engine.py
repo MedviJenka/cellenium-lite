@@ -3,7 +3,7 @@ from typing import Optional
 from dataclasses import dataclass
 from bini.infrastructure.prompts import Agents
 from bini.engine.functionality import Functionality
-from bini.core.modules.exceptions import PromptException
+from bini.infrastructure.exceptions import PromptException
 
 
 @dataclass
