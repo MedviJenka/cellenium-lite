@@ -30,8 +30,8 @@ class Bini(Agents, Functionality):
                 "messages": [
                     {"role": "system", "content": [{"type": "text", "text": self.image_visualization_agent}]},
                     {"role": "user", "content": [
-                        {"type": "image_url","image_url": {"url": f"data:image/jpeg;base64,{self.get_image(self.image_path)}"}},
-                        {"type": "sample_image","image_url": {"url": f"data:image/jpeg;base64,{self.get_image(self.sample_image)}"}},
+                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(self.image_path)}"}},
+                        {"type": "sample_image", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(self.sample_image)}"}},
                         {"type": "text", "text": self.prompt}
                     ]}
                 ],

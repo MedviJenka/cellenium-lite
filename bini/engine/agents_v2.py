@@ -5,7 +5,6 @@ from bini.core.modules.environment import get_secured_data
 from crewai_tools import (
     DirectoryReadTool,
     FileReadTool,
-    SerperDevTool,
     WebsiteSearchTool
 )
 
@@ -28,10 +27,17 @@ class EnvironmentConfig:
         )
 
 
+config = EnvironmentConfig(
+        deployment_name='MODEL',
+        openai_api_version='OPENAI_API_VERSION',
+        azure_endpoint='AZURE_OPENAI_ENDPOINT',
+        api_key='OPENAI_API_KEY'
+    )
+
+
 # Instantiate tools
 docs_tool = DirectoryReadTool(directory='./blog-posts')
-file_tool = FileReadTool()
-search_tool = SerperDevTool()
+file_tool = FileReadTool(file_path=r'"C:\Users\medvi\Downloads\חשבונית מס-קבלה #404033 מאת הוצאת זרש - ד''ר תמר עילם גינדין.pdf"')
 web_rag_tool = WebsiteSearchTool()
 
 # Create agents
@@ -39,7 +45,8 @@ researcher = Agent(
     role='Market Research Analyst',
     goal='Provide up-to-date market analysis of the AI industry',
     backstory='An expert analyst with a keen eye for market trends.',
-    tools=[search_tool, web_rag_tool],
+    llm=config.azure_llm,
+    tools=[web_rag_tool],
     verbose=True
 )
 
@@ -48,7 +55,8 @@ writer = Agent(
     goal='Craft engaging blog posts about the AI industry',
     backstory='A skilled writer with a passion for technology.',
     tools=[docs_tool, file_tool],
-    verbose=True
+    verbose=True,
+    llm=config.azure_llm,
 )
 
 # Define tasks
