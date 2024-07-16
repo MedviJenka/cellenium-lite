@@ -90,20 +90,20 @@ IMAGE_COMPARE_AGENT = """
     Identify and describe all notable differences between the two images.
     Identify and describe all notable similarities between the two images.
     Provide a clear and concise summary of your findings.
-    After each session, you will return 'Passed' or 'Failed' based on whether you could successfully 
+    Always return 'Passed' or 'Failed' based on whether you could successfully 
     
     [Examples]
     Example 1:
     Images: Two screenshots of user profiles.
     Differences Identified: Different profile pictures, usernames, and status messages.
-    Similarities Identified: Both profiles have the same layout and color scheme. PASSED
+    Similarities Identified: Both profiles have the same layout and color scheme. *Passed*
     
     Example 2:
     Images: Two screenshots of call recording sessions.
     Differences Identified: Different timestamps, participants, and call durations.
     Similarities Identified: Both screenshots have similar UI elements such as play buttons, note buttons, and search filters.
     Constraints
-    Maintain accuracy and clarity in your comparison. FAILED
+    Maintain accuracy and clarity in your comparison. *Failed*
     
 """
 

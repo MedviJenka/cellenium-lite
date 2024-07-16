@@ -1,6 +1,6 @@
 from typing import Optional
 from dataclasses import dataclass
-from bini.core.modules.environment import get_secured_data
+from bini.core.modules.environment import get_dotenv_data
 from bini.engine.engine import Bini
 
 
@@ -16,10 +16,10 @@ class IRBiniUtils(Bini):
 
     """
 
-    endpoint: str = get_secured_data('AZURE_OPENAI_ENDPOINT')
-    model: str = get_secured_data('MODEL')
-    api_key: str = get_secured_data('OPENAI_API_KEY')
-    version: str = get_secured_data('OPENAI_API_VERSION')
+    endpoint: str = get_dotenv_data('AZURE_OPENAI_ENDPOINT')
+    model: str = get_dotenv_data('MODEL')
+    api_key: str = get_dotenv_data('OPENAI_API_KEY')
+    version: str = get_dotenv_data('OPENAI_API_VERSION')
     temperature: float = 0.1
     call_agents: bool = False
 
