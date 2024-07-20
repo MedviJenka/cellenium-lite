@@ -1,3 +1,4 @@
+import uuid
 import warnings
 from typing import Optional
 from dataclasses import dataclass
@@ -36,7 +37,7 @@ class DriverEngine(DriverManager):
         except Exception as e:
             raise e
 
-    def take_screenshot(self, name: str, prompt: Optional[str] = None) -> None:
+    def take_screenshot(self, name: Optional[str] = None, prompt: Optional[str] = None) -> None:
 
         bini = IRBiniUtils()
         image = fr'{IMAGES}\{name}.png'
@@ -45,8 +46,15 @@ class DriverEngine(DriverManager):
             print(f'image path: {image}')
             self.driver.screenshot(path=image)
             bini.run(image_path=image, prompt=prompt)
-
+            if name is not None:
+                image = fr'{IMAGES}\{name}.png'
+            else:
+                image = fr'{IMAGES}\{self.__random_id}.png'
         self.driver.screenshot(path=image)
+
+    @property
+    def __random_id(self) -> str:
+        return str(uuid.uuid4())
 
     @staticmethod
     def __get_element_properties(**kwargs) -> tuple:

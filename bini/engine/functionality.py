@@ -1,5 +1,6 @@
 import base64
 import requests
+from typing import Optional
 from dataclasses import dataclass, field
 
 
@@ -7,11 +8,11 @@ from dataclasses import dataclass, field
 class Functionality:
 
     api_key: str
-    temperature: float
-    endpoint: str
+    temperature: Optional[str] = None
     image_path: str = field(init=False)
     sample_image: str = field(default='', init=False)
     prompt: str = field(init=False)
+    endpoint: str = field(default='')
 
     @property
     def params(self) -> tuple:

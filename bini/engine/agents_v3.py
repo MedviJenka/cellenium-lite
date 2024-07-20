@@ -2,12 +2,14 @@ from crewai import Agent, Task, Crew
 from bini.engine.azure_config import EnvironmentConfig
 
 
-config = EnvironmentConfig(
-        deployment_name='MODEL',
-        openai_api_version='OPENAI_API_VERSION',
-        azure_endpoint='AZURE_OPENAI_ENDPOINT',
-        api_key='OPENAI_API_KEY'
-    )
+data = {
+    'deployment_name': 'MODEL',
+    'openai_api_version': 'OPENAI_API_VERSION',
+    'azure_endpoint': 'AZURE_OPENAI_ENDPOINT',
+    'api_key': 'OPENAI_API_KEY'
+}
+
+config = EnvironmentConfig(**data)
 
 # Create agents
 image_vision_agent = Agent(
@@ -20,8 +22,8 @@ image_vision_agent = Agent(
 
 # Define tasks
 image_vision_task = Task(
-    description='Write a detailed code review output based on code provided',
-    expected_output='code review:',
+    description='you will get an output from {image_vision_agent}, validate the data contains Passed value',
+    expected_output='Passed',
     agent=image_vision_agent
 )
 
@@ -34,5 +36,4 @@ crew = Crew(
 )
 
 
-def run_image_agent() -> dict:
-    return crew.kickoff()
+crew.kickoff()

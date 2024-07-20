@@ -11,7 +11,7 @@ class TestTitle:
         assert title == 'Google'
         self.engine.get_element(name='search').fill('cats')
         self.engine.get_element(name='search', screenshot=True)
-        self.engine.take_screenshot(name='google', prompt='what do you see in this picture?')
+        self.engine.take_screenshot(prompt='what do you see in this picture?')
 
 
 class TestSTLogin:

@@ -9,10 +9,9 @@ from bini.infrastructure.exceptions import PromptException
 @dataclass
 class Bini(Agents, Functionality):
 
-    model: str
-    api_key: str
-    version: str
-    temperature: float
+    model: str = ''
+    api_key: str = ''
+    version: str = ''
 
     def __post_init__(self) -> None:
         """Initializes the Bini class with the correct endpoint."""
