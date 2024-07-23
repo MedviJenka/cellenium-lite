@@ -7,7 +7,6 @@ from dataclasses import dataclass, field
 class Functionality:
 
     api_key: str
-    temperature: float
     endpoint: str
     image_path: str = field(init=False)
     sample_image: str = field(default='', init=False)
@@ -38,16 +37,6 @@ class Functionality:
         return {
             "Content-Type": "application/json",
             "api-key": self.api_key,
-        }
-
-    def _payload(self, agent: str, function: str) -> dict:
-        """Creates the payload for the API request."""
-        return {
-            "messages": [
-                {"role": "system", "content": [{"type": "text", "text": agent}]},
-                {"role": "user", "content": [{"type": "text", "text": function}]},
-            ],
-            "temperature": self.temperature,
         }
 
     def _make_request(self, payload: dict) -> str:

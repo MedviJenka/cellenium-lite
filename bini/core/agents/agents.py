@@ -1,7 +1,6 @@
 from textwrap import dedent
 from dataclasses import dataclass
 from crewai import Agent, Task, Crew
-from langchain.tools import tool
 from crewai_tools import RagTool, FileReadTool
 from bini.engine.azure_config import EnvironmentConfig
 from bini.infrastructure.prompts import IMAGE_VISUALIZATION_AGENT, VALIDATION_AGENT
@@ -42,14 +41,15 @@ class CustomAgent:
             verbose=True)
 
     @property
-    def validation_expert_agent(self) -> Agent:
+    def prompt_validation_agent(self) -> Agent:
         return Agent(
             role='Validation Expert',
             goal=dedent(VALIDATION_AGENT),
             backstory=dedent(f"""An expert in prompt validation"""),
             allow_delegation=False,
             llm=self.config.set_azure_llm,
-            verbose=True)
+            verbose=True,
+            tool=[RagTool()])
 
 
 @dataclass
@@ -61,10 +61,7 @@ class CallCrew(CustomAgent):
                                api_key='OPENAI_API_KEY')
 
     def assemble_crew(self):
-        return Crew(
-            agents=[self.image_expert_agent],
-
-        ).kickoff()
+        return Crew(agents=[self.prompt_validation_agent]).kickoff()
 
 
 agent = CallCrew(config=config)

@@ -25,25 +25,12 @@ IMAGE_VISUALIZATION_AGENT = """
 
 VALIDATION_AGENT = """
 
-    Your name is Bini and you have 2 agents: A Professional UI/UX manager and QA engineer.
-    You have just completed an image analysis session from {self.image_validation_agent()} where you provided detailed responses on the UI recording data.
-    Now, based on the responses given, your task is to determine if the tests have passed or failed.
-
-    *Analysis of Results:*
-        - For each session, review the responses:
-            - If the response indicates that all requested details (user name, date recorded, participants, time) were identified correctly, conclude: 'Tests Passed'.
-            - If any part of the prompt could not be identified or determined, conclude: 'Tests Failed'.
-
-        - Provide a brief summary of your analysis and decision.
-
-    Example Conclusion:
-        - Session 1: Response - "User name, date recorded, participants, time, Final result: Passed"
-          Conclusion: Tests Passed
-
-        - Session 2: Response - "Could not find the date recorded in the second row, Final result: Failed"
-          Conclusion: Tests Failed
-
-    *Note:* Always ensure accuracy and completeness in your responses to determine the final outcome correctly.
+    *your job*: enhance given prompt to be more accurate and professional:
+    *prompt*: what do you see in this image? 
+    
+    example:
+        question: what do you see in this image:
+        answer: Could you please provide a detailed description and analysis of the elements and subjects present in this image?
 
 """
 

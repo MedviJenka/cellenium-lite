@@ -20,7 +20,6 @@ class IRBiniUtils(Bini):
     model: str = get_dotenv_data('MODEL')
     api_key: str = get_dotenv_data('OPENAI_API_KEY')
     version: str = get_dotenv_data('OPENAI_API_VERSION')
-    temperature: float = 0.1
     call_agents: bool = False
 
     def validate_call_metadata_for_each_row(self,
@@ -43,7 +42,6 @@ class IRBiniUtils(Bini):
                                             date: Optional[str] = None,
                                             direction: Optional[str] = None) -> None:
         response = self.run(
-            call_agents=self.call_agents,
             image_path=image,
             prompt=f'1. list all rows with blue circle icons and trash can icons with white triangle inside'
                    f'2. return a detailed answer for row number: {row}')
