@@ -9,13 +9,16 @@ from bini.infrastructure.exceptions import PromptException
 @dataclass
 class Bini(Agents, Functionality):
 
-    model: str = ''
-    api_key: str = ''
-    version: str = ''
+    model: str
+    api_key: str
+    version: str
 
     def __post_init__(self) -> None:
         """Initializes the Bini class with the correct endpoint."""
         self.endpoint = f"{self.endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
+
+    def prompt_agent(self) -> str:
+        """Enhances given prompt in more professional manner"""
 
     def image_agent(self) -> str:
 
@@ -34,7 +37,7 @@ class Bini(Agents, Functionality):
                         {"type": "text", "text": self.prompt}
                     ]}
                 ],
-                "temperature": self.temperature,
+                "temperature": 0.1,
             }
 
         else:
@@ -47,31 +50,17 @@ class Bini(Agents, Functionality):
                         {"type": "text", "text": self.prompt}
                     ]}
                 ],
-                "temperature": self.temperature,
+                "temperature": 0.1,
             }
 
         return self._make_request(payload)
 
-    def image_validation_agent(self) -> str:
-        """Processes the output of the image agent using the validation agent."""
-        function_output = self.image_agent()
-        payload = self._payload(agent=self.validation_agent, function=function_output)
-        return self._make_request(payload)
-
-    def final_validation_agent(self) -> str:
-        """Processes the output of the main agent using the conclusion agent."""
-        function_output = self.image_validation_agent()
-        payload = self._payload(agent=self.conclusion_agent, function=function_output)
-        return self._make_request(payload)
-
-    def run(self, image_path: str, prompt: str, call_agents: Optional[bool] = False, sample_image: Optional[str] = '') -> str:
+    def run(self, image_path: str, prompt: str, sample_image: Optional[str] = '') -> str:
         """Runs the appropriate agents based on the call_agents flag."""
         try:
             self.params = (image_path, prompt, sample_image)
-            if call_agents:
-                return self.final_validation_agent()
-            else:
-                return self.image_agent()
+            return self.image_agent()
+
         except FileNotFoundError as e:
             raise e
         except requests.RequestException as e:
@@ -88,7 +77,7 @@ class Bini(Agents, Functionality):
                     {"type": "text", "text": prompt}
                 ]}
             ],
-            "temperature": self.temperature,
+            "temperature": 0.1,
         }
         try:
             return self._make_request(payload)

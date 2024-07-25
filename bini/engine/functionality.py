@@ -1,6 +1,5 @@
 import base64
 import requests
-from typing import Optional
 from dataclasses import dataclass, field
 
 
@@ -8,11 +7,10 @@ from dataclasses import dataclass, field
 class Functionality:
 
     api_key: str
-    temperature: Optional[str] = None
+    endpoint: str
     image_path: str = field(init=False)
     sample_image: str = field(default='', init=False)
     prompt: str = field(init=False)
-    endpoint: str = field(default='')
 
     @property
     def params(self) -> tuple:
@@ -39,16 +37,6 @@ class Functionality:
         return {
             "Content-Type": "application/json",
             "api-key": self.api_key,
-        }
-
-    def _payload(self, agent: str, function: str) -> dict:
-        """Creates the payload for the API request."""
-        return {
-            "messages": [
-                {"role": "system", "content": [{"type": "text", "text": agent}]},
-                {"role": "user", "content": [{"type": "text", "text": function}]},
-            ],
-            "temperature": self.temperature,
         }
 
     def _make_request(self, payload: dict) -> str:
