@@ -1,6 +1,6 @@
 import requests
 from typing import Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from bini.core.agents.prompt_agent import SetAgent
 from bini.engine.azure_config import EnvironmentConfig
 from bini.infrastructure.prompts import Prompts
@@ -13,8 +13,6 @@ config = EnvironmentConfig(api_key='OPENAI_API_KEY',
                            openai_api_version='OPENAI_API_VERSION',
                            deployment_name='MODEL')
 
-agent = SetAgent(config=config)
-
 
 @dataclass
 class Bini(Functionality):
@@ -22,47 +20,37 @@ class Bini(Functionality):
     model: str
     api_key: str
     version: str
+    agent: SetAgent = field(init=False)
 
     def __post_init__(self) -> None:
         """Initializes the Bini class with the correct endpoint."""
         self.endpoint = f"{self.endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
         self.agent = SetAgent(config=config)
 
+    @property
     def prompt_agent(self) -> str:
         """Enhances given prompt in more professional manner"""
+        return self.agent.execute(self.prompt)
 
     def image_agent(self) -> str:
-
         """
-        If sample image provided insert it in the request
-        Else, use just one image.
+        If sample image provided insert it in the request else, use just one image.
         """
+        user_content = [
+            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(self.image_path)}"}},
+            {"type": "text", "text": self.prompt_agent}
+        ]
 
         if self.sample_image:
-            payload = {
-                "messages": [
-                    {"role": "system", "content": [{"type": "text", "text": Prompts.image_visualization_agent}]},
-                    {"role": "user", "content": [
-                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(self.image_path)}"}},
-                        {"type": "sample_image", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(self.sample_image)}"}},
-                        {"type": "text", "text": self.agent.execute(self.prompt)}
-                    ]}
-                ],
-                "temperature": 0.1,
-            }
+            user_content.insert(__index=1, __object={"type": "sample_image", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(self.sample_image)}"}})
 
-        else:
-            payload = {
-                "messages": [
-                    {"role": "system", "content": [{"type": "text", "text": Prompts.image_visualization_agent}]},
-                    {"role": "user", "content": [
-                        {"type": "image_url",
-                         "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(self.image_path)}"}},
-                        {"type": "text", "text": self.agent.execute(self.prompt)}
-                    ]}
-                ],
-                "temperature": 0.1,
-            }
+        payload = {
+            "messages": [
+                {"role": "system", "content": [{"type": "text", "text": Prompts.image_visualization_agent}]},
+                {"role": "user", "content": user_content}
+            ],
+            "temperature": 0.1,
+        }
 
         return self._make_request(payload)
 
