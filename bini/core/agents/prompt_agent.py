@@ -5,19 +5,13 @@ from bini.core.modules.executor import Executor
 from bini.engine.azure_config import EnvironmentConfig
 
 
-config = EnvironmentConfig(deployment_name='MODEL',
-                           openai_api_version='OPENAI_API_VERSION',
-                           azure_endpoint='AZURE_OPENAI_ENDPOINT',
-                           api_key='OPENAI_API_KEY')
-
-
 @dataclass
-class SetCrew(Executor):
+class SetAgent(Executor):
 
     config: EnvironmentConfig
 
     def __post_init__(self) -> None:
-        self.custom_agent = CustomAgent(config=config)
+        self.custom_agent = CustomAgent(config=self.config)
         self.agent = self.custom_agent.prompt_expert_agent
 
     @property
@@ -41,7 +35,3 @@ class SetCrew(Executor):
     def execute(self, prompt: str) -> str:
         crew = self.set_task.kickoff(inputs={"input": prompt})
         return crew.split('Final Answer')[0]
-
-
-app = SetCrew(config=config)
-print(app.execute(prompt='do you see this icon on the left of the screen?'))

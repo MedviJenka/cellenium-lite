@@ -95,7 +95,7 @@ IMAGE_COMPARE_AGENT = """
 """
 
 
-class Agents:
+class Prompts:
 
     image_visualization_agent: str = IMAGE_VISUALIZATION_AGENT
     validation_agent: str = VALIDATION_AGENT

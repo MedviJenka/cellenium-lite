@@ -1,13 +1,23 @@
 import requests
 from typing import Optional
 from dataclasses import dataclass
-from bini.infrastructure.prompts import Agents
+from bini.core.agents.prompt_agent import SetAgent
+from bini.engine.azure_config import EnvironmentConfig
+from bini.infrastructure.prompts import Prompts
 from bini.engine.functionality import Functionality
 from bini.infrastructure.exceptions import PromptException
 
 
+config = EnvironmentConfig(api_key='OPENAI_API_KEY',
+                           azure_endpoint='AZURE_OPENAI_ENDPOINT',
+                           openai_api_version='OPENAI_API_VERSION',
+                           deployment_name='MODEL')
+
+agent = SetAgent(config=config)
+
+
 @dataclass
-class Bini(Agents, Functionality):
+class Bini(Functionality):
 
     model: str
     api_key: str
@@ -16,6 +26,7 @@ class Bini(Agents, Functionality):
     def __post_init__(self) -> None:
         """Initializes the Bini class with the correct endpoint."""
         self.endpoint = f"{self.endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
+        self.agent = SetAgent(config=config)
 
     def prompt_agent(self) -> str:
         """Enhances given prompt in more professional manner"""
@@ -30,11 +41,11 @@ class Bini(Agents, Functionality):
         if self.sample_image:
             payload = {
                 "messages": [
-                    {"role": "system", "content": [{"type": "text", "text": self.image_visualization_agent}]},
+                    {"role": "system", "content": [{"type": "text", "text": Prompts.image_visualization_agent}]},
                     {"role": "user", "content": [
                         {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(self.image_path)}"}},
                         {"type": "sample_image", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(self.sample_image)}"}},
-                        {"type": "text", "text": self.prompt}
+                        {"type": "text", "text": self.agent.execute(self.prompt)}
                     ]}
                 ],
                 "temperature": 0.1,
@@ -43,11 +54,11 @@ class Bini(Agents, Functionality):
         else:
             payload = {
                 "messages": [
-                    {"role": "system", "content": [{"type": "text", "text": self.image_visualization_agent}]},
+                    {"role": "system", "content": [{"type": "text", "text": Prompts.image_visualization_agent}]},
                     {"role": "user", "content": [
                         {"type": "image_url",
                          "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(self.image_path)}"}},
-                        {"type": "text", "text": self.prompt}
+                        {"type": "text", "text": self.agent.execute(self.prompt)}
                     ]}
                 ],
                 "temperature": 0.1,
@@ -70,7 +81,7 @@ class Bini(Agents, Functionality):
         """Processes an image with a given prompt using the image visualization agent."""
         payload = {
             "messages": [
-                {"role": "system", "content": [{"type": "text", "text": self.image_compare_agent}]},
+                {"role": "system", "content": [{"type": "text", "text": Prompts.image_compare_agent}]},
                 {"role": "user", "content": [
                     {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(image_path)}"}},
                     {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(compare_to)}"}},
