@@ -1,6 +1,6 @@
 from typing import Optional
 from dataclasses import dataclass
-from bini.core.modules.environment import get_dotenv_data
+from bini.infrastructure.environment import get_dotenv_data
 from bini.engine.engine import Bini
 
 

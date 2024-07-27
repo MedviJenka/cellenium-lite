@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from langchain_openai import AzureChatOpenAI
-from bini.core.modules.environment import get_dotenv_data
+from bini.infrastructure.environment import get_dotenv_data
 
 
 @dataclass

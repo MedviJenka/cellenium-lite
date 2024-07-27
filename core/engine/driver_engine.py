@@ -21,7 +21,7 @@ class DriverEngine(DriverManager):
     def get_web(self, url: str) -> None:
         self.driver.goto(url)
 
-    def get_element(self, name: str, screenshot: Optional[bool] = False) -> any:
+    def get_element(self, name: str, prompt: Optional[str] = None) -> any:
 
         element_name, element_type, element_locator = self.__get_element_properties(sheet_name=self.screen, value=name)
         output = f'element name: {element_name} | elements locator: {element_locator} | element type: {element_type}'
@@ -29,9 +29,10 @@ class DriverEngine(DriverManager):
 
         try:
             log.level.info(output)
-            if screenshot:
+            if prompt:
                 self.driver.locator(f'[{element_locator}={element_type}]').screenshot(path=f'{screenshot_path}')
                 log.level.info(f'screen shot success: {screenshot_path}')
+                self.take_screenshot(name=name, prompt=prompt)
             return self.driver.locator(f'[{element_locator}={element_type}]')
 
         except Exception as e:

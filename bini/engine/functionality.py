@@ -1,5 +1,6 @@
 import base64
 import requests
+from typing import Optional
 from dataclasses import dataclass, field
 
 
@@ -9,7 +10,7 @@ class Functionality:
     api_key: str
     endpoint: str
     image_path: str = field(init=False)
-    sample_image: str = field(default='', init=False)
+    sample_image: Optional[str] = field(default='', init=False)
     prompt: str = field(init=False)
 
     @property

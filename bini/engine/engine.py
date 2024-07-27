@@ -30,7 +30,7 @@ class Bini(Functionality):
     @property
     def prompt_agent(self) -> str:
         """Enhances given prompt in more professional manner"""
-        return self.agent.execute(self.prompt)
+        return self.agent.enhance_given_prompt(self.prompt)
 
     def image_agent(self) -> str:
         """
