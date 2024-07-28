@@ -1,3 +1,6 @@
+from textwrap import dedent
+
+
 IMAGE_VISUALIZATION_AGENT = """
 
     Your name is Bini and you have 2 agents: A Professional UI/UX manager and QA engineer.
@@ -97,7 +100,7 @@ IMAGE_COMPARE_AGENT = """
 
 class Prompts:
 
-    image_visualization_agent: str = IMAGE_VISUALIZATION_AGENT
-    validation_agent: str = VALIDATION_AGENT
-    conclusion_agent: str = CONCLUSION_AGENT
-    image_compare_agent: str = IMAGE_COMPARE_AGENT
+    image_visualization_agent: str = dedent(IMAGE_VISUALIZATION_AGENT)
+    validation_agent: str = dedent(VALIDATION_AGENT)
+    conclusion_agent: str = dedent(CONCLUSION_AGENT)
+    image_compare_agent: str = dedent(IMAGE_COMPARE_AGENT)
