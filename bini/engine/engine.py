@@ -28,7 +28,7 @@ class Bini(Functionality):
         self.agent = SetAgent(config=config)
 
     @property
-    def prompt_agent(self) -> str:
+    def enhance_prompt(self) -> str:
         """Enhances given prompt in more professional manner"""
         return self.agent.enhance_given_prompt(self.prompt)
 
@@ -38,7 +38,7 @@ class Bini(Functionality):
         """
         user_content = [
             {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(self.image_path)}"}},
-            {"type": "text", "text": self.prompt_agent}
+            {"type": "text", "text": self.enhance_prompt}
         ]
 
         if self.sample_image:
