@@ -10,13 +10,13 @@ class Logger:
         self.time_format: str = f'{self.time: %A | %d/%m/%Y | %X}'
         self.format: str = f'%(levelname)s | {self.time_format} | %(message)s | Function: %(funcName)s | Line: %(lineno)d'
 
+    @property
+    def level(self) -> logging:
+
         logging.basicConfig(filename=BINI_LOGS,
                             filemode='a',
                             datefmt=self.time_format,
                             format=self.format,
                             level=logging.INFO)
-        self.logger = logging.getLogger()
 
-    @property
-    def level(self) -> logging:
-        return self.logger
+        return logging.getLogger()
