@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from langchain_openai import AzureChatOpenAI
+from langchain_openai import AzureChatOpenAI, OpenAI
 from bini.infrastructure.environment import get_dotenv_data
 
 
@@ -19,3 +19,13 @@ class EnvironmentConfig:
             azure_endpoint=get_dotenv_data(self.azure_endpoint),
             api_key=get_dotenv_data(self.api_key)
         )
+
+
+@dataclass
+class OpenaiEnvironmentConfig:
+
+    api_key: str
+
+    @property
+    def set_openai_llm(self) -> OpenAI:
+        return OpenAI(openai_api_key=get_dotenv_data(self.api_key))

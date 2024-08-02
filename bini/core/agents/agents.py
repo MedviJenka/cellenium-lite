@@ -9,7 +9,6 @@ config = EnvironmentConfig(deployment_name='MODEL',
                            azure_endpoint='AZURE_OPENAI_ENDPOINT',
                            api_key='OPENAI_API_KEY')
 
-
 @dataclass
 class CustomAgent:
 
@@ -23,6 +22,7 @@ class CustomAgent:
     """
 
     config: EnvironmentConfig
+    model: str = 'azure'
 
     @property
     def prompt_expert_agent(self) -> Agent:
@@ -31,7 +31,7 @@ class CustomAgent:
             goal=dedent(f"""Rephrasing user prompt in more professional way"""),
             backstory=dedent(f"""Rephrasing user prompt in more professional way"""),
             allow_delegation=False,
-            llm=self.config.set_azure_llm,
+            llm=self.config.set_azure_llm if self.model == 'azure' else 'openai',
             verbose=True)
 
 
