@@ -26,3 +26,12 @@ class TestSTLogin:
     def test_web(self) -> None:
         self.engine.get_web("https://stngqa.ai-logix.net/ui/login")
         self.engine.get_element('login').click()
+
+
+class TestCodeGen:
+
+    def setup_method(self) -> None:
+        self.engine = DriverEngine(screen='ST', headless=False)
+
+    def test(self) -> None:
+        self.engine.codegen(url='https://www.google.com')

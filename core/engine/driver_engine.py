@@ -1,3 +1,4 @@
+import os
 import uuid
 import warnings
 from typing import Optional
@@ -17,6 +18,10 @@ log = Logger()
 class DriverEngine(DriverManager):
 
     screen: Optional[str] = None
+
+    @staticmethod
+    def codegen(url: str) -> None:
+        os.system(f'npx playwright codegen {url}')
 
     def get_web(self, url: str) -> None:
         self.driver.goto(url)
