@@ -9,6 +9,7 @@ config = EnvironmentConfig(deployment_name='MODEL',
                            azure_endpoint='AZURE_OPENAI_ENDPOINT',
                            api_key='OPENAI_API_KEY')
 
+
 @dataclass
 class CustomAgent:
 

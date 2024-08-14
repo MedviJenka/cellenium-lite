@@ -1,6 +1,6 @@
 import requests
 from typing import Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from bini.core.agents.prompt_agent import SetAgent
 from bini.engine.azure_config import EnvironmentConfig
 from bini.infrastructure.prompts import Prompts
@@ -18,31 +18,28 @@ config = EnvironmentConfig(api_key='OPENAI_API_KEY',
 class Bini(Functionality):
 
     model: str
-    api_key: str
     version: str
-    agent: SetAgent = field(init=False)
 
     def __post_init__(self) -> None:
         """Initializes the Bini class with the correct endpoint."""
         self.endpoint = f"{self.endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
         self.agent = SetAgent(config=config)
 
-    @property
-    def enhance_prompt(self) -> str:
+    def enhance_prompt(self, prompt) -> str:
         """Enhances given prompt in more professional manner"""
-        return self.agent.enhance_given_prompt(self.prompt)
+        return self.agent.enhance_given_prompt(prompt)
 
-    def image_agent(self) -> str:
+    def image_agent(self, image_path: str, sample_image: str, prompt: str) -> str:
         """
         If sample image provided insert it in the request else, use just one image.
         """
         user_content = [
-            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(self.image_path)}"}},
-            {"type": "text", "text": self.enhance_prompt}
+            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(image_path)}"}},
+            {"type": "text", "text": self.enhance_prompt(prompt)}
         ]
 
-        if self.sample_image:
-            user_content.insert(__index=1, __object={"type": "sample_image", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(self.sample_image)}"}})
+        if sample_image:
+            user_content.insert(__index=1, __object={"type": "sample_image", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(sample_image)}"}})
 
         payload = {
             "messages": [
@@ -57,8 +54,7 @@ class Bini(Functionality):
     def run(self, image_path: str, prompt: str, sample_image: Optional[str] = '') -> str:
         """Runs the appropriate agents based on the call_agents flag."""
         try:
-            self.params = (image_path, prompt, sample_image)
-            return self.image_agent()
+            return self.image_agent(image_path=image_path, sample_image=sample_image, prompt=prompt)
 
         except FileNotFoundError as e:
             raise e

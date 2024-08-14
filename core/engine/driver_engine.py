@@ -58,6 +58,16 @@ class DriverEngine(DriverManager):
                 image = fr'{IMAGES}\{self.__random_id}.png'
         self.driver.screenshot(path=image)
 
+    @staticmethod
+    def codegen(website: str) -> None:
+
+        """
+        :TODO: each click will append elements to google sheets
+
+        """
+
+        os.system(f'npx playwright codegen {website}')
+
     @property
     def __random_id(self) -> str:
         return str(uuid.uuid4())

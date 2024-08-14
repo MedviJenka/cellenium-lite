@@ -1,7 +1,6 @@
 import base64
 import requests
-from typing import Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass
@@ -9,18 +8,6 @@ class Functionality:
 
     api_key: str
     endpoint: str
-    image_path: str = field(init=False)
-    sample_image: Optional[str] = field(default='', init=False)
-    prompt: str = field(init=False)
-
-    @property
-    def params(self) -> tuple:
-        return self.image_path, self.prompt, self.sample_image
-
-    @params.setter
-    def params(self, values: tuple[str, str, str]) -> None:
-        """Sets the image path and prompt for the instance."""
-        self.image_path, self.prompt, self.sample_image = values
 
     @staticmethod
     def _encode_image(image_path: str) -> str:
