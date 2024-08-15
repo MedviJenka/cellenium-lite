@@ -7,20 +7,10 @@ from bini.engine.engine import Bini
 @dataclass
 class IRBiniUtils(Bini):
 
-    """
-    agents are more accurate but also more expensive and with slower runtime
-
-    for 17 tests:
-        run time without agents: 01:47 ~ 02:22
-        run time with agents: 03:23 ~ 03:46
-
-    """
-
     endpoint: str = get_dotenv_data('AZURE_OPENAI_ENDPOINT')
     model: str = get_dotenv_data('MODEL')
     api_key: str = get_dotenv_data('OPENAI_API_KEY')
     version: str = get_dotenv_data('OPENAI_API_VERSION')
-    call_agents: bool = False
 
     def validate_call_metadata_for_each_row(self,
                                             image: str,

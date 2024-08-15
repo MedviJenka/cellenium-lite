@@ -2,12 +2,12 @@ from core.modules.decorators import negative
 from bini.infrastructure.ai_utils import IRBiniUtils
 
 
-bini = IRBiniUtils(call_agents=False)
+bini = IRBiniUtils()
 
 
 def test_user_is_displayed() -> None:
     response = bini.run(
-        image_path=r"C:\Users\medvi\OneDrive\Desktop\cellenium-lite\bini\core\data\images\img.png",
+        image_path=r"C:\Users\medvi\OneDrive\Desktop\cellenium-lite\tests\test_4\img.png",
         prompt='Is Efrat Lang displayed on the right side of the screen? at the end type Passed if yes')
     assert 'Passed' in response
 
