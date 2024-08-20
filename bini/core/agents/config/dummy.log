@@ -1,0 +1,60 @@
+============================= test session starts =============================
+platform linux -- Python 3.9.1, pytest-6.2.1, py-1.10.0, pluggy-0.13.1
+rootdir: /my_project
+collected 10 items
+
+test_module.py::test_add PASSED                                            [ 10%]
+test_module.py::test_subtract FAILED                                        [ 20%]
+test_module.py::test_multiply PASSED                                        [ 30%]
+test_module.py::test_divide FAILED                                          [ 40%]
+test_module.py::test_modulus PASSED                                         [ 50%]
+test_module.py::test_power FAILED                                           [ 60%]
+test_module.py::test_square_root PASSED                                     [ 70%]
+test_module.py::test_logarithm FAILED                                       [ 80%]
+test_module.py::test_exponent PASSED                                        [ 90%]
+test_module.py::test_factorial FAILED                                       [100%]
+
+================================== FAILURES ===================================
+____________________________ test_subtract _____________________________
+Traceback (most recent call last):
+    File "/my_project/test_module.py", line 12, in test_subtract
+        assert subtract(10, 5) == 6
+AssertionError: assert 5 == 6
+
+____________________________ test_divide ______________________________
+Traceback (most recent call last):
+    File "/my_project/test_module.py", line 22, in test_divide
+        assert divide(10, 2) == 3
+AssertionError: assert 5 == 3
+
+____________________________ test_power ______________________________
+Traceback (most recent call last):
+    File "/my_project/test_module.py", line 32, in test_power
+        assert power(2, 3) == 9
+AssertionError: assert 8 == 9
+
+____________________________ test_logarithm ___________________________
+Traceback (most recent call last):
+    File "/my_project/test_module.py", line 42, in test_logarithm
+        assert logarithm(100) == 2
+AssertionError: assert 4.605 == 2
+
+____________________________ test_factorial ___________________________
+Traceback (most recent call last):
+    File "/my_project/test_module.py", line 52, in test_factorial
+        assert factorial(5) == 121
+AssertionError: assert 120 == 121
+
+=========================== short test summary info ===========================
+FAILED test_module.py::test_subtract - AssertionError: assert 5 == 6
+FAILED test_module.py::test_divide - AssertionError: assert 5 == 3
+FAILED test_module.py::test_power - AssertionError: assert 8 == 9
+FAILED test_module.py::test_logarithm - AssertionError: assert 4.605 == 2
+FAILED test_module.py::test_factorial - AssertionError: assert 120 == 121
+PASSED test_module.py::test_add
+PASSED test_module.py::test_multiply
+PASSED test_module.py::test_modulus
+PASSED test_module.py::test_square_root
+PASSED test_module.py::test_exponent
+
+========================= 5 failed, 5 passed in 0.11s =========================

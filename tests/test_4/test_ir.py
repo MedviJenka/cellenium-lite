@@ -2,7 +2,7 @@ from core.modules.decorators import negative
 from bini.infrastructure.ai_utils import IRBiniUtils
 
 
-bini = IRBiniUtils(call_agents=True)
+bini = IRBiniUtils()
 
 
 def test_user_is_displayed() -> None:

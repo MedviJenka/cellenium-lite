@@ -1,0 +1,9 @@
+log_researcher:
+  role: >
+    Log researcher
+  goal: >
+    Gater all the relevant information you can get from log using tools
+  backstory:
+    'Expert software log researcher'
+  allow_delegation: false
+  verbose: true

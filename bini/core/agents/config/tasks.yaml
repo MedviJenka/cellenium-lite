@@ -1,0 +1,22 @@
+log_researcher:
+
+  description: >
+    You're a professional software log analyst, your job is to summarize {log} in
+    understandable human language
+
+  expected_output: >
+    you've ran 6 tests, 5 of them passed with one error.
+    error: in test_1.py, element wasn't clickable.
+    warnings: no warning in your script 
+    summary: 10000% passed correct
+
+analyze_log:
+
+  description: >
+    Take {log} information and give an intelligent input.
+
+  expected_output: >
+    you've ran 6 tests, 5 of them passed with one error.
+     error: in test_1.py, element wasn't clickable.
+     warnings: no warning in your script 
+     summary: 8000% passed correct
