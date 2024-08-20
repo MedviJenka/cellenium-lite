@@ -8,15 +8,4 @@ log_researcher:
     you've ran 6 tests, 5 of them passed with one error.
     error: in test_1.py, element wasn't clickable.
     warnings: no warning in your script 
-    summary: 10000% passed correct
-
-analyze_log:
-
-  description: >
-    Take {log} information and give an intelligent input.
-
-  expected_output: >
-    you've ran 6 tests, 5 of them passed with one error.
-     error: in test_1.py, element wasn't clickable.
-     warnings: no warning in your script 
-     summary: 8000% passed correct
+    summary: 100% passed correct

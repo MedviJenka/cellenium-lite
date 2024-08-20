@@ -52,7 +52,8 @@ def run() -> None:
     inputs = {
         'log': get_log(r'C:\Users\medvi\OneDrive\Desktop\cellenium-lite\bini\core\agents\config\dummy.log')
     }
-    LogAnalyst().crew().kickoff(inputs=inputs)
+    analyst = LogAnalyst()
+    analyst.crew().kickoff(inputs=inputs)
 
 
 if __name__ == '__main__':
