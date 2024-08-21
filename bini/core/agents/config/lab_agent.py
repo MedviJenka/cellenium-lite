@@ -1,49 +1,24 @@
-import yaml
 from crewai import Agent, Task, Crew
-from langchain_openai import AzureChatOpenAI
-from bini.infrastructure.environment import get_dotenv_data
+from dataclasses import dataclass
+from bini.engine.azure_config import EnvironmentConfig
+from bini.engine.engine import config
+from bini.infrastructure.abstract_paths import AGENTS_CONFIG, TASKS_CONFIG
 from bini.infrastructure.executor import Executor
+from bini.infrastructure.modules import read_yaml
 
 
-def read_yaml(file_path) -> dict:
-
-    """
-    Reads a YAML file and returns the content as a dictionary.
-
-    :param file_path: Path to the YAML file.
-    :return: Dictionary containing YAML data.
-
-    """
-
-    with open(file_path, 'r') as file:
-        try:
-            data = yaml.safe_load(file)
-            return data
-        except yaml.YAMLError:
-            raise FileNotFoundError
-
-
+@dataclass
 class AgentLab(Executor):
 
-    tasks_config: str = r'C:\Users\medvi\OneDrive\Desktop\cellenium-lite\bini\core\agents\config\tasks.yaml'
-    agents_config: str = r'C:\Users\medvi\OneDrive\Desktop\cellenium-lite\bini\core\agents\config\agents.yaml'
-
-    def __init__(self):
-        self.config = AzureChatOpenAI(
-            deployment_name=get_dotenv_data('MODEL'),
-            openai_api_version=get_dotenv_data('OPENAI_API_VERSION'),
-            azure_endpoint=get_dotenv_data('AZURE_OPENAI_ENDPOINT'),
-            api_key=get_dotenv_data('OPENAI_API_KEY'),
-            temperature=0
-        )
+    config: EnvironmentConfig
 
     @property
     def custom_agent(self) -> Agent:
-        return Agent(**read_yaml(self.agents_config)['agent'], llm=self.config)
+        return Agent(**read_yaml(AGENTS_CONFIG)['agent'], llm=self.config.set_azure_llm)
 
     def tasks(self, prompt: str) -> Task:
         # Load task configuration from YAML
-        task_config = read_yaml(self.tasks_config)['prompt_validator']
+        task_config = read_yaml(TASKS_CONFIG)['prompt_validator']
 
         # Modify the description to include the provided prompt dynamically
         task_config['description'] = f"{task_config['description']} Prompt to validate: {prompt}"
@@ -62,6 +37,6 @@ class AgentLab(Executor):
         return self.set_crew(prompt=prompt).kickoff()
 
 
-agents = AgentLab()
+agents = AgentLab(config=config)
 
 print(agents.execute('hello'))

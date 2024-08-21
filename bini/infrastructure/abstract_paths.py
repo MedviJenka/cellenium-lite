@@ -9,3 +9,5 @@ GLOBAL_PATH = abstract_dir.split('core')[0][:-1]
 TESTS = fr'{GLOBAL_PATH}\tests'
 BINI_LOGS = fr'{GLOBAL_PATH}\logs\logs.log'
 SAMPLES = fr'{GLOBAL_PATH}\core\data\samples.xlsx'
+AGENTS_CONFIG = fr'{GLOBAL_PATH}\core\agents\config\agents.yaml'
+TASKS_CONFIG = fr'{GLOBAL_PATH}\core\agents\config\tasks.yaml'
