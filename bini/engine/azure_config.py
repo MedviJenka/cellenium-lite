@@ -30,3 +30,9 @@ class OpenaiEnvironmentConfig:
     @property
     def set_openai_llm(self) -> OpenAI:
         return OpenAI(openai_api_key=get_dotenv_data(self.api_key))
+
+
+config = EnvironmentConfig(deployment_name='MODEL',
+                           openai_api_version='OPENAI_API_VERSION',
+                           azure_endpoint='AZURE_OPENAI_ENDPOINT',
+                           api_key='OPENAI_API_KEY')
