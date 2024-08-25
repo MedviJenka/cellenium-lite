@@ -1,13 +1,13 @@
 from textwrap import dedent
 from dataclasses import dataclass
 from crewai import Agent, Crew
-from bini.engine.azure_config import EnvironmentConfig
+from bini.engine.azure_config import AzureOpenAIEnvironmentConfig
 
 
-config = EnvironmentConfig(deployment_name='MODEL',
-                           openai_api_version='OPENAI_API_VERSION',
-                           azure_endpoint='AZURE_OPENAI_ENDPOINT',
-                           api_key='OPENAI_API_KEY')
+config = AzureOpenAIEnvironmentConfig(deployment_name='MODEL',
+                                      openai_api_version='OPENAI_API_VERSION',
+                                      azure_endpoint='AZURE_OPENAI_ENDPOINT',
+                                      api_key='OPENAI_API_KEY')
 
 
 @dataclass
@@ -22,7 +22,7 @@ class CustomAgent:
 
     """
 
-    config: EnvironmentConfig
+    config: AzureOpenAIEnvironmentConfig
     model: str = 'azure'
 
     @property
@@ -32,14 +32,14 @@ class CustomAgent:
             goal=dedent(f"""Rephrasing user prompt in more professional way"""),
             backstory=dedent(f"""Rephrasing user prompt in more professional way"""),
             allow_delegation=False,
-            llm=self.config.set_azure_llm if self.model == 'azure' else 'openai',
+            llm=self.config if self.model == 'azure' else 'openai',
             verbose=True)
 
 
 @dataclass
 class CallCrew(CustomAgent):
 
-    config: EnvironmentConfig
+    config: AzureOpenAIEnvironmentConfig
 
     def assemble_crew(self):
         return Crew(agents=[self.prompt_expert_agent]).kickoff()

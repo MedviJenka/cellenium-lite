@@ -4,7 +4,7 @@ from bini.infrastructure.environment import get_dotenv_data
 
 
 @dataclass
-class EnvironmentConfig:
+class AzureOpenAIEnvironmentConfig:
 
     deployment_name: str
     openai_api_version: str
@@ -32,7 +32,7 @@ class OpenaiEnvironmentConfig:
         return OpenAI(openai_api_key=get_dotenv_data(self.api_key))
 
 
-config = EnvironmentConfig(deployment_name='MODEL',
-                           openai_api_version='OPENAI_API_VERSION',
-                           azure_endpoint='AZURE_OPENAI_ENDPOINT',
-                           api_key='OPENAI_API_KEY')
+config = AzureOpenAIEnvironmentConfig(deployment_name='MODEL',
+                                      openai_api_version='OPENAI_API_VERSION',
+                                      azure_endpoint='AZURE_OPENAI_ENDPOINT',
+                                      api_key='OPENAI_API_KEY')
