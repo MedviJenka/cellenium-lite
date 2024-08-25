@@ -48,8 +48,8 @@ class Bini(APIRequestHandler):
     def run(self, image_path: str, prompt: str, sample_image: Optional[str] = '') -> str:
         """Runs the appropriate agents based on the call_agents flag."""
         try:
-            return self.image_agent(image_path=image_path, sample_image=sample_image, prompt=prompt)
-
+            result = self.image_agent(image_path=image_path, sample_image=sample_image, prompt=prompt)
+            return self.enhance_prompt(result)
         except FileNotFoundError as e:
             raise e
 

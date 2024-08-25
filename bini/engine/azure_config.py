@@ -6,10 +6,10 @@ from bini.infrastructure.environment import get_dotenv_data
 @dataclass
 class AzureOpenAIEnvironmentConfig:
 
+    api_key: str
+    azure_endpoint: str
     deployment_name: str
     openai_api_version: str
-    azure_endpoint: str
-    api_key: str
 
     @property
     def set_azure_llm(self) -> AzureChatOpenAI:
