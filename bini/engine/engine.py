@@ -2,9 +2,9 @@ import requests
 from typing import Optional
 from dataclasses import dataclass
 from bini.core.agents.prompt_agent import SetAgent
-from bini.infrastructure.prompts import Prompts
+from bini.engine.azure_config import AzureOpenAIEnvironmentConfig
 from bini.engine.functionality import APIRequestHandler
-from bini.engine.azure_config import config
+from bini.infrastructure.prompts import Prompts
 
 
 @dataclass
@@ -12,16 +12,26 @@ class Bini(APIRequestHandler):
 
     model: str
     version: str
-    config = config.set_azure_llm
 
     def __post_init__(self) -> None:
+
+        self.config = AzureOpenAIEnvironmentConfig(api_key='OPENAI_API_KEY',
+                                                   azure_endpoint='AZURE_OPENAI_ENDPOINT',
+                                                   openai_api_version='OPENAI_API_VERSION',
+                                                   deployment_name='MODEL')
+
         """Initializes the Bini class with the correct endpoint."""
         self.endpoint = f"{self.endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
         self.agent = SetAgent(config=self.config)
 
-    def enhance_prompt(self, prompt) -> str:
+    def enhance_prompt(self, prompt: str) -> str:
         """Enhances given prompt in more professional manner"""
         return self.agent.enhance_given_prompt(prompt)
+
+    def enhance_result(self, prompt: str) -> str:
+        """
+        :TODO: enhance result with agent
+        """
 
     def image_agent(self, image_path: str, sample_image: str, prompt: str) -> str:
         """
@@ -50,6 +60,7 @@ class Bini(APIRequestHandler):
         try:
             result = self.image_agent(image_path=image_path, sample_image=sample_image, prompt=prompt)
             return self.enhance_prompt(result)
+
         except FileNotFoundError as e:
             raise e
 

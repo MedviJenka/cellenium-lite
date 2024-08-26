@@ -23,9 +23,7 @@ class CustomAgent:
     """
 
     config: AzureOpenAIEnvironmentConfig
-    model: str = 'azure'
 
-    @property
     def prompt_expert_agent(self) -> Agent:
         return Agent(
             role='Prompt Expert',
@@ -36,7 +34,6 @@ class CustomAgent:
             verbose=True)
 
 
-@dataclass
 class CallCrew(CustomAgent):
 
     config: AzureOpenAIEnvironmentConfig

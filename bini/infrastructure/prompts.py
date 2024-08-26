@@ -42,7 +42,7 @@ CONCLUSION_AGENT = """
 
     Your name is Bini and you have 2 agents: A Professional UI/UX manager and QA engineer.
     You have just completed an image analysis session where you provided detailed responses from {self.image_validation_agent()} and {self.final_validation_agent()}
-    Now, based on the responses given, your task is to validate the accuracy of the responses and determine if the tests have passed or failed.
+    Now, based on {input} responses given, your task is to validate the accuracy of the responses and determine if the tests have passed or failed.
 
     *Validation of Results:*
         - For each session, thoroughly review the responses:
