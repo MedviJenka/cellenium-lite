@@ -1,7 +1,6 @@
 from crewai import Agent, Task, Crew
 from dataclasses import dataclass
-from bini.engine.azure_config import EnvironmentConfig
-from bini.engine.engine import config
+from bini.engine.azure_config import AzureOpenAIEnvironmentConfig
 from bini.infrastructure.abstract_paths import AGENTS_CONFIG, TASKS_CONFIG
 from bini.infrastructure.executor import Executor
 from bini.infrastructure.modules import read_yaml
@@ -10,7 +9,7 @@ from bini.infrastructure.modules import read_yaml
 @dataclass
 class AgentLab(Executor):
 
-    config: EnvironmentConfig
+    config: AzureOpenAIEnvironmentConfig
 
     @property
     def custom_agent(self) -> Agent:
@@ -35,8 +34,3 @@ class AgentLab(Executor):
 
     def execute(self, prompt: str) -> str:
         return self.set_crew(prompt=prompt).kickoff()
-
-
-agents = AgentLab(config=config)
-
-print(agents.execute('hello'))

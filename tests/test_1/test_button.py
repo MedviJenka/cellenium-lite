@@ -13,6 +13,8 @@ class TestTitle:
         self.engine.get_web("https://www.google.com")
         title = self.engine.driver.title()
         assert title == 'Google'
+
+    def test_bini(self) -> None:
         self.engine.get_element(name='search').fill('cats')
         self.engine.get_element(name='search', prompt='what do you see in this picture?')
         self.engine.take_screenshot(prompt='what do you see in this picture?')

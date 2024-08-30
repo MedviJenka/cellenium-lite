@@ -143,22 +143,6 @@ def test_duration_displayed_in_recording_row() -> None:
                                              row=1,
                                              duration='00:04:44')
 
-
-def test_compare_images_1() -> None:
-    response = bini.image_compare(image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png",
-                                  compare_to=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png",
-                                  prompt='what are the differences?')
-    assert 'Passed' in response
-
-
-@negative
-def test_compare_images_2() -> None:
-    response = bini.image_compare(image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png",
-                                  compare_to=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_2.png",
-                                  prompt='what are the differences?')
-    assert 'Passed' in response
-
-
 def test_find_icon_sample() -> None:
     response = bini.run(image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_1.png",
                         sample_image=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_12.png",

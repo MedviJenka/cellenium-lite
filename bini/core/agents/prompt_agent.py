@@ -1,17 +1,14 @@
-from dataclasses import dataclass
 from crewai import Agent, Task, Crew
 from bini.core.agents.agents import CustomAgent
 from bini.engine.azure_config import AzureOpenAIEnvironmentConfig
 
 
-@dataclass
 class SetAgent:
 
-    config: AzureOpenAIEnvironmentConfig
-
-    def __post_init__(self) -> None:
-        self.custom_agent = CustomAgent(config=self.config)
-        self.agent = self.custom_agent.prompt_expert_agent
+    def __init__(self, config: AzureOpenAIEnvironmentConfig) -> None:
+        self.config = config
+        self.custom_agent = CustomAgent(config=self.config.set_azure_llm)
+        self.agent = self.custom_agent.prompt_expert_agent()
 
     @property
     def set_task(self) -> Crew:
@@ -19,7 +16,7 @@ class SetAgent:
         task = Task(
             expected_output="professional prompt engineer: {input}",
             description="rephrase prompt in more professional text {input}",
-            agent=self.agent,
+            agent=self.agent,  # Ensure this is an instance of Agent
         )
 
         agent = Agent(
@@ -37,8 +34,8 @@ class SetAgent:
 
         task = Task(
             expected_output="professional prompt engineer: {input}",
-            description="rephrase chat gpt reponse in more professional manner {input}",
-            agent=self.agent,
+            description="rephrase chat gpt response in more professional manner {input}",
+            agent=self.agent,  # Ensure this is an instance of Agent
         )
 
         agent = Agent(

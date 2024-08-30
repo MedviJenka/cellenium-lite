@@ -19,10 +19,6 @@ class DriverEngine(DriverManager):
 
     screen: Optional[str] = None
 
-    @staticmethod
-    def codegen(url: str) -> None:
-        os.system(f'npx playwright codegen {url}')
-
     def get_web(self, url: str) -> None:
         self.driver.goto(url)
 
@@ -35,8 +31,8 @@ class DriverEngine(DriverManager):
         try:
             log.level.info(output)
             if prompt:
-                self.driver.locator(f'[{element_locator}={element_type}]').screenshot(path=f'{screenshot_path}')
                 log.level.info(f'screen shot success: {screenshot_path}')
+                self.driver.locator(f'[{element_locator}={element_type}]').screenshot(path=f'{screenshot_path}')
                 self.take_screenshot(name=name, prompt=prompt)
             return self.driver.locator(f'[{element_locator}={element_type}]')
 
