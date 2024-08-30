@@ -1,7 +1,9 @@
 import io
 import base64
 import requests
+from typing import MutableMapping
 from dataclasses import dataclass
+from time import sleep
 from PIL import Image
 
 
@@ -46,20 +48,24 @@ class APIRequestHandler(ImageCompression):
     api_key: str
     endpoint: str
 
-    @property
-    def _headers(self) -> dict:
-        """Returns the headers for the API request."""
-        return {
+    def __post_init__(self):
+        # Create a session object to reuse TCP connections
+        self.session = requests.Session()
+        self.session.headers.update({
             "Content-Type": "application/json",
             "api-key": self.api_key,
-        }
+        })
+
+    @property
+    def _headers(self) -> MutableMapping[str, str | bytes]:
+        """Headers are already managed by the session object, so this can be removed."""
+        return self.session.headers
 
     def get_response_json(self, payload: dict) -> dict:
-        """Makes the API request and returns the output."""
-        response = requests.post(url=self.endpoint, headers=self._headers, json=payload)
+        """Makes the API request and returns the JSON output."""
+        response = self.session.post(url=self.endpoint, json=payload)
         response.raise_for_status()
-        data = response.json()
-        return data
+        return response.json()
 
     def get_tokens(self, payload: dict) -> None:
         data = self.get_response_json(payload=payload)
@@ -67,21 +73,22 @@ class APIRequestHandler(ImageCompression):
         print(f'Tokens Used: {tokens}')
 
     def make_request(self, payload: dict) -> str:
-
         """Makes the API request and returns the output."""
-
         try:
-
             data = self.get_response_json(payload=payload)
             output = data['choices'][0]['message']['content']
             self.get_tokens(payload=payload)
 
-            if requests.RequestException:
-                from time import sleep
-                sleep(3)
-                pass
-
             return output
+
+        except requests.RequestException:
+            # Retry logic in case of request failure
+            sleep(3)
+            return self.make_request(payload)
 
         except Exception as e:
             raise e
+
+    def __del__(self):
+        # Close the session when the object is deleted
+        self.session.close()
