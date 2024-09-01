@@ -1,53 +1,60 @@
 import requests
 from typing import Optional
-from dataclasses import dataclass
 from bini.core.agents.prompt_agent import SetAgent
-from bini.engine.azure_config import AzureOpenAIEnvironmentConfig
-from bini.engine.functionality import APIRequestHandler
+from bini.engine.request_handler import APIRequestHandler
 from bini.infrastructure.prompts import Prompts
 
 
-@dataclass
 class Bini(APIRequestHandler):
 
-    model: str
-    version: str
+    """
+    A class to manage interactions with the Bini OpenAI deployment.
+    :param: model The model name for the OpenAI deployment.
+    :param: api_key (str): The API key for accessing the OpenAI service.
+    :param: version (str): The version of the OpenAI API to use.
+    :param: endpoint (str): final azure openai endpoint
 
-    def __post_init__(self) -> None:
+    """
 
-        self.config = AzureOpenAIEnvironmentConfig(api_key='OPENAI_API_KEY',
-                                                   azure_endpoint='AZURE_OPENAI_ENDPOINT',
-                                                   openai_api_version='OPENAI_API_VERSION',
-                                                   deployment_name='MODEL')
+    def __init__(self, model: str, version: str, endpoint: str) -> None:
+        self.model = model
+        self.version = version
+        self.endpoint = f"{endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
+        self.session = requests.Session()
 
-        """Initializes the Bini class with the correct endpoint."""
-        self.endpoint = f"{self.endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
-        self.agent = SetAgent(config=self.config)
+    @property
+    def __set_agent(self) -> SetAgent:
+        """Setting up agent object"""
+        return SetAgent()
 
-    def enhance_prompt(self, prompt: str) -> str:
+    def prompt_agent(self, prompt: str) -> str:
         """Enhances given prompt in more professional manner"""
-        return self.agent.enhance_given_prompt(prompt)
+        return self.__set_agent.enhance_given_prompt(prompt)
 
-    def enhance_result(self, prompt: str) -> str:
+    def result_agent(self, result: str) -> str:
+        """Enhances given prompt in more professional manner"""
+        return self.__set_agent.enhance_given_result(result)
+
+    def run_image_processing(self, image_path: str, prompt: str, sample_image: Optional[str] = '') -> str:
+
         """
-        :TODO: enhance result with agent
+        Sends a request to the image visualization engine.
+        If self.sample_image is provided, it includes the sample image in the payload.
+        :return: Image processing output as a string.
+
         """
 
-    def image_agent(self, image_path: str, sample_image: str, prompt: str) -> str:
-        """
-        If sample image provided insert it in the request else, use just one image.
-        """
         user_content = [
             {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(image_path)}"}},
-            {"type": "text", "text": self.enhance_prompt(prompt)}
+            {"type": "text", "text": self.prompt_agent(prompt=prompt)}  # self.prompt for prompt without agent
         ]
 
         if sample_image:
-            user_content.insert(__index=1, __object={"type": "sample_image", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(sample_image)}"}})
+            user_content.append({"type": "sample_image", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(sample_image)}"}})
 
         payload = {
             "messages": [
-                {"role": "system", "content": [{"type": "text", "text": Prompts.image_visualization_agent}]},
+                {"role": "system", "content": [{"type": "text", "text": Prompts.image_visualization_prompt}]},
                 {"role": "user", "content": user_content}
             ],
             "temperature": 0.1,
@@ -55,14 +62,19 @@ class Bini(APIRequestHandler):
 
         return self.make_request(payload)
 
-    def run(self, image_path: str, prompt: str, sample_image: Optional[str] = '') -> str:
-        """Runs the appropriate agents based on the call_agents flag."""
+    def run(self, image_path: str or callable, prompt: str, sample_image: Optional[str] = '') -> str or list:
+
+        """
+        Runs Bini module using image path and sample image as an optional reference
+        """
+
         try:
-            result = self.image_agent(image_path=image_path, sample_image=sample_image, prompt=prompt)
-            return self.enhance_prompt(result)
+            result = self.run_image_processing(image_path=image_path, sample_image=sample_image, prompt=prompt)
+            return self.__set_agent.enhance_given_result(result)
+            # return v.set_agent(result)
 
         except FileNotFoundError as e:
-            raise e
+            raise f'File: {image_path} cannot be found, exception: {e}'
 
         except requests.RequestException as e:
-            raise e
+            raise f'Failed to send rest request, status code: {e}'
