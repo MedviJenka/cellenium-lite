@@ -3,7 +3,7 @@ import uuid
 import warnings
 from typing import Optional
 from dataclasses import dataclass
-from bini.infrastructure.ai_utils import IRBiniUtils
+from bini.infrastructure.ai_utils_example import BiniUtils
 from core.data.constants import IMAGES
 from core.modules.logger import Logger
 from core.engine.api_engine import get_name, get_locator, get_type
@@ -41,7 +41,7 @@ class DriverEngine(DriverManager):
 
     def take_screenshot(self, name: Optional[str] = None, prompt: Optional[str] = None) -> None:
 
-        bini = IRBiniUtils()
+        bini = BiniUtils()
         image = fr'{IMAGES}\{name}.png'
 
         if prompt:
