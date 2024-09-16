@@ -57,7 +57,7 @@ class Bini(APIRequestHandler):
                 {"role": "system", "content": [{"type": "text", "text": Prompts.image_visualization_prompt}]},
                 {"role": "user", "content": user_content}
             ],
-            "temperature": 0.1,
+            "temperature": 0,
         }
 
         return self.make_request(payload)

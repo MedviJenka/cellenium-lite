@@ -7,8 +7,8 @@ bini = BiniUtils()
 
 def test_user_is_displayed() -> None:
     response = bini.run(
-        image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\tests\img.png",
-        prompt='Is Efrat Lang displayed on the right side of the screen? at the end type Passed if yes')
+        image_path=r"C:\Users\medvi\OneDrive\Desktop\cellenium-lite\tests\test_4\img_1.png",
+        prompt='Is Joni Sherman displayed on the right side of the screen?')
     assert 'Passed' in response
 
 
