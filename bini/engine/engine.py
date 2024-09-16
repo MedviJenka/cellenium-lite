@@ -21,11 +21,7 @@ class Bini(APIRequestHandler):
         self.version = version
         self.endpoint = f"{endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
         self.session = requests.Session()
-
-    @property
-    def __set_agent(self) -> SetAgent:
-        """Setting up agent object"""
-        return SetAgent()
+        self.__set_agent = SetAgent()
 
     def prompt_agent(self, prompt: str) -> str:
         """Enhances given prompt in more professional manner"""
