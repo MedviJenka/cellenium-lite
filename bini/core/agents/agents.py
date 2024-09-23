@@ -1,6 +1,6 @@
+from crewai import Agent
 from textwrap import dedent
 from dataclasses import dataclass
-from crewai import Agent
 from bini.engine.azure_config import AzureOpenAIConfig
 
 

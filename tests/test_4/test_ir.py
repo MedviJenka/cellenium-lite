@@ -14,8 +14,8 @@ def test_user_is_displayed() -> None:
 
 def test_meeting_insights() -> None:
     response = bini.run(
-        image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\bini\core\data\images\img_5.png",
-        prompt='validate the dates are displayed are from 4/4/24 to 13/5/24, parse the date type as day/month/year')
+        image_path=r"C:\Users\evgenyp\PycharmProjects\cellenium-lite\tests\test_4\img.png",
+        prompt='what is displayed')
     assert 'Passed' in response
 
 

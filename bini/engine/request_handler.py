@@ -20,29 +20,32 @@ class APIRequestHandler(ImageCompression):
         }
 
     def get_response_json(self, payload: dict) -> dict:
-        """Makes the API request and returns the output."""
+        """Sends API request and returns the output."""
         response = self.session.post(url=self.endpoint, headers=self._headers, json=payload)
         response.raise_for_status()
         data = response.json()
         return data
 
-    def get_tokens(self, payload: dict) -> None:
+    def get_tokens(self, payload: dict) -> str:
         """returns amount of tokens used in current session"""
         data = self.get_response_json(payload=payload)
         tokens = data["usage"]["total_tokens"]
-        print(tokens)
+        return tokens
 
     def make_request(self, payload: dict) -> str:
         """Makes the API request and returns the output."""
         try:
             data = self.get_response_json(payload=payload)
             output = data['choices'][0]['message']['content']
-            self.get_tokens(payload=payload)
+            tokens = self.get_tokens(payload=payload)
+            print(f'Tokens used: {tokens}')
             return output
+
         except requests.RequestException as e:
             print(f"Request error: {e}")
             sleep(3)
             raise
+
         except Exception as e:
             print(f"An error occurred: {e}")
             raise

@@ -1,5 +1,5 @@
-from bini.engine.engine import Bini
 from bini.core.modules.environment import get_dotenv_data
+from bini.engine.engine import Bini
 
 
 class BiniUtils(Bini):

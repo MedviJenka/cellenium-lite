@@ -1,10 +1,10 @@
+from dataclasses import dataclass
 from langchain.agents import tool
 from langchain.agents import AgentExecutor
 from bini.engine.azure_config import AzureOpenAIConfig
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.agents.format_scratchpad.openai_tools import format_to_openai_tool_messages
 from langchain.agents.output_parsers.openai_tools import OpenAIToolsAgentOutputParser
-from dataclasses import dataclass
 
 
 @dataclass

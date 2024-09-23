@@ -96,89 +96,74 @@ From this stage you can test with Bini. Navigate to your tasting dir and call Bi
 
 
 .. code-block::
+
     import pytest
-from qasharedinfra.infra.common.services.bini_ai.infrastructure.exceptions import BiniPromptException
-from qasharedinfra.infra.ovoc.general.bini_utils import OVOCBiniUtils
-from qasharedinfra.infra.smarttap.selenium.utils.recording_profile_slnm_utils import SmartTap
-from qasharedinfra.infra.smarttap.selenium.st_selenium_utils import *
-from testing.smarttap.interactions_page.core.images import CallIcons
+    from qasharedinfra.infra.common.services.bini_ai.infrastructure.exceptions import BiniPromptException
+    from qasharedinfra.infra.ovoc.general.bini_utils import OVOCBiniUtils
+    from qasharedinfra.infra.smarttap.selenium.utils.recording_profile_slnm_utils import SmartTap
+    from qasharedinfra.infra.smarttap.selenium.st_selenium_utils import *
+    from testing.smarttap.interactions_page.core.images import CallIcons
+
+    global bini
 
 
+    st: SmartTap = env.devices['Device_1']
 
 
-global bini
+    @pytest.fixture(scope='module', autouse=True)
+    def init_globals() -> None:
+
+       global bini
+
+       st.logger_.info('\n******** Module (Script) Setup ********')
+       bini = OVOCBiniUtils()
+       st.test_prerequisites(selenium=True, headless=True)
+       st.ui.utils.st_selenium_go_to_screen_in_current_window(st.selenium, st.st_screens.interactions)
+
+       yield
+
+       logger.info('******** Module (Script) TearDown ********')
+       st.selenium.finalize()
+
+    @pytest.fixture(scope='function', autouse=True)
+    def setup_and_teardown() -> None:
+       st.logger_.info('******** Test Setup ********')
+
+       yield
+
+       st.logger_.info('******** Test TearDown ********')
 
 
+    class TestPlayerIcons:
+
+       """
+       Tests if player icons are correctly displayed on the device screen.
 
 
-st: SmartTap = env.devices['Device_1']
+       """
+
+       def set_test_icons(self, sample_icon: CallIcons) -> None:
 
 
+           try:
+               sleep(5)
+               response = bini.run(image_path=take_screenshot(device=st,  element_name='play_icons_column'),
+                                   sample_image=sample_icon,
+                                   prompt='test prompt)?')
+
+               assert 'Passed' in response
+               assert 'Something you want to validate' in response
+
+           except BiniPromptException as e:
+               raise f'bini exception: {e}'
 
 
-@pytest.fixture(scope='module', autouse=True)
-def init_globals() -> None:
+           except WebDriverException as e:
+               raise f'base selenium exception: {e}'
 
 
-   global bini
-
-
-   st.logger_.info('\n******** Module (Script) Setup ********')
-   bini = OVOCBiniUtils()
-   st.test_prerequisites(selenium=True, headless=True)
-   st.ui.utils.st_selenium_go_to_screen_in_current_window(st.selenium, st.st_screens.interactions)
-
-
-   yield
-
-
-   logger.info('******** Module (Script) TearDown ********')
-   st.selenium.finalize()
-
-@pytest.fixture(scope='function', autouse=True)
-def setup_and_teardown() -> None:
-   st.logger_.info('******** Test Setup ********')
-
-
-   yield
-
-
-   st.logger_.info('******** Test TearDown ********')
-
-
-
-
-class TestPlayerIcons:
-
-
-   """
-   Tests if player icons are correctly displayed on the device screen.
-
-
-   """
-
-   def set_test_icons(self, sample_icon: CallIcons) -> None:
-
-
-       try:
-           sleep(5)
-           response = bini.run(image_path=take_screenshot(device=st,  element_name='play_icons_column'),
-                               sample_image=sample_icon,
-                               prompt='test prompt)?')
-
-           assert 'Passed' in response
-           assert 'Something you want to validate' in response
-
-       except BiniPromptException as e:
-           raise f'bini exception: {e}'
-
-
-       except WebDriverException as e:
-           raise f'base selenium exception: {e}'
-
-
-       except Exception as e:
-           raise e
+           except Exception as e:
+               raise e
 
 
 Pro Tip

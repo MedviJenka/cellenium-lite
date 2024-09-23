@@ -25,17 +25,17 @@ class Bini(APIRequestHandler):
 
     def prompt_agent(self, prompt: str) -> str:
         """Enhances given prompt in more professional manner"""
-        return self.__set_agent.enhance_given_prompt(prompt)
+        return self.__set_agent.enhance_prompt(prompt)
 
     def result_agent(self, result: str) -> str:
         """Enhances given prompt in more professional manner"""
-        return self.__set_agent.enhance_given_result(result)
+        return self.__set_agent.validate_result(result)
 
     def run_image_processing(self, image_path: str, prompt: str, sample_image: Optional[str] = '') -> str:
 
         """
         Sends a request to the image visualization engine.
-        If self.sample_image is provided, it includes the sample image in the payload.
+        If self.sample_image is provided, it will include the sample image in the payload.
         :return: Image processing output as a string.
 
         """
@@ -66,8 +66,7 @@ class Bini(APIRequestHandler):
 
         try:
             result = self.run_image_processing(image_path=image_path, sample_image=sample_image, prompt=prompt)
-            return self.__set_agent.enhance_given_result(result)
-            # return v.set_agent(result)
+            return self.__set_agent.validate_result(result)
 
         except FileNotFoundError as e:
             raise f'File: {image_path} cannot be found, exception: {e}'
