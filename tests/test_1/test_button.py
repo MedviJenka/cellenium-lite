@@ -1,15 +1,12 @@
-from bini.infrastructure.logger import Logger
 from core.engine.driver_engine import DriverEngine
 
 
 class TestTitle:
 
     def setup_method(self) -> None:
-        self.log = Logger()
         self.engine = DriverEngine(screen='Google', headless=True)
 
     def test_web(self) -> None:
-        self.log.level.info('hey')
         self.engine.get_web("https://www.google.com")
         title = self.engine.driver.title()
         assert title == 'Google'

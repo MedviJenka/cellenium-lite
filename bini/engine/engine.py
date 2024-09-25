@@ -1,11 +1,12 @@
 import requests
 from typing import Optional
 from bini.core.agents.prompt_agent import SetAgent
+from bini.engine.factory import BiniFactory
 from bini.engine.request_handler import APIRequestHandler
 from bini.infrastructure.prompts import Prompts
 
 
-class Bini(APIRequestHandler):
+class Bini(BiniFactory, APIRequestHandler):
 
     """
     A class to manage interactions with the Bini OpenAI deployment.
@@ -17,11 +18,9 @@ class Bini(APIRequestHandler):
     """
 
     def __init__(self, model: str, version: str, endpoint: str) -> None:
-        self.model = model
-        self.version = version
-        self.endpoint = f"{endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
         self.session = requests.Session()
         self.__set_agent = SetAgent()
+        BiniFactory.__init__(self, model=model, version=version, endpoint=endpoint)
 
     def prompt_agent(self, prompt: str) -> str:
         """Enhances given prompt in more professional manner"""
