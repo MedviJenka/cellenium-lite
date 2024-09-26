@@ -4,3 +4,4 @@
 /core/environment/_json/
 /core/environment/credentials.json
 /.env
+/bini/engine/__pycache__/
