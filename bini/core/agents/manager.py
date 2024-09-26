@@ -1,9 +1,7 @@
 from crewai import Agent, Crew, Task
 from crewai.telemetry import Telemetry
 from requests.exceptions import ReadTimeout, ConnectionError
-
 from bini.core.agents.agents import CustomAgent
-from bini.core.memory.memory import MemoryEngine
 from bini.engine.azure_config import AzureOpenAIConfig
 
 
@@ -19,7 +17,7 @@ class WorkaroundHandler:
                 setattr(Telemetry, attr, lambda *args, **kwargs: None)
 
 
-class AgentManager(WorkaroundHandler, MemoryEngine):
+class AgentManager(WorkaroundHandler):
 
     """
     Handles the initialization and management of agents and task crews.
@@ -39,8 +37,8 @@ class AgentManager(WorkaroundHandler, MemoryEngine):
         self.prompt_agent = self.custom_agent.prompt_expert_agent
         self.validation_agent = self.custom_agent.final_result_agent
 
-    def create_task_crew(self,
-                         task_description: str,
+    @staticmethod
+    def create_task_crew(task_description: str,
                          task_output: str,
                          agent: Agent,
                          supporting_role: str,
@@ -68,7 +66,6 @@ class AgentManager(WorkaroundHandler, MemoryEngine):
             backstory=supporting_backstory,
             memory=True,
             verbose=True,
-            tools=[self.memory_tool]
         )
 
         return Crew(ready=False, agents=[agent, supporting_agent], tasks=[task])
