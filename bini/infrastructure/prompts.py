@@ -89,7 +89,111 @@ VALIDATION_AGENT = """
 """
 
 
+CODE_AGENT_PROMPT = """
+
+you are a professional code engineer, you purpose it to write a code based on a screenshot, the code must be built as an example bellow:
+
+Analyze the screenshot provided and generate a functional Python test script using the `pytest` framework. 
+
+*IMPORTANT*:
+1. Create unique class and method names that reflect the UI elements or interactions present in the image. 
+    - If a **login button** is present, generate a test method like `test_login_button`.
+    - If there is a **form field**, generate methods to test field validation, e.g., `test_form_field_validation`.
+    - Identify buttons, forms, text fields, or navigation elements and generate corresponding test cases.
+  
+2. Write the code as a valid `pytest` script following these principles:
+    - **Class name**: Use `Test<ClassName>` for the class, where `<ClassName>` reflects the screen or feature (e.g., `TestLoginScreen`).
+    - **Method names**: Start with `test_` followed by the action or feature being tested.
+    - Ensure the code is **modular**, uses **assertions**, and reflects real-world user interactions. Use `pytest` best practices.
+  
+3. If elements require input (like a username field), provide realistic test inputs:
+    - Example: `username = "test_user"` or `password = "P@ssw0rd!"`
+  
+4. Assume the use of `selenium` for UI interactions. Provide meaningful selectors such as `find_element_by_id`, `find_element_by_xpath`, or others, depending on the elements seen in the image.
+
+5. Make sure the code follows good **naming conventions** and includes **setup** and **teardown** logic for Selenium WebDriver.
+
+6. ** YOU SHOULD STICK TO THE EXAMPLE BELOW CODE BUILD **
+
+7. import libraries only once and in the first lines of the file, do not repeat imports 
+
+example:
+
+import pytest
+from qasharedinfra.infra.common.services.bini_ai.infrastructure.exceptions import BiniPromptException
+from qasharedinfra.infra.smarttap.selenium.st_selenium_utils import *
+from qasharedinfra.infra.smarttap.selenium.utils.azure_table_data.table_query import TablesQuery
+from qasharedinfra.infra.smarttap.selenium.utils.bini_utils import IRBiniUtils
+from testing.smarttap.interactions_page.core.base_model import BaseModel
+from testing.smarttap.version.constants import AZURE_STORAGE_DATA
+
+global bini
+
+
+HEADLESS = True
+st = env.devices['Device_1']
+logger = env.logger
+
+
+@pytest.fixture(scope='module', autouse=True)
+def init_globals() -> None:
+    global bini
+
+    st.logger_.info('\n******** Module (Script) Setup ********')
+    bini = IRBiniUtils()
+    st.test_prerequisites(selenium=True, headless=HEADLESS)
+    st.ui.utils.st_selenium_go_to_screen_in_current_window(st.selenium, st.st_screens.help_center)
+
+    yield
+
+    logger.info('******** Module (Script) TearDown ********')
+    st.selenium.finalize()
+
+
+@pytest.fixture(scope='function', autouse=True)
+def setup_and_teardown() -> None:
+    st.logger_.info('******** Test Setup ********')
+
+    yield
+
+    st.logger_.info('******** Test TearDown ********')
+
+
+class TestSystemVersion(BaseModel):
+
+    def setup_method(self) -> None:
+        self.driver = st.selenium
+        self.log = st.logger_
+        self.ui = st.ui
+
+    @property
+    def version(self) -> str:
+        table_query = TablesQuery(**AZURE_STORAGE_DATA)
+        version_number = table_query.get_table_data(query='Release')
+        return version_number
+
+    def test_smarttap_version(self) -> None:
+
+        try:
+            response = bini.run(image_path=take_screenshot(device=st, element_name='version'),
+                                prompt='what is the version number displayed?')
+            self.log.info(f'version: {self.version, response},')
+            assert 'Passed' and self.version in response
+
+        except BiniPromptException as e:
+            self.log.failed(e)
+            raise f'bini exception: {BiniPromptException(exception=e, message='check logs')}'
+
+        except WebDriverException as e:
+            self.log.error(e)
+            raise f'base selenium exception: {e}'
+            
+
+"""
+
+
 class Prompts(StrEnum):
 
     image_visualization_prompt: str = IMAGE_VISUALIZATION_PROMPT
     validation_agent: str = VALIDATION_AGENT
+    code_agent_prompt: str = CODE_AGENT_PROMPT

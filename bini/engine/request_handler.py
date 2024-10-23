@@ -1,3 +1,4 @@
+import time
 import requests
 from time import sleep
 from dataclasses import dataclass
@@ -21,7 +22,7 @@ class APIRequestHandler(ImageCompression):
 
     def get_response_json(self, payload: dict) -> dict:
         """Sends API request and returns the output."""
-        response = self.session.post(url=self.endpoint, headers=self._headers, json=payload)
+        response = self.session.post(url=self.endpoint, headers=self._headers, json=payload, verify=False)
         response.raise_for_status()
         data = response.json()
         return data
@@ -44,8 +45,21 @@ class APIRequestHandler(ImageCompression):
         except requests.RequestException as e:
             print(f"Request error: {e}")
             sleep(3)
-            raise
+            raise e
 
         except Exception as e:
             print(f"An error occurred: {e}")
-            raise
+            raise e
+
+    def make_request_with_retry(self, payload: dict, retries: int = 3) -> str:
+        """Retries API calls to handle failures."""
+        for attempt in range(retries):
+
+            try:
+                return self.make_request(payload)
+
+            except requests.RequestException as e:
+                if attempt < retries - 1:
+                    time.sleep(3)
+                else:
+                    raise e

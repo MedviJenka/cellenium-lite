@@ -1,12 +1,13 @@
 import requests
 from typing import Optional
+
 from bini.core.agents.prompt_agent import SetAgent
-from bini.engine.factory import BiniFactory
+from bini.engine.base_model import BiniBaseModel
 from bini.engine.request_handler import APIRequestHandler
 from bini.infrastructure.prompts import Prompts
 
 
-class Bini(BiniFactory, APIRequestHandler):
+class Bini(BiniBaseModel, APIRequestHandler):
 
     """
     A class to manage interactions with the Bini OpenAI deployment.
@@ -18,9 +19,13 @@ class Bini(BiniFactory, APIRequestHandler):
     """
 
     def __init__(self, model: str, version: str, endpoint: str) -> None:
-        self.session = requests.Session()
         self.__set_agent = SetAgent()
-        BiniFactory.__init__(self, model=model, version=version, endpoint=endpoint)
+        self.session = requests.Session()
+        BiniBaseModel.__init__(self, model=model, version=version, endpoint=endpoint)
+
+    def switch_model(self, model: str, version: str) -> None:
+        self.model = model
+        self.version = version
 
     def prompt_agent(self, prompt: str) -> str:
         """Enhances given prompt in more professional manner"""
@@ -55,9 +60,9 @@ class Bini(BiniFactory, APIRequestHandler):
             "temperature": 0,
         }
 
-        return self.make_request(payload)
+        return self.make_request_with_retry(payload)
 
-    def run(self, image_path: str or callable, prompt: str, sample_image: Optional[str] = '') -> str or list:
+    def run(self, image_path: str or callable, prompt: str, sample_image: Optional[str] = '') -> str:
 
         """
         Runs Bini module using image path and sample image as an optional reference
@@ -68,7 +73,7 @@ class Bini(BiniFactory, APIRequestHandler):
             return self.__set_agent.validate_result(result)
 
         except FileNotFoundError as e:
-            raise f'File: {image_path} cannot be found, exception: {e}'
+            raise f'⚠ File: {image_path} cannot be found, exception: {e} ⚠'
 
         except requests.RequestException as e:
-            raise f'Failed to send rest request, status code: {e}'
+            raise f'⚠ Failed to send rest request, status code: {e} ⚠'

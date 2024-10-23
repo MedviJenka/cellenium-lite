@@ -5,7 +5,7 @@ import os
 abstract_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Automation
-GLOBAL_PATH = abstract_dir.split('qasharedinfra')[0][:-1]
+GLOBAL_PATH = abstract_dir.split('infrastructure')[0][:-1]
 TESTS = fr'{GLOBAL_PATH}\tests'
 BINI_LOGS = fr'{GLOBAL_PATH}\tests\logs\logs.log'
 SAMPLES = fr'{GLOBAL_PATH}\core\data\samples.xlsx'

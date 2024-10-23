@@ -1,7 +1,6 @@
 import io
 import base64
 from PIL import Image
-
 from bini.infrastructure.constants import WIDTH, HEIGHT
 
 

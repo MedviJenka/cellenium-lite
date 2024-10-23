@@ -1,5 +1,5 @@
-from bini.core.agents.manager import AgentManager
 from bini.infrastructure.prompts import Prompts
+from bini.core.agents.manager import AgentManager
 
 
 class SetAgent(AgentManager):
@@ -23,6 +23,7 @@ class SetAgent(AgentManager):
             supporting_goal="Rephrase {input}",
             supporting_backstory="Professional Rephrase Agent"
         )
+
         return self.process_with_crew(crew, prompt)
 
     def validate_result(self, result: str) -> str:
