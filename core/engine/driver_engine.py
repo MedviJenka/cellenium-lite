@@ -2,7 +2,6 @@ import uuid
 import warnings
 from typing import Optional
 from dataclasses import dataclass
-from bini.engine.utils import BiniUtils
 from core.data.constants import IMAGES
 from core.modules.logger import Logger
 from core.engine.api_engine import get_name, get_locator, get_type
@@ -25,7 +24,7 @@ class DriverEngine(DriverManager):
     def get_web(self, url: str) -> None:
         self.driver.goto(url)
 
-    def get_element(self, name: str, prompt: Optional[str] = None) -> any:
+    def get_element(self, name: str) -> any:
 
         element_name, element_type, element_locator = self.__get_element_properties(sheet_name=self.screen, value=name)
         output = f'element name: {element_name} | elements locator: {element_locator} | element type: {element_type}'
@@ -33,10 +32,8 @@ class DriverEngine(DriverManager):
 
         try:
             log.level.info(output)
-            if prompt:
-                log.level.info(f'screen shot success: {screenshot_path}')
-                self.driver.locator(f'[{element_locator}={element_type}]').screenshot(path=f'{screenshot_path}')
-                self.take_screenshot(name=name, prompt=prompt)
+            log.level.info(f'screen shot success: {screenshot_path}')
+            self.take_screenshot(name=name)
             return self.driver.locator(f'[{element_locator}={element_type}]')
 
         except Exception as e:
@@ -55,20 +52,16 @@ class DriverEngine(DriverManager):
             log.level.info(f"Dynamic element found: {element.nth(0).inner_text()}")
             return element.nth(0)
 
-    def take_screenshot(self, name: Optional[str] = None, prompt: Optional[str] = None) -> None:
+    def take_screenshot(self, name: Optional[str] = None) -> str:
 
-        bini = BiniUtils()
         image = fr'{IMAGES}\{name}.png'
-
-        if prompt:
-            print(f'image path: {image}')
-            self.driver.screenshot(path=image)
-            bini.run(image_path=image, prompt=prompt)
-            if name is not None:
-                image = fr'{IMAGES}\{name}.png'
-            else:
-                image = fr'{IMAGES}\{self.__random_id}.png'
         self.driver.screenshot(path=image)
+        if name is not None:
+            image = fr'{IMAGES}\{name}.png'
+        else:
+            image = fr'{IMAGES}\{self.__random_id}.png'
+        self.driver.screenshot(path=image)
+        return image
 
     @property
     def __random_id(self) -> str:
@@ -80,7 +73,3 @@ class DriverEngine(DriverManager):
         element_locator = get_locator(**kwargs)
         element_type = get_type(**kwargs)
         return element_name, element_type, element_locator,
-
-
-driver = DriverEngine()
-driver.get_web('https://www.google.com')
