@@ -2,7 +2,7 @@ import uuid
 import warnings
 from typing import Optional
 from dataclasses import dataclass
-from bini.infrastructure.ai_utils_example import BiniUtils
+from bini.engine.utils import BiniUtils
 from core.data.constants import IMAGES
 from core.modules.logger import Logger
 from core.engine.api_engine import get_name, get_locator, get_type
@@ -41,6 +41,19 @@ class DriverEngine(DriverManager):
 
         except Exception as e:
             raise e
+
+    def get_dynamic_element(self, name: str):
+
+        element_name, element_type, element_locator = self.__get_element_properties(sheet_name=self.screen, value=name)
+        dynamic_selector = f"[{element_locator}*='{element_type}']"
+        log.level.info(f"Using dynamic selector: {dynamic_selector}")
+        element = self.driver.locator(dynamic_selector)
+
+        if element.count() == 0:
+            raise Exception(f"Dynamic element with locator {dynamic_selector} not found")
+        else:
+            log.level.info(f"Dynamic element found: {element.nth(0).inner_text()}")
+            return element.nth(0)
 
     def take_screenshot(self, name: Optional[str] = None, prompt: Optional[str] = None) -> None:
 
