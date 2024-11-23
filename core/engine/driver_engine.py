@@ -17,7 +17,11 @@ log = Logger()
 @dataclass
 class DriverEngine(DriverManager):
 
+    headless: bool = False
     screen: Optional[str] = None
+
+    def __post_init__(self):
+        super().__init__(headless=self.headless)
 
     def get_web(self, url: str) -> None:
         self.driver.goto(url)
@@ -74,3 +78,7 @@ class DriverEngine(DriverManager):
         element_locator = get_locator(**kwargs)
         element_type = get_type(**kwargs)
         return element_name, element_type, element_locator,
+
+
+driver = DriverEngine()
+driver.get_web('https://www.google.com')

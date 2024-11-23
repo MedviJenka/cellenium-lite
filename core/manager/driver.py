@@ -1,6 +1,6 @@
 from typing import Optional
-from dataclasses import dataclass
 from playwright.sync_api import sync_playwright
+from dataclasses import dataclass
 
 
 @dataclass
@@ -11,15 +11,12 @@ class DriverManager:
     a Playwright browser instance.
 
     headless: .............................. Testing in background with no UI
-
     """
 
-    headless: Optional[bool] = True
+    headless: Optional[bool] = False
     play = sync_playwright().start()
     chrome = play.chromium.launch(headless=headless)
-
-    def __post_init__(self) -> None:
-        self.driver = self.chrome.new_page()
+    driver = chrome.new_page()
 
     def __del__(self) -> None:
         self.chrome.close()

@@ -1,9 +1,4 @@
-INFO |  Sunday | 30/06/2024 | 11:00:22 | Endpoint: <Response [200]>, Duration: 1.68 seconds | Function: log_performance | Line: 83
-INFO |  Sunday | 30/06/2024 | 19:23:02 | Endpoint: <Response [401]>, Duration: 1.08 seconds | Function: log_performance | Line: 95
-INFO |  Sunday | 30/06/2024 | 19:25:04 | Endpoint: <Response [401]>, Duration: 1.29 seconds | Function: log_performance | Line: 95
-INFO |  Tuesday | 02/07/2024 | 15:01:10 | Endpoint: <Response [401]>, Duration: 0.73 seconds | Function: log_performance | Line: 42
-INFO |  Tuesday | 02/07/2024 | 15:01:25 | Endpoint: <Response [401]>, Duration: 0.70 seconds | Function: log_performance | Line: 42
-INFO |  Tuesday | 02/07/2024 | 15:01:59 | Endpoint: <Response [401]>, Duration: 0.71 seconds | Function: log_performance | Line: 42
-INFO |  Tuesday | 02/07/2024 | 15:02:35 | Endpoint: <Response [401]>, Duration: 0.70 seconds | Function: log_performance | Line: 42
-INFO |  Sunday | 07/07/2024 | 14:58:28 | using model: bini, version: 2024-02-15-preview | Function: __post_init__ | Line: 20
-INFO |  Sunday | 07/07/2024 | 14:59:02 | using model: bini, version: 2024-02-15-preview | Function: __post_init__ | Line: 20
+INFO |  Saturday | 23/11/2024 | 13:52:34 | <Worksheet 'Google' id:0> | Function: __read_google_sheet | Line: 55
+INFO |  Saturday | 23/11/2024 | 13:52:34 | [['name', 'locator', 'type', 'actions', 'image'], ['button', 'NAME', 'btnK', '', ''], ['search', 'NAME', 'q', '', '']] | Function: __read_google_sheet | Line: 56
+INFO |  Saturday | 23/11/2024 | 13:52:34 | ['name', 'locator', 'type', 'actions', 'image'] | Function: __read_google_sheet | Line: 57
+INFO |  Saturday | 23/11/2024 | 13:52:34 | {'name': 'button', 'locator': 'NAME', 'type': 'btnK', 'actions': '', 'image': ''} | Function: __read_google_sheet | Line: 61

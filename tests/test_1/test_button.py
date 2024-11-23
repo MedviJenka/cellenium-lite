@@ -12,6 +12,7 @@ class TestTitle:
         assert title == 'Google'
 
     def test_bini(self) -> None:
+        self.test_web()
         self.engine.get_element(name='search').fill('cats')
         self.engine.get_element(name='search', prompt='what do you see in this picture?')
         self.engine.take_screenshot(prompt='what do you see in this picture?')

@@ -5,3 +5,4 @@
 /core/environment/credentials.json
 /.env
 /bini/engine/__pycache__/
+/core/modules/jira.json

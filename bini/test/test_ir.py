@@ -1,5 +1,4 @@
 from bini.infrastructure.ai_utils_example import BiniUtils
-from core.modules.decorators import negative
 
 
 bini = BiniUtils()
