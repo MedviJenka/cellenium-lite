@@ -4,6 +4,7 @@ from typing import Optional
 from bini.core.agents.prompt_agent import SetAgent
 from bini.engine.base_model import BiniBaseModel
 from bini.engine.request_handler import APIRequestHandler
+from bini.infrastructure.colors import TerminalColors
 from bini.infrastructure.prompts import Prompts
 
 
@@ -18,10 +19,10 @@ class Bini(BiniBaseModel, APIRequestHandler):
 
     """
 
-    def __init__(self, model: str, version: str, endpoint: str) -> None:
+    def __init__(self, model: str, version: str, endpoint: str, api_key: str) -> None:
         self.__set_agent = SetAgent()
         self.session = requests.Session()
-        BiniBaseModel.__init__(self, model=model, version=version, endpoint=endpoint)
+        BiniBaseModel.__init__(self, model=model, version=version, endpoint=endpoint, api_key=api_key)
 
     def switch_model(self, model: str, version: str) -> None:
         self.model = model
@@ -35,10 +36,34 @@ class Bini(BiniBaseModel, APIRequestHandler):
         """Enhances given prompt in more professional manner"""
         return self.__set_agent.validate_result(result)
 
+    def __friendly_message_output(self, output: str) -> None:
+
+        colors = TerminalColors()
+        message = output.split('Final result:')[0]
+        result = output.split('Final result:')[1]
+
+        if 'Failed' in result:
+            result = f"{colors.RED}Result: {result}"
+        else:
+            result = f"{colors.GREEN}Result: {result}"
+
+        final = f"""       
+        {colors.CYAN}
+        ✅ AI Successfully generated
+        ✅ Model: {self.model}
+        ✅ Version: {self.version}
+        ✅ Output:
+        {colors.YELLOW}
+        {message}
+        {result}           
+        """
+
+        print(final)
+
     def run_image_processing(self, image_path: str, prompt: str, sample_image: Optional[str] = '') -> str:
 
         """
-        Sends a request to the image visualization engine.
+        Sends request to the image visualization engine.
         If self.sample_image is provided, it will include the sample image in the payload.
         :return: Image processing output as a string.
 
@@ -46,7 +71,7 @@ class Bini(BiniBaseModel, APIRequestHandler):
 
         user_content = [
             {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(image_path)}"}},
-            {"type": "text", "text": self.prompt_agent(prompt=prompt)}  # self.prompt for prompt without agent
+            {"type": "text", "text": self.result_agent(result=prompt)}  # self.prompt for prompt without agent
         ]
 
         if sample_image:
@@ -60,7 +85,7 @@ class Bini(BiniBaseModel, APIRequestHandler):
             "temperature": 0,
         }
 
-        return self.make_request_with_retry(payload)
+        return self.make_request_with_retry(payload=payload)
 
     def run(self, image_path: str or callable, prompt: str, sample_image: Optional[str] = '') -> str:
 
@@ -70,6 +95,7 @@ class Bini(BiniBaseModel, APIRequestHandler):
 
         try:
             result = self.run_image_processing(image_path=image_path, sample_image=sample_image, prompt=prompt)
+            self.__friendly_message_output(output=result)
             return self.__set_agent.validate_result(result)
 
         except FileNotFoundError as e:

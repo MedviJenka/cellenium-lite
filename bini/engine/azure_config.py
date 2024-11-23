@@ -38,9 +38,9 @@ class AzureOpenAIConfig:
     """
 
     model: str = get_dotenv_data('MODEL')
-    api_key: str = get_dotenv_data('OPENAI_API_KEY')
-    openai_api_version: str = get_dotenv_data('OPENAI_API_VERSION')
-    azure_endpoint: str = get_dotenv_data('AZURE_OPENAI_ENDPOINT')
+    api_key: str = get_dotenv_data('AZURE_API_KEY')
+    version: str = get_dotenv_data('AZURE_API_VERSION')
+    endpoint: str = get_dotenv_data('AZURE_API_BASE')
 
     @property
     def set_azure_llm(self) -> AzureChatOpenAI:
@@ -49,7 +49,7 @@ class AzureOpenAIConfig:
 
         return AzureChatOpenAI(
             deployment_name=self.model,
-            openai_api_version=self.openai_api_version,
-            azure_endpoint=self.azure_endpoint,
+            openai_api_version=self.version,
+            azure_endpoint=self.endpoint,
             api_key=self.api_key
         )

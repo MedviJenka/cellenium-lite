@@ -1,5 +1,5 @@
-from bini.core.modules.environment import get_dotenv_data
 from bini.engine.engine import Bini
+from bini.core.modules.environment import get_dotenv_data
 
 
 class BiniUtils(Bini):
@@ -24,14 +24,7 @@ class BiniUtils(Bini):
 
     def __init__(self) -> None:
         self.model: str = get_dotenv_data('MODEL')
-        self.api_key: str = get_dotenv_data('OPENAI_API_KEY')
-        self.version: str = get_dotenv_data('OPENAI_API_VERSION')
-        self.endpoint: str = get_dotenv_data('AZURE_OPENAI_ENDPOINT')
-        super().__init__(endpoint=self.endpoint, model=self.model, version=self.version)
-
-    def __str__(self) -> None:
-        self.endpoint = f"{self.endpoint}/openai/deployments/{self.model}/chat/completions?api-version={self.version}"
-
-    def functions(self) -> any:
-        """add your own functions below"""
-        ...
+        self.api_key: str = get_dotenv_data('AZURE_API_KEY')
+        self.version: str = get_dotenv_data('AZURE_API_VERSION')
+        self.endpoint: str = get_dotenv_data('AZURE_API_BASE')
+        super().__init__(endpoint=self.endpoint, model=self.model, version=self.version, api_key=self.api_key)

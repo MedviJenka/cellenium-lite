@@ -1,4 +1,4 @@
-from bini.infrastructure.ai_utils_example import BiniUtils
+from bini.engine.utils import BiniUtils
 
 
 bini = BiniUtils()
