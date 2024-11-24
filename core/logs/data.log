@@ -1,4 +1,6 @@
-INFO |  Saturday | 23/11/2024 | 13:52:34 | <Worksheet 'Google' id:0> | Function: __read_google_sheet | Line: 55
-INFO |  Saturday | 23/11/2024 | 13:52:34 | [['name', 'locator', 'type', 'actions', 'image'], ['button', 'NAME', 'btnK', '', ''], ['search', 'NAME', 'q', '', '']] | Function: __read_google_sheet | Line: 56
-INFO |  Saturday | 23/11/2024 | 13:52:34 | ['name', 'locator', 'type', 'actions', 'image'] | Function: __read_google_sheet | Line: 57
-INFO |  Saturday | 23/11/2024 | 13:52:34 | {'name': 'button', 'locator': 'NAME', 'type': 'btnK', 'actions': '', 'image': ''} | Function: __read_google_sheet | Line: 61
+INFO |  Sunday | 24/11/2024 | 01:57:33 | <Worksheet 'Google' id:0> | Function: __read_google_sheet | Line: 55
+INFO |  Sunday | 24/11/2024 | 01:57:33 | [['name', 'locator', 'type', 'actions', 'image'], ['button', 'NAME', 'btnK', '', ''], ['search', 'NAME', 'q', '', ''], ['first_row', 'XPATH', '//*[@id="Alh6id"]/div[1]/div/ul/li[1]', '', '']] | Function: __read_google_sheet | Line: 56
+INFO |  Sunday | 24/11/2024 | 01:57:33 | ['name', 'locator', 'type', 'actions', 'image'] | Function: __read_google_sheet | Line: 57
+INFO |  Sunday | 24/11/2024 | 01:57:33 | {'name': 'button', 'locator': 'NAME', 'type': 'btnK', 'actions': '', 'image': ''} | Function: __read_google_sheet | Line: 61
+INFO |  Sunday | 24/11/2024 | 01:57:33 | {'name': 'search', 'locator': 'NAME', 'type': 'q', 'actions': '', 'image': ''} | Function: __read_google_sheet | Line: 61
+INFO |  Sunday | 24/11/2024 | 01:57:33 | {'name': 'first_row', 'locator': 'XPATH', 'type': '//*[@id="Alh6id"]/div[1]/div/ul/li[1]', 'actions': '', 'image': ''} | Function: __read_google_sheet | Line: 61

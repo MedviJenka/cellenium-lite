@@ -34,12 +34,12 @@ class DriverEngine(DriverManager):
             log.level.info(output)
             log.level.info(f'screen shot success: {screenshot_path}')
             self.take_screenshot(name=name)
-            return self.driver.locator(f'[{element_locator}={element_type}]')
+            return self.driver.locator(f'[{element_locator}={element_type}]').wait_for(state="visible")
 
         except Exception as e:
             raise e
 
-    def get_dynamic_element(self, name: str):
+    def get_dynamic_element(self, name: str) -> any:
 
         element_name, element_type, element_locator = self.__get_element_properties(sheet_name=self.screen, value=name)
         dynamic_selector = f"[{element_locator}*='{element_type}']"
