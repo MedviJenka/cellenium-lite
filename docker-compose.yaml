@@ -1,71 +1,55 @@
-version: '3.9'
+version: '3.0'
 
 services:
 
-  cellenium:
+  base:
     build:
       context: .
+      dockerfile: Dockerfile
+    image: base
+
+  core:
+    build:
+      context: .
+      dockerfile: core/Dockerfile
+    depends_on:
+      - base
     ports:
-      - ${CELLENIUM_PORT}
-    env_file:
-      - '.env'
+      - "8080:80"
     volumes:
+      - ./core:/core
       - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
-      - ./allure-results:/cellenium/tests/allure-results
-      - ./allure-reports:/cellenium/tests/allure-reports
-    restart: on-failure
 
-  test_1:
-    extends:
-      service: cellenium
-    ports:
-      - ${TEST_PORTS}
-    command: >
-      bash -c "pytest tests/test_1 -n ${PARALLEL} --alluredir=/tests/reports"
-
-
-
-#  test_2:
-#    extends:
-#      service: cellenium
-#    command: >
-#      bash -c "pytest ./tests/test_2 -n ${PARALLEL} --alluredir=allure-results"
-#
-#  test_3:
-#    extends:
-#      service: cellenium
-#    command: >
-#      bash -c "pytest ./tests/test_3 -n ${PARALLEL} --alluredir=allure-results"
+  tests:
+      build:
+        dockerfile: tests/Dockerfile
+        context: .
+      depends_on:
+        - core
+        - allure-server
+      volumes:
+        - ./core:/core
+        - ./tests:/tests
+      ports:
+        - ${PORT}
+      healthcheck:
+        test: [ "CMD-SHELL", "curl -f http://localhost:${PORT} || exit 1" ]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+      environment:
+        - DEBUG=true
+      command: >
+        bash -c "pytest -n ${PARALLEL} && allure generate allure-results --clean -o allure-results && allure serve"
 
   allure-server:
-    depends_on:
-      - test_1
-    image: frankescobar/allure-docker-service
+    image: frankescobar/allure-docker-service:latest
     volumes:
-      - ./allure-results:/cellenium/tests/allure-results
-      - ./allure-reports:/cellenium/tests/allure-reports
-    ports:
-      - ${ALLURE_PORT}
-      - ${ALLURE_DOCKER_SERVICE_API_PORT}
+      - ./allure-results:/app/allure-results
     environment:
-      CHECK_RESULTS_EVERY_SECONDS: 1
+      CHECK_RESULTS_EVERY_SECONDS: 10
       KEEP_HISTORY: 1
-      KEEP_HISTORY_LATEST: 25
-    healthcheck:
-      test: curl --fail http://localhost:${ALLURE_DOCKER_SERVICE_API_PORT} || echo 'Health check failed'
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    restart: on-failure
-#    healthcheck:
-#      test: ["CMD-SHELL", "python --version || exit 1"]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 2
-#    deploy:
-#      resources:
-#        limits:
-#          cpus: '2'
-
-volumes:
-  shared:
+      ANALYTICS: 1
+      SECURITY: 0
+    ports:
+      - "4040:4040"

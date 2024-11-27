@@ -3,6 +3,4 @@
 /.pytest_cache/
 /core/environment/_json/
 /core/environment/credentials.json
-/.env
-/bini/engine/__pycache__/
-/core/modules/jira.json
+/bini/.env
