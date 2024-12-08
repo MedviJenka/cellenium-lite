@@ -13,21 +13,21 @@ services:
     env_file:
       - /.env
     ports:
-      - "8888:8888"
+      - "${PORT}${PORT}"
     networks:
       - my-network
 
-  allure-server:
-    image: frankescobar/allure-docker-service:latest
-    volumes:
-      - ./allure-results:/app/allure-results
-    environment:
-      CHECK_RESULTS_EVERY_SECONDS: 10
-      KEEP_HISTORY: 1
-      ANALYTICS: 1
-      SECURITY: 0
-    ports:
-      - "4040:4040"
+#  allure-server:
+#    image: frankescobar/allure-docker-service:latest
+#    volumes:
+#      - ./allure-results:/app/allure-results
+#    environment:
+#      CHECK_RESULTS_EVERY_SECONDS: 10
+#      KEEP_HISTORY: 1
+#      ANALYTICS: 1
+#      SECURITY: 0
+#    ports:
+#      - "4040:4040"
 
 networks:
   my-network:
