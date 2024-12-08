@@ -1,6 +1,5 @@
-/.venv/
 /venv/
 /.pytest_cache/
-/core/environment/_json/
-/core/environment/credentials.json
-/bini/.env
+/_core/environment/_json/
+/_core/environment/credentials.json
+/.env

@@ -71,7 +71,7 @@ class Bini(BiniBaseModel, APIRequestHandler):
 
         user_content = [
             {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{self.get_image(image_path)}"}},
-            {"type": "text", "text": self.result_agent(result=prompt)}  # self.prompt for prompt without agent
+            {"type": "text", "text": self.prompt_agent(prompt=prompt)}  # self.prompt for prompt without agent
         ]
 
         if sample_image:

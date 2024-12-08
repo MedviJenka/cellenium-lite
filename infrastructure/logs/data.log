@@ -1,0 +1,5 @@
+INFO |  Thursday | 28/11/2024 | 00:57:28 | <Worksheet 'Google' id:0> | Function: __read_google_sheet | Line: 44
+INFO |  Thursday | 28/11/2024 | 00:57:28 | [['name', 'locator', 'type', 'actions', 'comments'], ['button', 'NAME', 'btnK', '', ''], ['search', 'NAME', 'q', '', ''], ['first_row', 'XPATH', '//*[@id="Alh6id"]/div[1]/div/ul/li[1]', '', ''], ['lucky', 'NAME', 'btnI', '', '']] | Function: __read_google_sheet | Line: 45
+INFO |  Thursday | 28/11/2024 | 00:57:28 | ['name', 'locator', 'type', 'actions', 'comments'] | Function: __read_google_sheet | Line: 46
+INFO |  Thursday | 28/11/2024 | 00:57:28 | {'name': 'button', 'locator': 'NAME', 'type': 'btnK', 'actions': '', 'comments': ''} | Function: __read_google_sheet | Line: 50
+INFO |  Thursday | 28/11/2024 | 00:57:28 | {'name': 'search', 'locator': 'NAME', 'type': 'q', 'actions': '', 'comments': ''} | Function: __read_google_sheet | Line: 50

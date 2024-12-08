@@ -2,45 +2,20 @@ version: '3.0'
 
 services:
 
-  base:
+  cellenium:
     build:
       context: .
-      dockerfile: Dockerfile
-    image: base
-
-  core:
-    build:
-      context: .
-      dockerfile: core/Dockerfile
-    depends_on:
-      - base
+      args:
+        OPENAI_API_KEY: ${OPENAI_API_KEY}
+        AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT}
+        OPENAI_API_VERSION: ${OPENAI_API_VERSION}
+        MODEL: ${MODEL}
+    env_file:
+      - /.env
     ports:
-      - "8080:80"
-    volumes:
-      - ./core:/core
-      - ${LOCAL_CREDENTIALS}:${CONTAINER_CREDENTIALS}
-
-  tests:
-      build:
-        dockerfile: tests/Dockerfile
-        context: .
-      depends_on:
-        - core
-        - allure-server
-      volumes:
-        - ./core:/core
-        - ./tests:/tests
-      ports:
-        - ${PORT}
-      healthcheck:
-        test: [ "CMD-SHELL", "curl -f http://localhost:${PORT} || exit 1" ]
-        interval: 30s
-        timeout: 10s
-        retries: 5
-      environment:
-        - DEBUG=true
-      command: >
-        bash -c "pytest -n ${PARALLEL} && allure generate allure-results --clean -o allure-results && allure serve"
+      - "8888:8888"
+    networks:
+      - my-network
 
   allure-server:
     image: frankescobar/allure-docker-service:latest
@@ -53,3 +28,7 @@ services:
       SECURITY: 0
     ports:
       - "4040:4040"
+
+networks:
+  my-network:
+    driver: bridge

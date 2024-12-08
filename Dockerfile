@@ -1,7 +1,10 @@
 ARG VERSION=3.12.2
 FROM python:${VERSION}
-
-WORKDIR /base
+LABEL author="jenia p"
+WORKDIR /cellenium
+COPY requirements.txt /cellenium
+COPY . .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Install Chrome
 RUN apt-get update && \
@@ -17,3 +20,5 @@ RUN wget https://github.com/allure-framework/allure2/releases/download/2.13.9/al
     ln -s /opt/allure-2.13.9/bin/allure /usr/bin/allure
 
 ENV PATH="/opt/allure-2.13.9/bin:${PATH}"
+ENTRYPOINT ["pytest"]
+CMD ["/tests"]

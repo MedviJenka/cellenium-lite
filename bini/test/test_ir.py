@@ -11,7 +11,7 @@ def test_user_is_displayed() -> None:
         image_path=IMAGE,
         prompt='Is Joni Sherman displayed on the right side of the screen '
                'and how many rows with blue icon with play button are displayed? '
-               '** return a an integer as an answer **')
+               '** return an integer as an answer **')
     assert 'Passed' in response
     assert '1' or 'once' in response
 

@@ -124,7 +124,7 @@ from qasharedinfra.infra.common.services.bini_ai.infrastructure.exceptions impor
 from qasharedinfra.infra.smarttap.selenium.st_selenium_utils import *
 from qasharedinfra.infra.smarttap.selenium.utils.azure_table_data.table_query import TablesQuery
 from qasharedinfra.infra.smarttap.selenium.utils.bini_utils import IRBiniUtils
-from testing.smarttap.interactions_page.core.base_model import BaseModel
+from testing.smarttap.interactions_page._core.base_model import BaseModel
 from testing.smarttap.version.constants import AZURE_STORAGE_DATA
 
 global bini
