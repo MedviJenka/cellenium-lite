@@ -21,4 +21,4 @@ RUN wget https://github.com/allure-framework/allure2/releases/download/2.13.9/al
 
 ENV PATH="/opt/allure-2.13.9/bin:${PATH}"
 ENTRYPOINT ["pytest"]
-CMD ["/tests"]
+CMD ["./tests"]
