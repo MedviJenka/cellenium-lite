@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from dataclasses import dataclass
-from infrastructure.infrastructure.data.constants import LOGS
+from infrastructure.data.constants import LOGS
 
 
 @dataclass

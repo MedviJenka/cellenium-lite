@@ -2,8 +2,8 @@ import gspread
 from functools import lru_cache
 from dataclasses import dataclass
 from google.oauth2.service_account import Credentials
-from infrastructure.infrastructure.core.logger import Logger
-from infrastructure.infrastructure.data.constants import SCOPES
+from infrastructure.core.logger import Logger
+from infrastructure.data.constants import SCOPES
 
 
 log = Logger()
