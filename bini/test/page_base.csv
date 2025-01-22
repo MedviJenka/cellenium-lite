@@ -1,4 +1,4 @@
-Tag Name,Element Type,Element Path
-button,id,login_button
-input,id,i0116
-input,id,idSIButton9
+Tag Name,Element Type,Element Path,Action,Value
+button,id,login_button,Clicked on button,
+input,id,i0116,Clicked on input,
+input,id,idSIButton9,Clicked on input,

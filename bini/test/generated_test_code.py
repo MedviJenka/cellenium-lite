@@ -1,3 +1,4 @@
+
 import pytest
 from qasharedinfra.infra.common.services.bini_ai.infrastructure.exceptions import BiniPromptException
 from qasharedinfra.infra.smarttap.selenium.st_selenium_utils import *
@@ -41,7 +42,7 @@ def setup() -> None:
 
 class TestSystemVersion(BaseModel):
     
-    def test_zejpow(self, setup) -> None:
-        setup.get_mapped_element('button')
-        setup.get_mapped_element('input')
-        setup.get_mapped_element('input')
+    def test_otzeau(self, setup) -> None:
+        setup.get_mapped_element('button').click(None)
+        setup.get_mapped_element('input').inject_text(None)
+        setup.get_mapped_element('input').inject_text(None)

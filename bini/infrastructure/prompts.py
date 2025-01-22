@@ -112,6 +112,13 @@ CODE_AGENT_PROMPT = f"""
    and build a test code based on pytest as displayed below. but i want you to insert each item by the order
    in each method that starts with get_mapped_element(item1)... 
    
+** please notice the 4th and 5th items in each list: 
+    if the 4th element name is "Clicked on button" you will add the <5th value> value:
+   example: setup.get_mapped_element(item1).click("<5th value>")
+   
+   if one of them is "Clicked on input" you will add the <5th value> value:
+   example: setup.get_mapped_element(item1).inject_text("<5th value>")
+   
 current list is {browser_recorder.execute()}
 
 example:
@@ -160,10 +167,10 @@ def setup() -> None:
 class TestSystemVersion(BaseModel):
     
     def test_{generate_random_word()}(self, setup) -> None:
-        setup.get_mapped_element(item1)
-        setup.get_mapped_element(item2)
-        setup.get_mapped_element(item3)
-        setup.get_mapped_element(item5)
+        setup.get_mapped_element(item1).click(item5)
+        setup.get_mapped_element(item2).inject_text(item5)
+        setup.get_mapped_element(item3).click(item5)
+        setup.get_mapped_element(item5).inject_text(item5)
 
 """
 

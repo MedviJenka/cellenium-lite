@@ -106,15 +106,15 @@ class Bini(BiniBaseModel, APIRequestHandler):
         except requests.RequestException as e:
             raise f'⚠ Failed to send rest request, status code: {e} ⚠'
 
-    def create_python_file(self, output: str) -> None:
+    def __create_python_file(self, output: str) -> None:
         file_path = "generated_test_code.py"
         with open(file_path, "w") as file:
-            file.write(self.extract_text_from_backticks(output=output))
+            file.write(self.__extract_text_from_backticks(output=output))
 
     @staticmethod
-    def extract_text_from_backticks(output: str) -> str:
+    def __extract_text_from_backticks(output: str) -> str:
         """
-        Extracts the text inside triple backticks (``` ... ```).
+        Extracts the code inside triple backticks (``` <CODE> ```).
 
         :param output: The input string containing backticks.
         :return: The extracted text, or an empty string if no backticks are found.
@@ -122,7 +122,7 @@ class Bini(BiniBaseModel, APIRequestHandler):
         match = re.search(r'```(.*?)```', output, re.DOTALL)
         return match.group(1).strip() if match else ""
 
-    def bini_code(self, create_python_file: Optional[bool] = False) -> str:
+    def bini_code(self, create_python_file: Optional[bool] = False) -> None:
 
         payload = {
             "messages": [
@@ -134,5 +134,4 @@ class Bini(BiniBaseModel, APIRequestHandler):
 
         print(f"Test code successfully written to {output}")
         if create_python_file:
-            self.create_python_file(output=output)
-
+            self.__create_python_file(output=output)

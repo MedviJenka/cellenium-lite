@@ -3,48 +3,52 @@ from playwright.sync_api import sync_playwright
 from infrastructure.core.executor import Executor
 
 JS_SCRIPT = """
-                    window.recordedInteractions = [];
+    window.recordedInteractions = [];
 
-                    document.addEventListener('click', (event) => {
-                        const target = event.target;
-                        const interaction = {
-                            action: 'click',
-                            tag_name: target.tagName.toLowerCase(),
-                            id: target.id || null,
-                            name: target.name || null,
-                            xpath: generateXPath(target),
-                        };
-                        window.recordedInteractions.push(interaction);
-                    });
+    document.addEventListener('click', (event) => {
+        const target = event.target;
+        const interaction = {
+            action: 'click',
+            tag_name: target.tagName.toLowerCase(),
+            id: target.id || null,
+            name: target.name || null,
+            xpath: generateXPath(target),
+            action_description: `Clicked on ${target.tagName.toLowerCase()}`,
+            value: null  // No value for clicks
+        };
+        window.recordedInteractions.push(interaction);
+    });
 
-                    document.addEventListener('input', (event) => {
-                        const target = event.target;
-                        const interaction = {
-                            action: 'input',
-                            tag_name: target.tagName.toLowerCase(),
-                            id: target.id || null,
-                            name: target.name || null,
-                            xpath: generateXPath(target),
-                        };
-                        window.recordedInteractions.push(interaction);
-                    });
+    document.addEventListener('input', (event) => {
+        const target = event.target;
+        const interaction = {
+            action: 'input',
+            tag_name: target.tagName.toLowerCase(),
+            id: target.id || null,
+            name: target.name || null,
+            xpath: generateXPath(target),
+            action_description: `Typed in ${target.tagName.toLowerCase()}`,
+            value: target.value || ''  // Explicitly capture the typed value
+        };
+        window.recordedInteractions.push(interaction);
+    });
 
-                    function generateXPath(element) {
-                        if (element.id) return `//*[@id="${element.id}"]`;
-                        if (element === document.body) return '/html/body';
-                        let ix = 0;
-                        const siblings = element.parentNode ? element.parentNode.childNodes : [];
-                        for (let i = 0; i < siblings.length; i++) {
-                            const sibling = siblings[i];
-                            if (sibling === element) {
-                                const path = generateXPath(element.parentNode);
-                                return `${path}/${element.tagName.toLowerCase()}[${ix + 1}]`;
-                            }
-                            if (sibling.nodeType === 1 && sibling.tagName === element.tagName) ix++;
-                        }
-                        return '';
-                    }
-                """
+    function generateXPath(element) {
+        if (element.id) return `//*[@id="${element.id}"]`;
+        if (element === document.body) return '/html/body';
+        let ix = 0;
+        const siblings = element.parentNode ? element.parentNode.childNodes : [];
+        for (let i = 0; i < siblings.length; i++) {
+            const sibling = siblings[i];
+            if (sibling === element) {
+                const path = generateXPath(element.parentNode);
+                return `${path}/${element.tagName.toLowerCase()}[${ix + 1}]`;
+            }
+            if (sibling.nodeType === 1 && sibling.tagName === element.tagName) ix++;
+        }
+        return '';
+    }
+"""
 
 
 class BrowserRecorder(Executor):
@@ -66,10 +70,6 @@ class BrowserRecorder(Executor):
                 # Inject JavaScript to capture interactions and generate XPath
                 page.add_init_script(JS_SCRIPT)
                 page.goto(self.screen)
-                login_button_selector = "#login_button"
-                page.wait_for_selector(login_button_selector)  # Wait until the button is visible
-                page.click(login_button_selector)
-                print(f"Clicked on login button with selector: {login_button_selector}")
 
                 # Allow interactions to be recorded
                 print("Interact with the browser if needed. Close it when you're done.")
@@ -93,8 +93,10 @@ class BrowserRecorder(Executor):
                                         else "xpath"
                                     )
                                     element_path = interaction["id"] or interaction["name"] or interaction["xpath"]
+                                    action_description = interaction["action_description"]
+                                    value = interaction.get("value")
 
-                                    self.interactions.append([tag_name, element_type, element_path])
+                                    self.interactions.append([tag_name, element_type, element_path, action_description, value])
                                     self.recorded_elements.add(element_identifier)
 
                             # Clear interactions in the browser
@@ -118,7 +120,7 @@ class BrowserRecorder(Executor):
         """Save the interactions to a CSV file."""
         with open(self.output_csv, mode="w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(["Tag Name", "Element Type", "Element Path"])
+            writer.writerow(["Tag Name", "Element Type", "Element Path", "Action", "Value"])
             writer.writerows(self.interactions)
 
     def get_interactions(self):
