@@ -22,3 +22,8 @@ def test_find_icon_sample() -> None:
                         prompt='how many times the icon sample is displayed in provided image?')
     assert '10' in response
     assert 'Passed' in response
+
+
+def test_bini_code() -> None:
+    bini.get_browser_recorder_list()
+    # bini.bini_code()

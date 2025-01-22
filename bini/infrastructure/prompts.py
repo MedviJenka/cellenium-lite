@@ -89,11 +89,7 @@ VALIDATION_AGENT = """
 """
 
 
-CODE_AGENT_PROMPT = """
-
-you are a professional code engineer, you purpose it to write a code based on a screenshot, the code must be built as an example bellow:
-
-Analyze the screenshot provided and generate a functional Python test script using the `pytest` framework. 
+CODE_AGENT_PROMPT = f"""
 
 *IMPORTANT*:
 ** you will be provided with a lists inside a list that contains 3 items in it. exmaple:  [[item1, item2, item3], [item1, item2, item3] and so on...] 
@@ -101,27 +97,7 @@ Analyze the screenshot provided and generate a functional Python test script usi
    and build a test code based on pytest as displayed below. but i want you to insert each item by the order
    in each method that starts with get_mapped_element(item1)... 
    
-   
-1. Create unique class and method names that reflect the UI elements or interactions present in the image. 
-    - If a **login button** is present, generate a test method like `test_login_button`.
-    - If there is a **form field**, generate methods to test field validation, e.g., `test_form_field_validation`.
-    - Identify buttons, forms, text fields, or navigation elements and generate corresponding test cases.
-  
-2. Write the code as a valid `pytest` script following these principles:
-    - **Class name**: Use `Test<ClassName>` for the class, where `<ClassName>` reflects the screen or feature (e.g., `TestLoginScreen`).
-    - **Method names**: Start with `test_` followed by the action or feature being tested.
-    - Ensure the code is **modular**, uses **assertions**, and reflects real-world user interactions. Use `pytest` best practices.
-  
-3. If elements require input (like a username field), provide realistic test inputs:
-    - Example: `username = "test_user"` or `password = "P@ssw0rd!"`
-  
-4. Assume the use of `selenium` for UI interactions. Provide meaningful selectors such as `find_element_by_id`, `find_element_by_xpath`, or others, depending on the elements seen in the image.
-
-5. Make sure the code follows good **naming conventions** and includes **setup** and **teardown** logic for Selenium WebDriver.
-
-6. ** YOU SHOULD STICK TO THE EXAMPLE BELOW CODE BUILD **
-
-7. import libraries only once and in the first lines of the file, do not repeat imports 
+current list is {...}
 
 example:
 
@@ -132,8 +108,6 @@ from qasharedinfra.infra.smarttap.selenium.utils.azure_table_data.table_query im
 from qasharedinfra.infra.smarttap.selenium.utils.bini_utils import IRBiniUtils
 from testing.smarttap.interactions_page._core.base_model import BaseModel
 from testing.smarttap.version.constants import AZURE_STORAGE_DATA
-
-global bini
 
 
 HEADLESS = True
@@ -183,3 +157,52 @@ class Prompts(StrEnum):
     image_visualization_prompt: str = IMAGE_VISUALIZATION_PROMPT
     validation_agent: str = VALIDATION_AGENT
     code_agent_prompt: str = CODE_AGENT_PROMPT
+
+
+def lists() -> list[list[str]]:
+    return [["item1", "item2", "item3"], ["item4", "item5", "item6"], ["item7", "item8", "item9"]]
+
+
+def extract_first_items(nested_list: list):
+    """
+    Extract the first item from each sublist.
+    """
+    return [sublist[0] for sublist in nested_list]
+
+
+def generate_test_code(items: list) -> str:
+    """
+    Generate pytest code dynamically based on the extracted items.
+    """
+    test_template = f"""
+import pytest
+
+@pytest.fixture
+def setup_environment():
+    # Add setup logic here
+    pass
+
+
+class TestGenerated:
+
+    def test_generated(self, setup_environment):
+        # Example of a mapped test
+        
+    """
+    for item in items:
+        test_template += f"        self.get_mapped_element('{item}')\n"
+
+    test_template += """
+        assert True  # Add meaningful assertions here
+    """
+    return test_template
+
+
+def main():
+    nested_list = lists()
+    first_items = extract_first_items(nested_list)
+    print(f"Extracted Items: {first_items}")  # Debugging Output
+    test_code = generate_test_code(first_items)
+    print("\nGenerated Test Code:\n")
+    print(test_code)
+

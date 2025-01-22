@@ -1,26 +1,8 @@
 import csv
 from playwright.sync_api import sync_playwright
-from playwright._impl._errors import Error
+from infrastructure.core.executor import Executor
 
-from bini.engine.utils import BiniUtils
-
-
-class BrowserRecorder:
-    def __init__(self, output_csv="elements.csv"):
-        self.interactions = []  # List to store interactions
-        self.recorded_elements = set()  # To track processed elements
-        self.output_csv = output_csv
-
-    def run(self, start_url):
-        """Run the browser and record interactions."""
-        with sync_playwright() as p:
-            try:
-                browser = p.chromium.launch(headless=False)
-                context = browser.new_context()
-                page = context.new_page()
-
-                # Inject JavaScript to capture interactions and generate XPath
-                page.add_init_script("""
+JS_SCRIPT = """
                     window.recordedInteractions = [];
 
                     document.addEventListener('click', (event) => {
@@ -62,11 +44,35 @@ class BrowserRecorder:
                         }
                         return '';
                     }
-                """)
+                """
 
-                # Navigate to the start URL
-                page.goto(start_url)
-                print("Interact with the browser. Close it when you're done.")
+
+class BrowserRecorder(Executor):
+
+    def __init__(self, screen: str, output_csv="page_base.csv") -> None:
+        self.screen = screen
+        self.interactions = []
+        self.recorded_elements = set()
+        self.output_csv = output_csv
+
+    def run(self):
+        """Run the browser and automate interactions."""
+        with sync_playwright() as p:
+            try:
+                browser = p.chromium.launch(headless=False)
+                context = browser.new_context()
+                page = context.new_page()
+
+                # Inject JavaScript to capture interactions and generate XPath
+                page.add_init_script(JS_SCRIPT)
+                page.goto(self.screen)
+                login_button_selector = "#login_button"
+                page.wait_for_selector(login_button_selector)  # Wait until the button is visible
+                page.click(login_button_selector)
+                print(f"Clicked on login button with selector: {login_button_selector}")
+
+                # Allow interactions to be recorded
+                print("Interact with the browser if needed. Close it when you're done.")
 
                 while True:
                     try:
@@ -88,18 +94,13 @@ class BrowserRecorder:
                                     )
                                     element_path = interaction["id"] or interaction["name"] or interaction["xpath"]
 
-                                    # Update the tag name for the first input or button
-                                    if not any(i[0] in ["button", "input"] for i in self.interactions):
-                                        if tag_name in ["button", "input"]:
-                                            tag_name = f"primary-{tag_name}"
-
                                     self.interactions.append([tag_name, element_type, element_path])
                                     self.recorded_elements.add(element_identifier)
 
                             # Clear interactions in the browser
                             page.evaluate("window.recordedInteractions = []")
 
-                    except Error as e:
+                    except Exception as e:
                         print(f"Navigation or context issue: {e}")
                         if "closed" in str(e):
                             break
@@ -124,21 +125,16 @@ class BrowserRecorder:
         """Return the list of recorded interactions."""
         return self.interactions
 
+    def execute(self) -> list:
+        self.run()
+        self.save_to_csv()
+
+        print("\nRecorded Interactions:")
+        print(self.get_interactions())
+        print(f"\nInteractions saved to {self.output_csv}")
+
+        return self.get_interactions()
 
 
-
-bini = BiniUtils()
-bini.bini_code(interaction_list=[[1,2,3], [1,2,3], [1,2,3]])
-# if __name__ == "__main__":
-#
-#     recorder = BrowserRecorder(output_csv="elements.csv")
-#     start_url = input("Enter the URL to start recording: ")
-#     recorder.run(start_url)
-#
-#     # Save interactions to a CSV file
-#     recorder.save_to_csv()
-#
-#     print("\nRecorded Interactions:")
-#     print(recorder.get_interactions())
-#
-#     print(f"\nInteractions saved to {recorder.output_csv}")
+br = BrowserRecorder(screen='https://irqa.ai-logix.net')
+br.execute()

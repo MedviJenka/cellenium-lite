@@ -38,7 +38,7 @@ class AzureOpenAIConfig:
     """
 
     model: str = get_dotenv_data('MODEL')
-    api_key: str = get_dotenv_data('AZURE_API_KEY')
+    api_key: str = get_dotenv_data('OPENAI_API_KEY')
     version: str = get_dotenv_data('AZURE_API_VERSION')
     endpoint: str = get_dotenv_data('AZURE_API_BASE')
 

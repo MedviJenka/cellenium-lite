@@ -4,7 +4,8 @@ from bini.core.agents.prompt_agent import SetAgent
 from bini.engine.base_model import BiniBaseModel
 from bini.engine.request_handler import APIRequestHandler
 from bini.infrastructure.colors import TerminalColors
-from bini.infrastructure.prompts import Prompts, CODE_AGENT_PROMPT
+from bini.infrastructure.prompts import Prompts, main
+from infrastructure.codegen import BrowserRecorder
 
 
 class Bini(BiniBaseModel, APIRequestHandler):
@@ -21,6 +22,7 @@ class Bini(BiniBaseModel, APIRequestHandler):
     def __init__(self, model: str, version: str, endpoint: str, api_key: str) -> None:
         self.__set_agent = SetAgent()
         self.session = requests.Session()
+        self.browser_recorder = BrowserRecorder()
         BiniBaseModel.__init__(self, model=model, version=version, endpoint=endpoint, api_key=api_key)
 
     def switch_model(self, model: str, version: str) -> None:
@@ -103,16 +105,33 @@ class Bini(BiniBaseModel, APIRequestHandler):
         except requests.RequestException as e:
             raise f'⚠ Failed to send rest request, status code: {e} ⚠'
 
-    def bini_code(self, interaction_list: list, output_file: str = "test_bini.py") -> None:
+    def get_browser_recorder_list(self) -> list:
+        interaction_list = self.browser_recorder.execute()
+        tags = [interaction[0] for interaction in interaction_list]
+        return tags
+
+    def bini_code(self) -> None:
+
         """
         Generates a Python test file based on the provided interaction list.
         :param interaction_list: List of interactions [[tagname, id, path], ...].
-        :param output_file: The name of the output Python file.
         """
-        tags = [interaction[0] for interaction in interaction_list]  # Extract tag names
-        output = self.make_request(payload=CODE_AGENT_PROMPT)
 
-        with open(output, "w") as f:
-            f.write(output_file)
+        try:
+            tags = [interaction[0] for interaction in self.get_browser_recorder_list()]
 
-        print(f"Test code successfully written to {output_file}")
+        finally:
+            user_content = [
+                {"type": "text", "text": self.prompt_agent(prompt='you are the perfect code generator')}
+            ]
+
+            payload = {
+                "messages": [
+                    {"role": "system", "content": [{"type": "text", "text": main()}]},
+                    {"role": "user", "content": f'{user_content}\n{tags}'}
+                ],
+                "temperature": 0,
+            }
+            output = self.make_request(payload=payload)
+
+            print(f"Test code successfully written to {output}")
