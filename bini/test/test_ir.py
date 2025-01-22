@@ -25,4 +25,4 @@ def test_find_icon_sample() -> None:
 
 
 def test_bini_code() -> None:
-    bini.bini_code()
+    bini.bini_code(create_python_file=True)

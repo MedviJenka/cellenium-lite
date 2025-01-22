@@ -1,4 +1,19 @@
+import random
+import string
 from enum import StrEnum
+from infrastructure.codegen import BrowserRecorder
+
+
+def generate_random_word(length: int = 6) -> str:
+    """
+    Generates a random word of the specified length.
+
+    :param length: Length of the random word (default is 6).
+    :return: A random word as a string.
+    """
+    letters = string.ascii_lowercase
+    random_word = ''.join(random.choice(letters) for _ in range(length))
+    return random_word
 
 
 IMAGE_VISUALIZATION_PROMPT = """
@@ -88,7 +103,7 @@ VALIDATION_AGENT = """
 
 """
 
-
+browser_recorder = BrowserRecorder(screen='https://irqa.ai-logix.net')
 CODE_AGENT_PROMPT = f"""
 
 *IMPORTANT*:
@@ -97,7 +112,7 @@ CODE_AGENT_PROMPT = f"""
    and build a test code based on pytest as displayed below. but i want you to insert each item by the order
    in each method that starts with get_mapped_element(item1)... 
    
-current list is {...}
+current list is {browser_recorder.execute()}
 
 example:
 
@@ -117,14 +132,12 @@ logger = env.logger
 
 @pytest.fixture(scope='module', autouse=True)
 def init_globals() -> None:
-    global bini
-
     st.logger_.info('\n******** Module (Script) Setup ********')
     bini = IRBiniUtils()
     st.test_prerequisites(selenium=True, headless=HEADLESS)
     st.ui.utils.st_selenium_go_to_screen_in_current_window(st.selenium, st.st_screens.help_center)
 
-    yield
+    yield bini
 
     logger.info('******** Module (Script) TearDown ********')
     st.selenium.finalize()
@@ -134,7 +147,7 @@ def init_globals() -> None:
 def setup_and_teardown() -> None:
     st.logger_.info('******** Test Setup ********')
 
-    yield
+    yield 
 
     st.logger_.info('******** Test TearDown ********')
 
@@ -146,8 +159,11 @@ def setup() -> None:
 
 class TestSystemVersion(BaseModel):
     
-    def test_(self, setup) -> None:
-        setup.get_mapped_element(item1).in
+    def test_{generate_random_word()}(self, setup) -> None:
+        setup.get_mapped_element(item1)
+        setup.get_mapped_element(item2)
+        setup.get_mapped_element(item3)
+        setup.get_mapped_element(item5)
 
 """
 

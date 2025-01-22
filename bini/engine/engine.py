@@ -1,3 +1,4 @@
+import re
 import requests
 from typing import Optional
 from bini.core.agents.prompt_agent import SetAgent
@@ -105,29 +106,33 @@ class Bini(BiniBaseModel, APIRequestHandler):
         except requests.RequestException as e:
             raise f'⚠ Failed to send rest request, status code: {e} ⚠'
 
-    def get_browser_recorder_list(self) -> list:
-        interaction_list = self.browser_recorder.execute()
-        tags = [interaction[0] for interaction in interaction_list]
-        return tags
+    def create_python_file(self, output: str) -> None:
+        file_path = "generated_test_code.py"
+        with open(file_path, "w") as file:
+            file.write(self.extract_text_from_backticks(output=output))
 
-    def bini_code(self) -> None:
+    @staticmethod
+    def extract_text_from_backticks(output: str) -> str:
+        """
+        Extracts the text inside triple backticks (``` ... ```).
 
+        :param output: The input string containing backticks.
+        :return: The extracted text, or an empty string if no backticks are found.
         """
-        Generates a Python test file based on the provided interaction list.
-        :param interaction_list: List of interactions [[tagname, id, path], ...].
-        """
-        l = self.get_browser_recorder_list()
-        user_content = [
-            {"type": "text", "text": self.prompt_agent(prompt='you are the perfect code generator')}
-        ]
+        match = re.search(r'```(.*?)```', output, re.DOTALL)
+        return match.group(1).strip() if match else ""
+
+    def bini_code(self, create_python_file: Optional[bool] = False) -> str:
 
         payload = {
             "messages": [
-                {"role": "system", "content": [{"type": "text", "text": Prompts.code_agent_prompt}]},
-                {"role": "user", "content": f'{user_content}\n{l}'}
+                {"role": "system", "content": [{"type": "text", "text": Prompts.code_agent_prompt}]}
             ],
             "temperature": 0,
         }
         output = self.make_request(payload=payload)
 
         print(f"Test code successfully written to {output}")
+        if create_python_file:
+            self.create_python_file(output=output)
+
