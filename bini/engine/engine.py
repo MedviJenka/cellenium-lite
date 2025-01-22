@@ -1,11 +1,10 @@
 import requests
 from typing import Optional
-
 from bini.core.agents.prompt_agent import SetAgent
 from bini.engine.base_model import BiniBaseModel
 from bini.engine.request_handler import APIRequestHandler
 from bini.infrastructure.colors import TerminalColors
-from bini.infrastructure.prompts import Prompts
+from bini.infrastructure.prompts import Prompts, CODE_AGENT_PROMPT
 
 
 class Bini(BiniBaseModel, APIRequestHandler):
@@ -103,3 +102,17 @@ class Bini(BiniBaseModel, APIRequestHandler):
 
         except requests.RequestException as e:
             raise f'⚠ Failed to send rest request, status code: {e} ⚠'
+
+    def bini_code(self, interaction_list: list, output_file: str = "test_bini.py") -> None:
+        """
+        Generates a Python test file based on the provided interaction list.
+        :param interaction_list: List of interactions [[tagname, id, path], ...].
+        :param output_file: The name of the output Python file.
+        """
+        tags = [interaction[0] for interaction in interaction_list]  # Extract tag names
+        output = self.make_request(payload=CODE_AGENT_PROMPT)
+
+        with open(output, "w") as f:
+            f.write(output_file)
+
+        print(f"Test code successfully written to {output_file}")

@@ -96,6 +96,12 @@ you are a professional code engineer, you purpose it to write a code based on a 
 Analyze the screenshot provided and generate a functional Python test script using the `pytest` framework. 
 
 *IMPORTANT*:
+** you will be provided with a lists inside a list that contains 3 items in it. exmaple:  [[item1, item2, item3], [item1, item2, item3] and so on...] 
+   i want you to take only the first item from each list, for example: [[item1, ..., ...]. [item1, ..., ...]]
+   and build a test code based on pytest as displayed below. but i want you to insert each item by the order
+   in each method that starts with get_mapped_element(item1)... 
+   
+   
 1. Create unique class and method names that reflect the UI elements or interactions present in the image. 
     - If a **login button** is present, generate a test method like `test_login_button`.
     - If there is a **form field**, generate methods to test field validation, e.g., `test_form_field_validation`.
@@ -159,35 +165,15 @@ def setup_and_teardown() -> None:
     st.logger_.info('******** Test TearDown ********')
 
 
+@pytest.fixture
+def setup() -> None:
+    driver = st.selenium
+
+
 class TestSystemVersion(BaseModel):
-
-    def setup_method(self) -> None:
-        self.driver = st.selenium
-        self.log = st.logger_
-        self.ui = st.ui
-
-    @property
-    def version(self) -> str:
-        table_query = TablesQuery(**AZURE_STORAGE_DATA)
-        version_number = table_query.get_table_data(query='Release')
-        return version_number
-
-    def test_smarttap_version(self) -> None:
-
-        try:
-            response = bini.run(image_path=take_screenshot(device=st, element_name='version'),
-                                prompt='what is the version number displayed?')
-            self.log.info(f'version: {self.version, response},')
-            assert 'Passed' and self.version in response
-
-        except BiniPromptException as e:
-            self.log.failed(e)
-            raise f'bini exception: {BiniPromptException(exception=e, message='check logs')}'
-
-        except WebDriverException as e:
-            self.log.error(e)
-            raise f'base selenium exception: {e}'
-            
+    
+    def test_(self, setup) -> None:
+        setup.get_mapped_element(item1).in
 
 """
 
