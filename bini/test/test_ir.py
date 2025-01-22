@@ -25,5 +25,4 @@ def test_find_icon_sample() -> None:
 
 
 def test_bini_code() -> None:
-    bini.get_browser_recorder_list()
-    # bini.bini_code()
+    bini.bini_code()

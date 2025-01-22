@@ -4,7 +4,7 @@ from bini.core.agents.prompt_agent import SetAgent
 from bini.engine.base_model import BiniBaseModel
 from bini.engine.request_handler import APIRequestHandler
 from bini.infrastructure.colors import TerminalColors
-from bini.infrastructure.prompts import Prompts, main
+from bini.infrastructure.prompts import Prompts
 from infrastructure.codegen import BrowserRecorder
 
 
@@ -22,7 +22,7 @@ class Bini(BiniBaseModel, APIRequestHandler):
     def __init__(self, model: str, version: str, endpoint: str, api_key: str) -> None:
         self.__set_agent = SetAgent()
         self.session = requests.Session()
-        self.browser_recorder = BrowserRecorder()
+        self.browser_recorder = BrowserRecorder(screen='https://irqa.ai-logix.net')
         BiniBaseModel.__init__(self, model=model, version=version, endpoint=endpoint, api_key=api_key)
 
     def switch_model(self, model: str, version: str) -> None:
@@ -116,22 +116,18 @@ class Bini(BiniBaseModel, APIRequestHandler):
         Generates a Python test file based on the provided interaction list.
         :param interaction_list: List of interactions [[tagname, id, path], ...].
         """
+        l = self.get_browser_recorder_list()
+        user_content = [
+            {"type": "text", "text": self.prompt_agent(prompt='you are the perfect code generator')}
+        ]
 
-        try:
-            tags = [interaction[0] for interaction in self.get_browser_recorder_list()]
+        payload = {
+            "messages": [
+                {"role": "system", "content": [{"type": "text", "text": Prompts.code_agent_prompt}]},
+                {"role": "user", "content": f'{user_content}\n{l}'}
+            ],
+            "temperature": 0,
+        }
+        output = self.make_request(payload=payload)
 
-        finally:
-            user_content = [
-                {"type": "text", "text": self.prompt_agent(prompt='you are the perfect code generator')}
-            ]
-
-            payload = {
-                "messages": [
-                    {"role": "system", "content": [{"type": "text", "text": main()}]},
-                    {"role": "user", "content": f'{user_content}\n{tags}'}
-                ],
-                "temperature": 0,
-            }
-            output = self.make_request(payload=payload)
-
-            print(f"Test code successfully written to {output}")
+        print(f"Test code successfully written to {output}")

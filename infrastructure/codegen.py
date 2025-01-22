@@ -134,7 +134,3 @@ class BrowserRecorder(Executor):
         print(f"\nInteractions saved to {self.output_csv}")
 
         return self.get_interactions()
-
-
-br = BrowserRecorder(screen='https://irqa.ai-logix.net')
-br.execute()
