@@ -29,7 +29,7 @@ class DriverEngine(DriverManager):
     def get_web(self, web_link: str, maximize_window=True) -> None:
 
         self.driver.get(web_link)
-        log.level.info(f'webdriver used: \n{self.driver} \n started: \n {web_link}')
+        log.log_info(f'webdriver used: \n{self.driver} \n started: \n {web_link}')
 
         if maximize_window:
             self.driver.maximize_window()
@@ -42,7 +42,7 @@ class DriverEngine(DriverManager):
 
         try:
             if element_type in Type.__members__:
-                log.level.info(output)
+                log.log_info(output)
                 return self.driver.find_element(Type[element_type].value, element_locator)
 
         except Exception as e:

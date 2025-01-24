@@ -6,7 +6,10 @@ from bini.engine.base_model import BiniBaseModel
 from bini.engine.request_handler import APIRequestHandler
 from bini.infrastructure.colors import TerminalColors
 from bini.infrastructure.prompts import Prompts
-from infrastructure.codegen import BrowserRecorder
+from infrastructure.core.logger import Logger
+
+
+log = Logger()
 
 
 class Bini(BiniBaseModel, APIRequestHandler):
@@ -23,7 +26,6 @@ class Bini(BiniBaseModel, APIRequestHandler):
     def __init__(self, model: str, version: str, endpoint: str, api_key: str) -> None:
         self.__set_agent = SetAgent()
         self.session = requests.Session()
-        self.browser_recorder = BrowserRecorder(screen='https://irqa.ai-logix.net')
         BiniBaseModel.__init__(self, model=model, version=version, endpoint=endpoint, api_key=api_key)
 
     def switch_model(self, model: str, version: str) -> None:

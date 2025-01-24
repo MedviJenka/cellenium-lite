@@ -2,7 +2,7 @@ import csv
 from typing import Optional
 from playwright.sync_api import sync_playwright
 from infrastructure.core.executor import Executor
-from bini.infrastructure.codegen_script import JS_SCRIPT
+from infrastructure.codegen.event_listener import JS_SCRIPT
 from infrastructure.core.logger import Logger
 
 
@@ -29,7 +29,7 @@ class BrowserRecorder(Executor):
                 page.add_init_script(JS_SCRIPT)
                 page.goto(self.screen)
 
-                log.level.info("Interact with the browser if needed. Close it when you're done.")
+                log.log_info("Interact with the browser if needed. Close it when you're done.")
 
                 while True:
                     try:
@@ -64,22 +64,23 @@ class BrowserRecorder(Executor):
                                 page.wait_for_timeout(100)
 
                     except Exception as e:
-                        log.level.info(f"Navigation or context issue: {e}")
+                        log.log_info(f"Navigation or context issue: {e}")
                         if "closed" in str(e):
                             break
             except Exception as e:
-                log.level.info(f"Error during execution: {e}")
+                log.log_info(f"Error during execution: {e}")
+
             finally:
                 try:
                     browser.close()
                 except Exception as e:
-                    log.level.info(f"Error closing the browser: {e}")
+                    log.log_info(f"Error closing the browser: {e}")
 
     def save_to_csv(self) -> None:
         """Save the interactions to a CSV file."""
         with open(self.output_csv, mode="w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(["Tag Name", "Element Type", "Element Path", "Action", "Value"])
+            writer.writerow(["Element Name", "Element Type", "Element Path", "Action", "Value"])
             writer.writerows(self.interactions)
 
     def get_interactions(self) -> list:
@@ -87,11 +88,13 @@ class BrowserRecorder(Executor):
         return self.interactions
 
     def __generate_methods(self, class_name: str) -> str:
+
         code_cache = []
 
         for each_list in self.get_interactions():
-            action = each_list[3]
+
             tag_name = each_list[0]
+            action = each_list[3]
             value = each_list[4]
 
             if action == 'Clicked on button':
@@ -102,6 +105,8 @@ class BrowserRecorder(Executor):
                 code_cache.append(f"setup.get_mapped_element('{tag_name}').send_text('{value}')")
             elif action.startswith('Clicked on'):
                 code_cache.append(f"setup.get_mapped_element('{tag_name}').Action(actions.click())")
+            elif action.startswith('Checkbox checked'):
+                code_cache.append(f"setup.get_mapped_element('{tag_name}').Action(actions.click())")
 
         methods_code = "\n  ".join(code_cache)
 
@@ -111,7 +116,7 @@ class BrowserRecorder(Executor):
             def test_{class_name.lower()}(self, setup) -> None:
                 {methods_code}
         """
-        log.level.info(final_code)
+        log.log_info(final_code)
         return final_code
 
     @staticmethod
@@ -119,15 +124,15 @@ class BrowserRecorder(Executor):
         file_path = "generated_test_code.py"
         with open(file_path, "w") as file:
             file.write(output)
-        log.level.info(f'python file: {file_path}')
+        log.log_info(f'python file: {file_path}')
 
     def execute(self, class_name: Optional[str] = None) -> None:
         self.run()
         self.save_to_csv()
 
-        log.level.info("\nRecorded Interactions:")
-        log.level.info(self.get_interactions())
-        log.level.info(f"\nInteractions saved to {self.output_csv}")
+        log.log_info("\nRecorded Interactions:")
+        log.log_info(f'{self.get_interactions()}')
+        log.log_info(f"\nInteractions saved to {self.output_csv}")
 
         code = self.__generate_methods(class_name=class_name)
 
@@ -135,5 +140,6 @@ class BrowserRecorder(Executor):
             self.__create_python_file(output=code)
 
 
-app = BrowserRecorder(screen='https://irqa.ai-logix.net')
-app.execute(class_name="App")
+if __name__ == '__main__':
+    app = BrowserRecorder(screen='https://irqa.ai-logix.net')
+    app.execute(class_name="App")

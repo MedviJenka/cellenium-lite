@@ -41,13 +41,13 @@ def __read_google_sheet(sheet_name: str, value: str, api: GoogleAPIAuth) -> dict
     all_rows = sheet.get_all_values()
     headers = all_rows[0]
 
-    log.level.info(sheet)
-    log.level.info(all_rows)
-    log.level.info(headers)
+    log.log_info(sheet)
+    log.log_info(all_rows)
+    log.log_info(headers)
 
     for row in all_rows[1:]:
         row_dict = dict(zip(headers, row))
-        log.level.info(row_dict)
+        log.log_info(row_dict)
         if row_dict['name'] == value:
             return row_dict
 

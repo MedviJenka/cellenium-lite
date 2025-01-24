@@ -2,17 +2,19 @@ import pytest
 from bini.engine.utils import BiniUtils
 from infrastructure.engine.driver_engine import DriverEngine
 
+
 bini = BiniUtils()
 
 
 @pytest.fixture
 def engine() -> DriverEngine:
-    return DriverEngine(screen='Google', headless=False)
+    return DriverEngine(screen='Google', headless=True)
 
 
 class TestGoogle:
 
-    def test_web(self, engine: engine) -> None:
+    def test_web(self, engine) -> None:
+
         engine.get_web("https://www.google.com")
         title = engine.driver.title
         engine.get_element('search').send_keys('cats')

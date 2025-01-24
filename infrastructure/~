@@ -1,0 +1,17 @@
+INFO |  Friday | 24/01/2025 | 18:29:30 | Interact with the browser if needed. Close it when you're done. | Function: run | Line: 32
+INFO |  Friday | 24/01/2025 | 18:29:30 | Navigation or context issue: Page.evaluate: Execution context was destroyed, most likely because of a navigation | Function: run | Line: 67
+INFO |  Friday | 24/01/2025 | 18:29:30 | Navigation or context issue: Page.evaluate: Execution context was destroyed, most likely because of a navigation | Function: run | Line: 67
+INFO |  Friday | 24/01/2025 | 18:29:30 | Navigation or context issue: Page.wait_for_timeout: Target page, context or browser has been closed | Function: run | Line: 67
+INFO |  Friday | 24/01/2025 | 18:29:30 | 
+Recorded Interactions: | Function: execute | Line: 129
+INFO |  Friday | 24/01/2025 | 18:29:30 | [['button', 'id', 'login_button', 'Clicked on button', None], ['input', 'id', 'i0116', 'Clicked on input', None], ['input', 'id', 'idSIButton9', 'Clicked on input', None]] | Function: execute | Line: 130
+INFO |  Friday | 24/01/2025 | 18:29:30 | 
+Interactions saved to page_base.csv | Function: execute | Line: 131
+INFO |  Friday | 24/01/2025 | 18:29:30 | class TestApp:
+
+            def test_app(self, setup) -> None:
+                setup.get_mapped_element('button').Action(actions.click())
+  setup.get_mapped_element('input').Action(actions.click())
+  setup.get_mapped_element('input').Action(actions.click())
+         | Function: __generate_methods | Line: 115
+INFO |  Friday | 24/01/2025 | 18:29:30 | python file: generated_test_code.py | Function: __create_python_file | Line: 123

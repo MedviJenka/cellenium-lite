@@ -1,7 +1,6 @@
 import random
 import string
 from enum import StrEnum
-from infrastructure.codegen import BrowserRecorder
 
 
 def generate_random_word(length: int = 6) -> str:
@@ -103,7 +102,6 @@ VALIDATION_AGENT = """
 
 """
 
-browser_recorder = BrowserRecorder(screen='https://irqa.ai-logix.net')
 CODE_AGENT_PROMPT = f"""
 
 *IMPORTANT*:
@@ -119,7 +117,7 @@ CODE_AGENT_PROMPT = f"""
    if one of them is "Clicked on input" you will add the <5th value> value:
    example: setup.get_mapped_element(item1).inject_text("<5th value>")
    
-current list is {browser_recorder.execute()}
+current list is 
 
 example:
 
