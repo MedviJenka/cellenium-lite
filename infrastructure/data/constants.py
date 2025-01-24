@@ -7,7 +7,7 @@ abstract_dir = os.path.dirname(os.path.abspath(__file__))
 
 GLOBAL_PATH = abstract_dir.split('infrastructure')[0][:-1]
 TESTS = fr'{GLOBAL_PATH}\tests'
-LOGS = fr'{GLOBAL_PATH}\logs\data.log'
+LOGS = fr'{GLOBAL_PATH}\infrastructure\logs\data.log'
 TEST_SUITE = fr'{TESTS}\_data\test_suite.xlsx'
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SCREENSHOTS = fr'{GLOBAL_PATH}\infrastructure\data\screenshots'

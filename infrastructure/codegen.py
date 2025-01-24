@@ -3,6 +3,10 @@ from typing import Optional
 from playwright.sync_api import sync_playwright
 from infrastructure.core.executor import Executor
 from bini.infrastructure.codegen_script import JS_SCRIPT
+from infrastructure.core.logger import Logger
+
+
+log = Logger()
 
 
 class BrowserRecorder(Executor):
@@ -13,7 +17,7 @@ class BrowserRecorder(Executor):
         self.recorded_elements = set()
         self.output_csv = output_csv
 
-    def run(self):
+    def run(self) -> None:
         """Run the browser and automate interactions."""
         with sync_playwright() as playwright:
             try:
@@ -25,7 +29,7 @@ class BrowserRecorder(Executor):
                 page.add_init_script(JS_SCRIPT)
                 page.goto(self.screen)
 
-                print("Interact with the browser if needed. Close it when you're done.")
+                log.level.info("Interact with the browser if needed. Close it when you're done.")
 
                 while True:
                     try:
@@ -60,25 +64,25 @@ class BrowserRecorder(Executor):
                                 page.wait_for_timeout(100)
 
                     except Exception as e:
-                        print(f"Navigation or context issue: {e}")
+                        log.level.info(f"Navigation or context issue: {e}")
                         if "closed" in str(e):
                             break
             except Exception as e:
-                print(f"Error during execution: {e}")
+                log.level.info(f"Error during execution: {e}")
             finally:
                 try:
                     browser.close()
                 except Exception as e:
-                    print(f"Error closing the browser: {e}")
+                    log.level.info(f"Error closing the browser: {e}")
 
-    def save_to_csv(self):
+    def save_to_csv(self) -> None:
         """Save the interactions to a CSV file."""
         with open(self.output_csv, mode="w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
             writer.writerow(["Tag Name", "Element Type", "Element Path", "Action", "Value"])
             writer.writerows(self.interactions)
 
-    def get_interactions(self):
+    def get_interactions(self) -> list:
         """Return the list of recorded interactions."""
         return self.interactions
 
@@ -99,7 +103,7 @@ class BrowserRecorder(Executor):
             elif action.startswith('Clicked on'):
                 code_cache.append(f"setup.get_mapped_element('{tag_name}').Action(actions.click())")
 
-        methods_code = "\n        ".join(code_cache)
+        methods_code = "\n  ".join(code_cache)
 
         # Ensure indentation for generated code
         final_code = f"""class Test{class_name}:
@@ -107,7 +111,7 @@ class BrowserRecorder(Executor):
             def test_{class_name.lower()}(self, setup) -> None:
                 {methods_code}
         """
-        print(final_code)
+        log.level.info(final_code)
         return final_code
 
     @staticmethod
@@ -115,26 +119,21 @@ class BrowserRecorder(Executor):
         file_path = "generated_test_code.py"
         with open(file_path, "w") as file:
             file.write(output)
-        print(f'python file: {file_path}')
+        log.level.info(f'python file: {file_path}')
 
     def execute(self, class_name: Optional[str] = None) -> None:
         self.run()
         self.save_to_csv()
 
-        print("\nRecorded Interactions:")
-        print(self.get_interactions())
-        print(f"\nInteractions saved to {self.output_csv}")
+        log.level.info("\nRecorded Interactions:")
+        log.level.info(self.get_interactions())
+        log.level.info(f"\nInteractions saved to {self.output_csv}")
+
         code = self.__generate_methods(class_name=class_name)
+
         if class_name:
             self.__create_python_file(output=code)
 
-# _data = [
-#     ['button', 'id', 'login_button', 'Clicked on button', None],
-#     ['input', 'id', 'i0116', 'Clicked on input', None],
-#     ['input', 'id', 'idSIButton9', 'Clicked on input', None],
-#     ['input', 'id', 'idSIButton9', 'Clicked on input', None],
-#     ['input', 'id', 'idSIButton9', 'Clicked on input', None]
-# ]
 
 app = BrowserRecorder(screen='https://irqa.ai-logix.net')
 app.execute(class_name="App")
