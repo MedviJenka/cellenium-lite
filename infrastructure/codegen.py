@@ -1,54 +1,8 @@
 import csv
+from typing import Optional
 from playwright.sync_api import sync_playwright
 from infrastructure.core.executor import Executor
-
-JS_SCRIPT = """
-    window.recordedInteractions = [];
-
-    document.addEventListener('click', (event) => {
-        const target = event.target;
-        const interaction = {
-            action: 'click',
-            tag_name: target.tagName.toLowerCase(),
-            id: target.id || null,
-            name: target.name || null,
-            xpath: generateXPath(target),
-            action_description: `Clicked on ${target.tagName.toLowerCase()}`,
-            value: null  // No value for clicks
-        };
-        window.recordedInteractions.push(interaction);
-    });
-
-    document.addEventListener('input', (event) => {
-        const target = event.target;
-        const interaction = {
-            action: 'input',
-            tag_name: target.tagName.toLowerCase(),
-            id: target.id || null,
-            name: target.name || null,
-            xpath: generateXPath(target),
-            action_description: `Typed in ${target.tagName.toLowerCase()}`,
-            value: target.value || ''  // Explicitly capture the typed value
-        };
-        window.recordedInteractions.push(interaction);
-    });
-
-    function generateXPath(element) {
-        if (element.id) return `//*[@id="${element.id}"]`;
-        if (element === document.body) return '/html/body';
-        let ix = 0;
-        const siblings = element.parentNode ? element.parentNode.childNodes : [];
-        for (let i = 0; i < siblings.length; i++) {
-            const sibling = siblings[i];
-            if (sibling === element) {
-                const path = generateXPath(element.parentNode);
-                return `${path}/${element.tagName.toLowerCase()}[${ix + 1}]`;
-            }
-            if (sibling.nodeType === 1 && sibling.tagName === element.tagName) ix++;
-        }
-        return '';
-    }
-"""
+from bini.infrastructure.codegen_script import JS_SCRIPT
 
 
 class BrowserRecorder(Executor):
@@ -61,53 +15,54 @@ class BrowserRecorder(Executor):
 
     def run(self):
         """Run the browser and automate interactions."""
-        with sync_playwright() as p:
+        with sync_playwright() as playwright:
             try:
-                browser = p.chromium.launch(headless=False)
+                browser = playwright.chromium.launch(headless=False)
                 context = browser.new_context()
                 page = context.new_page()
 
-                # Inject JavaScript to capture interactions and generate XPath
+                # Inject JavaScript to capture interactions
                 page.add_init_script(JS_SCRIPT)
                 page.goto(self.screen)
 
-                # Allow interactions to be recorded
                 print("Interact with the browser if needed. Close it when you're done.")
 
                 while True:
                     try:
-                        # Fetch interactions from the browser
-                        new_interactions = page.evaluate("window.recordedInteractions || []")
-                        if new_interactions:
-                            for interaction in new_interactions:
-                                # Deduplicate by element identifier
-                                element_identifier = (
-                                    interaction["tag_name"],
-                                    interaction["id"] or interaction["name"] or interaction["xpath"],
-                                )
-                                if element_identifier not in self.recorded_elements:
-                                    tag_name = interaction["tag_name"]
-                                    element_type = (
-                                        "id" if interaction["id"]
-                                        else "name" if interaction["name"]
-                                        else "xpath"
+                        # Evaluate only if the page is still open
+                        if not page.is_closed():
+                            new_interactions = page.evaluate("window.recordedInteractions || []")
+                            if new_interactions:
+                                for interaction in new_interactions:
+                                    element_identifier = (
+                                        interaction["tag_name"],
+                                        interaction["id"] or interaction["name"] or interaction["xpath"],
                                     )
-                                    element_path = interaction["id"] or interaction["name"] or interaction["xpath"]
-                                    action_description = interaction["action_description"]
-                                    value = interaction.get("value")
+                                    if element_identifier not in self.recorded_elements:
+                                        tag_name = interaction["tag_name"]
+                                        element_type = (
+                                            "id" if interaction["id"]
+                                            else "name" if interaction["name"]
+                                            else "xpath"
+                                        )
+                                        element_path = interaction["id"] or interaction["name"] or interaction["xpath"]
+                                        action_description = interaction["action_description"]
+                                        value = interaction.get("value")
 
-                                    self.interactions.append([tag_name, element_type, element_path, action_description, value])
-                                    self.recorded_elements.add(element_identifier)
+                                        self.interactions.append(
+                                            [tag_name, element_type, element_path, action_description, value])
+                                        self.recorded_elements.add(element_identifier)
 
-                            # Clear interactions in the browser
-                            page.evaluate("window.recordedInteractions = []")
+                                # Clear interactions
+                                page.evaluate("window.recordedInteractions = []")
+                            else:
+                                # Avoid tight infinite loop
+                                page.wait_for_timeout(100)
 
                     except Exception as e:
                         print(f"Navigation or context issue: {e}")
                         if "closed" in str(e):
                             break
-                        page.wait_for_load_state("domcontentloaded")
-
             except Exception as e:
                 print(f"Error during execution: {e}")
             finally:
@@ -127,12 +82,59 @@ class BrowserRecorder(Executor):
         """Return the list of recorded interactions."""
         return self.interactions
 
-    def execute(self) -> list:
+    def __generate_methods(self, class_name: str) -> str:
+        code_cache = []
+
+        for each_list in self.get_interactions():
+            action = each_list[3]
+            tag_name = each_list[0]
+            value = each_list[4]
+
+            if action == 'Clicked on button':
+                code_cache.append(f"setup.get_mapped_element('{tag_name}').Action(actions.click())")
+            elif action == 'Clicked on input' and value is not None:
+                code_cache.append(f"setup.get_mapped_element('{tag_name}').send_text('{value}')")
+            elif action == 'Typed in input':
+                code_cache.append(f"setup.get_mapped_element('{tag_name}').send_text('{value}')")
+            elif action.startswith('Clicked on'):
+                code_cache.append(f"setup.get_mapped_element('{tag_name}').Action(actions.click())")
+
+        methods_code = "\n        ".join(code_cache)
+
+        # Ensure indentation for generated code
+        final_code = f"""class Test{class_name}:
+
+            def test_{class_name.lower()}(self, setup) -> None:
+                {methods_code}
+        """
+        print(final_code)
+        return final_code
+
+    @staticmethod
+    def __create_python_file(output: str) -> None:
+        file_path = "generated_test_code.py"
+        with open(file_path, "w") as file:
+            file.write(output)
+        print(f'python file: {file_path}')
+
+    def execute(self, class_name: Optional[str] = None) -> None:
         self.run()
         self.save_to_csv()
 
         print("\nRecorded Interactions:")
         print(self.get_interactions())
         print(f"\nInteractions saved to {self.output_csv}")
+        code = self.__generate_methods(class_name=class_name)
+        if class_name:
+            self.__create_python_file(output=code)
 
-        return self.get_interactions()
+# _data = [
+#     ['button', 'id', 'login_button', 'Clicked on button', None],
+#     ['input', 'id', 'i0116', 'Clicked on input', None],
+#     ['input', 'id', 'idSIButton9', 'Clicked on input', None],
+#     ['input', 'id', 'idSIButton9', 'Clicked on input', None],
+#     ['input', 'id', 'idSIButton9', 'Clicked on input', None]
+# ]
+
+app = BrowserRecorder(screen='https://irqa.ai-logix.net')
+app.execute(class_name="App")
