@@ -1,0 +1,13 @@
+decision:
+  agent: agent
+  description: |
+    Based on the output: {output},
+    
+    **Important**
+      **always return**:
+        - Passed, if the prompt is fulfilled by the main image or the sample image is displayed in the main image.
+        - Failed if the prompt is not fulfilled by the main image 
+        - Failed if the sample image is not displayed in the main image.
+        - Failed if even one of the sample images is not displayed in the main image.
+  expected_output: |
+    Final_decision: Passed or Failed
