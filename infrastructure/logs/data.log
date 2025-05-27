@@ -1,0 +1,59 @@
+DEBUG | Monday | 27/01/2025 | 10:51:18 | asyncio | Using proactor: IocpProactor | Function: __init__ | Line: 634
+INFO | Monday | 27/01/2025 | 10:51:26 | root | Interact with the browser if needed. Close it when you're done. | Function: log_info | Line: 31
+INFO | Monday | 27/01/2025 | 10:51:30 | root | Navigation or context issue: Page.evaluate: Execution context was destroyed, most likely because of a navigation | Function: log_info | Line: 31
+INFO | Monday | 27/01/2025 | 10:51:32 | root | Navigation or context issue: Page.evaluate: Execution context was destroyed, most likely because of a navigation | Function: log_info | Line: 31
+INFO | Monday | 27/01/2025 | 10:51:35 | root | Navigation or context issue: Page.evaluate: Target page, context or browser has been closed | Function: log_info | Line: 31
+INFO | Monday | 27/01/2025 | 10:51:36 | root | 
+Recorded Interactions: | Function: log_info | Line: 31
+INFO | Monday | 27/01/2025 | 10:51:36 | root | [['Sign in with Microsoft 365_button', 'id', 'login_button', 'Clicked on Sign in with Microsoft 365', None], ['_input', 'id', 'i0116', 'Clicked on input', None], ['_input', 'id', 'idSIButton9', 'Clicked on input', None]] | Function: log_info | Line: 31
+INFO | Monday | 27/01/2025 | 10:51:36 | root | 
+Interactions saved to page_base.csv | Function: log_info | Line: 31
+INFO | Monday | 27/01/2025 | 10:51:36 | root | 
+        
+    import pytest
+    import coreinfra.core.environment.environment_variables as env
+    from coreinfra.services.selenium.mappedselenium import MappedSelenium
+    from qasharedinfra.devices.audc.meetinginsights.meetinginsights import MeetingInsightsSaaS
+    from qasharedinfra.infra.smarttap.selenium.utils.bini_utils import IRBiniUtils
+    
+    HEADLESS = False
+    medrei: MeetingInsightsSaaS = env.devices['Device_1']
+    log = env.logger
+    
+    
+    @pytest.fixture(scope='module', autouse=True)
+    def init_globals() -> None:
+    
+        st.logger_.info('
+******** Module (Script) Setup ********')
+        bini = IRBiniUtils()
+        st.test_prerequisites(selenium=True, headless=HEADLESS)
+        medrei.ui.utils.st_selenium_go_to_screen_in_current_window(st.selenium, st.st_screens)  # add screen
+    
+        yield bini
+    
+        medrei.logger.info('******** Module (Script) TearDown ********')
+        medrei.selenium.finalize()
+    
+    
+    @pytest.fixture(scope='function', autouse=True)
+    def setup_and_teardown() -> None:
+        medrei.logger_.info('******** Test Setup ********')
+    
+        yield
+    
+        medrei.logger_.info('******** Test TearDown ********')
+    
+    @pytest.fixture
+    def driver() -> MappedSelenium:
+        return medrei.selenium
+    
+    
+        class TestApp:
+
+            def test_app(self, driver) -> None:
+                driver.get_mapped_element('Sign in with Microsoft 365_button').Action(actions.click())
+        driver.get_mapped_element('_input').Action(actions.click())
+        driver.get_mapped_element('_input').Action(actions.click())
+         | Function: log_info | Line: 31
+INFO | Monday | 27/01/2025 | 10:51:36 | root | python file: generated_test_code.py | Function: log_info | Line: 31

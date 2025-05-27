@@ -97,3 +97,50 @@ function generateXPath(element) {
 
 
 """
+
+
+def init_code(device: str) -> str:
+
+    st_import = "from qasharedinfra.devices.audc.smarttap.smarttap import SmartTap"
+    mi_import = "from qasharedinfra.devices.audc.meetinginsights.meetinginsights import MeetingInsightsSaaS"
+
+    CODE = f"""
+    import pytest
+    import coreinfra.core.environment.environment_variables as env
+    from coreinfra.services.selenium.mappedselenium import MappedSelenium
+    {st_import if device == 'st' else mi_import}
+    from qasharedinfra.infra.smarttap.selenium.utils.bini_utils import IRBiniUtils
+    
+    HEADLESS = False
+    {device}: {'SmartTap' if device == 'st' else 'MeetingInsightsSaaS'} = env.devices['Device_1']
+    log = env.logger
+    
+    
+    @pytest.fixture(scope='module', autouse=True)
+    def init_globals() -> None:
+    
+        {device}.logger_.info('\n******** Module (Script) Setup ********')
+        bini = IRBiniUtils()
+        {device}.test_prerequisites(selenium=True, headless=HEADLESS)
+        {device}.ui.utils.st_selenium_go_to_screen_in_current_window({device}.selenium, {device}.st_screens)  # add screen
+    
+        yield bini
+    
+        {device}.logger.info('******** Module (Script) TearDown ********')
+        {device}.selenium.finalize()
+    
+    
+    @pytest.fixture(scope='function', autouse=True)
+    def setup_and_teardown() -> None:
+        {device}.logger_.info('******** Test Setup ********')
+    
+        yield
+    
+        {device}.logger_.info('******** Test TearDown ********')
+    
+    @pytest.fixture
+    def driver() -> MappedSelenium:
+        return {device}.selenium
+    
+    """
+    return CODE

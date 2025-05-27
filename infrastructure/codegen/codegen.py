@@ -1,10 +1,8 @@
 import csv
-from typing import Optional
 from playwright.sync_api import sync_playwright
 from infrastructure.core.executor import Executor
-from infrastructure.codegen.event_listener import JS_SCRIPT
+from infrastructure.codegen.event_listener import JS_SCRIPT, init_code
 from infrastructure.core.logger import Logger
-
 
 log = Logger()
 
@@ -87,33 +85,34 @@ class BrowserRecorder(Executor):
         """Return the list of recorded interactions."""
         return self.interactions
 
-    def __generate_methods(self, class_name: str) -> str:
+    def __generate_methods(self, class_name: str, device: str) -> str:
 
         code_cache = []
 
         for each_list in self.get_interactions():
-
             tag_name = each_list[0]
             action = each_list[3]
             value = each_list[4]
 
             if action == 'Clicked on button':
-                code_cache.append(f"setup.get_mapped_element('{tag_name}').Action(actions.click())")
+                code_cache.append(f"driver.get_mapped_element('{tag_name}').Action(actions.click())")
             elif action == 'Clicked on input' and value is not None:
-                code_cache.append(f"setup.get_mapped_element('{tag_name}').send_text('{value}')")
+                code_cache.append(f"driver.get_mapped_element('{tag_name}').send_text('{value}')")
             elif action == 'Typed in input':
-                code_cache.append(f"setup.get_mapped_element('{tag_name}').send_text('{value}')")
+                code_cache.append(f"driver.get_mapped_element('{tag_name}').send_text('{value}')")
             elif action.startswith('Clicked on'):
-                code_cache.append(f"setup.get_mapped_element('{tag_name}').Action(actions.click())")
+                code_cache.append(f"driver.get_mapped_element('{tag_name}').Action(actions.click())")
             elif action.startswith('Checkbox checked'):
-                code_cache.append(f"setup.get_mapped_element('{tag_name}').Action(actions.click())")
+                code_cache.append(f"driver.get_mapped_element('{tag_name}').Action(actions.click())")
 
-        methods_code = "\n  ".join(code_cache)
+        methods_code = "\n        ".join(code_cache)  # Ensure proper indentation for generated code
 
-        # Ensure indentation for generated code
-        final_code = f"""class Test{class_name}:
+        # Ensure overall indentation for the final generated code
+        final_code = f"""
+        {init_code(device=device)}
+        class Test{class_name}:
 
-            def test_{class_name.lower()}(self, setup) -> None:
+            def test_{class_name.lower()}(self, driver) -> None:
                 {methods_code}
         """
         log.log_info(final_code)
@@ -126,7 +125,7 @@ class BrowserRecorder(Executor):
             file.write(output)
         log.log_info(f'python file: {file_path}')
 
-    def execute(self, class_name: Optional[str] = None) -> None:
+    def execute(self, class_name: str, device: str) -> None:
         self.run()
         self.save_to_csv()
 
@@ -134,7 +133,7 @@ class BrowserRecorder(Executor):
         log.log_info(f'{self.get_interactions()}')
         log.log_info(f"\nInteractions saved to {self.output_csv}")
 
-        code = self.__generate_methods(class_name=class_name)
+        code = self.__generate_methods(class_name=class_name, device=device)
 
         if class_name:
             self.__create_python_file(output=code)
@@ -142,4 +141,4 @@ class BrowserRecorder(Executor):
 
 if __name__ == '__main__':
     app = BrowserRecorder(screen='https://irqa.ai-logix.net')
-    app.execute(class_name="App")
+    app.execute(class_name="App", device='medrei')

@@ -1,0 +1,45 @@
+determine_images:
+  agent: agent
+  description: Based on the presence of main and sample image path, determine if it's a "single_image" or "multiple_images" scenario.
+  expected_output: >
+    image_scenario: single_image or multiple_images
+
+describe_main_image:
+  agent: agent
+  description: |
+      Analyze the main image - {image} to describe as detailed as you can,
+      its key elements and features, icons, text, colors, everything you see.
+  expected_output: VERY Detailed description of the main image content.
+
+describe_sample_images:
+    agent: agent
+    description: |
+        If a sample image is provided, describe its key elements, features, icons, text, and colors.
+        If no sample image is provided, return an empty string.
+    expected_output: >
+        VERY Detailed description of the sample image content or an empty string if no sample image is provided.
+
+chain_of_thought:
+  agent: agent
+  description: |
+    Based on the prompt: {prompt} and the analysis from the preceding tasks output:
+      - main image: {{tasks.describe_main_image.output}}
+      - sample image: {{tasks.describe_sample_images.output}}
+    reason about whether the main image fulfills the requirements, considering the sample image if provided.
+  expected_output: Detailed chain of thought reasoning based on the analysis.
+
+decision:
+  agent: agent
+  description: |
+    Based on the prompt: {prompt}, the image(s): {image} {sample_image}, and the chain of thought: {{tasks.task3.output}},
+    
+    **Important**
+      **always provide**: a detailed reasoning output.
+      **always return**:
+        - Passed, if the prompt is fulfilled by the main image or the sample image is displayed in the main image.
+        - Failed if the prompt is not fulfilled by the main image 
+        - Failed if the sample image is not displayed in the main image.
+        - Failed if even one of the sample images is not displayed in the main image.
+  expected_output: |
+    Chain Of Thought: {{tasks.task5.output}}
+    Final_decision: Passed or Failed
