@@ -1,0 +1,28 @@
+grammar:
+  agent: agent
+  description: |
+    
+    You will receive a sentence: {prompt}
+
+    Your tasks are:
+      - Correct the grammar and phrasing to make it valid, natural, and understandable English.
+
+    ** IMPORTANT **
+      - Maintain the original intent of the question when correcting grammar.
+      - Do NOT add extra information or change the meaning.
+
+  expected_output: |
+    A grammatically correct and clear version of the question. 
+
+
+question_validation:
+  agent: agent
+  context: [ grammar ]
+  description: |
+    **IMPORTANT**
+      - return Invalid Question if the question is not clear, 
+        for example: "123456" or "cat dog".
+    
+      - return the original question if the question is valid.
+  expected_output: |
+    valid question

@@ -1,0 +1,16 @@
+version: "1.0"
+
+file_reader:
+  agent: file_reader
+  description: "Read the contents of the 'config.json' file and summarize the key settings."
+  expected_output: "A summary of the key configuration parameters found in 'config.json'."
+
+file_modifier:
+  agent: file_modifier
+  description: "Read the 'README.md' file. Then, add a new section titled 'Contribution Guidelines' with the text: 'Please follow the standard pull request process for contributions.' Finally, write the updated content back to 'README.md'."
+  expected_output: "The 'README.md' file should now contain a new section titled 'Contribution Guidelines' with the specified text."
+
+file_manager:
+  agent: file_manager
+  description: "List all the Python files (.py) in the 'src' directory."
+  expected_output: "A list of all files ending with '.py' located within the 'src' directory."

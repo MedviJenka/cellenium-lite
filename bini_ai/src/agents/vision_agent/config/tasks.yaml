@@ -1,0 +1,68 @@
+determine_images:
+  agent: agent
+  description: Based on the presence of main and sample image path, determine if it's a "single_image" or "multiple_images" scenario.
+  expected_output: >
+    image_scenario: single_image or multiple_images
+
+describe_main_image:
+  agent: agent
+  description: |
+    Analyze the main image - {image} to describe as detailed as you can,
+    its key elements and features, icons, text, colors, everything you see.
+  expected_output: VERY Detailed description of the main image content.
+
+
+describe_sample_images:
+  agent: agent
+  description: |
+    If a sample image is provided, describe its key elements, features, icons, text, and colors.
+    If no sample image is provided, return an empty string.
+  expected_output: >
+    VERY Detailed description of the sample image content or an empty string if no sample image is provided.
+
+conclusion:
+  agent: agent
+  context: [ describe_main_image, describe_sample_images ]
+  description: |
+    
+    Based on the prompt: {prompt} and the analysis from the preceding tasks output:
+
+    **IMPORTANT**
+    if only one image is given, you should only analyze the main image.
+    if two images are given, you should analyze both images and compare them to the prompt and main image to the sample image.
+
+  expected_output: Detailed conclusion based on the analysis of both images in relation to the prompt.
+
+chain_of_thought_output:
+  context: [ describe_main_image, describe_sample_images, conclusion ]
+  agent: agent
+  description: |
+    Based on the prompt: {prompt} and the analysis from the preceding tasks output:
+
+    **IMPORTANT**
+      you have a 2 main goals:
+        1. Analyze the main image and compare it to the original prompt
+
+        3. return numbers only in digits
+
+  expected_output: Detailed chain of thought reasoning based on the analysis.
+
+decision:
+  agent: agent
+  context: [ chain_of_thought_output, conclusion ]
+  description: |
+    Based on the prompt: {prompt}, the image(s): {image} {sample_image}
+    **Important:**
+      **Always:**
+        - Provide a detailed reasoning chain output.
+        - Based on the detailed reasoning in the chain of thought, determine if the image fulfills the prompt.
+        - Return "Passed" if the image fulfills the prompt.
+        - Return "Failed" if the image does not fulfill the prompt.
+        - Return "Failed" if the sample image
+  
+
+  expected_output: |
+    Detailed reasoning output based on the chain of thought analysis.
+    **Final Decision: Passed** 
+    or 
+    **Final Decision: Failed**
