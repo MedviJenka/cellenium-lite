@@ -1,11 +1,11 @@
+import os
 from crewai import Agent, Task, Crew
 from crewai_tools import MCPServerAdapter
 from mcp import StdioServerParameters
 
-import os
 
 # Create a StdioServerParameters object
-server_params=StdioServerParameters(
+server_params = StdioServerParameters(
     command="python3",
     args=["servers/math_stdio_server.py"],
     env={"UV_PYTHON": "3.12", **os.environ},

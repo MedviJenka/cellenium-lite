@@ -1,0 +1,19 @@
+version: '3.0'
+
+services:
+
+  bini:
+    container_name: bini-service
+    build:
+      context: .
+    env_file:
+      - .env
+    ports:
+      - "9000:9000"
+    networks:
+      - my-network
+
+
+networks:
+  my-network:
+    driver: bridge
