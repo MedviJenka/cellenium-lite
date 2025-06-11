@@ -1,83 +1,89 @@
-# BiniOps — Multistage AI Flow for Image and Prompt Analysis
+# Bini Image Analysis Feature
 
-`BiniOps` is a modular flow-based AI pipeline built on the `CrewAI` framework, designed to process an input prompt and image, refine the prompt, analyze the image, reason through the results, and return a final validation outcome. The flow also maintains a full trace of its decision-making process for transparency and debugging.
+## Overview
 
----
+This feature introduces an automated image analysis workflow powered by AI. It allows the system to process an image (
+and optionally a sample image) based on a user-provided prompt, analyze its content, and determine if it meets the
+criteria defined in the prompt. The workflow leverages Large Language Models (LLMs) and Computer Vision capabilities
+through a modular agent-based architecture built with CrewAI.
 
-## 🚀 Features
+The core functionality includes:
 
-- **Prompt Refinement** – Uses an English Professor agent to clean and refine the input prompt.
-- **Image Analysis** – Leverages a Computer Vision agent to interpret and extract data from the image.
-- **Chain-of-Thought Reasoning** – Applies logical reasoning over the analyzed data.
-- **Validation** – Uses a Validation Agent to confirm whether the image data meets expected criteria.
-- **Flow Control** – Decision routing based on result: Passed, Failed, or Invalid.
-- **Traceability** – Maintains a `cache` of all steps for full auditability.
+1. **Prompt Refinement:** Ensuring the user's prompt is clear and grammatically correct for optimal AI processing.
+2. **Image Analysis:** Utilizing a Computer Vision agent to meticulously describe the key elements, features, text, and
+   colors present in the provided image(s).
+3. **Chain of Thought Reasoning (Optional):** Providing a detailed step-by-step reasoning process based on the image
+   analysis and the original prompt. This helps in understanding how the final decision was reached.
+4. **Decision Making:** Determining whether the analyzed image(s) fulfill the requirements outlined in the user's
+   prompt.
+5. **Structured Output (Optional):** Providing the analysis results in a structured JSON format for easy integration and
+   consumption by other systems.
 
----
+## Architecture
 
-## 🧠 Agents Used
+The image analysis workflow is implemented as a CrewAI Flow named `BiniImage`. It consists of the following steps and
+agents:
 
-| Agent               | Description                                                  |
-|---------------------|--------------------------------------------------------------|
-| EnglishProfessor    | Improves the clarity and structure of the input prompt.      |
-| ComputerVisionAgent | Analyzes the image using computer vision capabilities.       |
-| ChainOfThought      | Applies logical reasoning to the image analysis.             |
-| ValidationAgent     | Validates whether the final data satisfies defined criteria. |
+* **Initial State (`InitialState`):** A Pydantic model that defines the input and intermediate data structures for the
+  flow. This includes the initial prompt, image paths, analysis data, and the final result.
+* **English Agent (`EnglishAgent`):** Responsible for refining the initial user prompt to ensure clarity and grammatical
+  correctness. This agent is used in the `refine_prompt` step.
+* **Computer Vision Agent (`ComputerVisionAgent`):** A specialized agent composed of several tasks designed for image
+  analysis:
+    * `determine_images`: Identifies if a single or multiple images are provided.
+    * `describe_main_image`: Provides a detailed description of the main image.
+    * `describe_sample_images`: Provides a detailed description of the sample image (if provided).
+    * `conclusion`: Synthesizes the descriptions and relates them to the original prompt.
+    * `chain_of_thought`: (If enabled) Generates a step-by-step reasoning based on the image analysis.
+    * `decision`: Makes the final determination (Pass/Fail) based on the analysis and reasoning.
+* **Flow Steps:**
+    * **`refine_prompt` (Start):** Initiates the flow by using the `EnglishAgent` to refine the user's prompt.
+    * **`decision_point` (Router):** Routes the flow based on whether the prompt is deemed valid or invalid.
+    * **`on_invalid_question` (Listen):** Handles cases where the initial prompt is invalid, setting the result
+      accordingly.
+    * **`analyze_image` (Listen):** Executes the `ComputerVisionAgent` to analyze the provided image(s) based on the (
+      potentially refined) prompt.
 
----
+## Usage
 
-## 📥 Input Format
+The `BiniUtils` class provides a convenient way to interact with the `BiniImage` flow.
 
-```json
-{
-  "prompt": "Describe the contents of the image",
-  "image": "/path/to/image.png",
-  "sample_image": "/path/to/sample.png" 
-}
-```
+### `BiniUtils` Class
 
----
+* **`__init__(chain_of_thought: Optional[bool] = True, to_json: Optional[bool] = False)`:** Initializes the `BiniUtils`
+  instance.
+    * `chain_of_thought`: A boolean flag to enable or disable the chain of thought reasoning in the analysis. Defaults
+      to `True`.
+    * `to_json`: A boolean flag to enable or disable structured JSON output for the final decision task. Defaults to
+      `False`.
+* **`run(prompt: str, image_path: str, sample_image: Union[str, list] = '') -> str`:** Executes the `BiniImage` flow
+  with the given inputs.
+    * `prompt`: The user's question or instruction regarding the image(s).
+    * `image_path`: The file path or URL of the main image to be analyzed.
+    * `sample_image`: An optional file path or URL of a sample image for comparison. Can be a single string or a list of
+      strings.
+    * Returns the raw output of the final analysis step. If `to_json` is enabled and the final task (`decision`) is
+      configured for JSON output, this will be a JSON string.
+* **`finalize()`:** Performs any necessary cleanup after the flow execution.
 
-## 🔄 Flow Breakdown
+### Example Usage
 
-1. **Refine Prompt**
-2. **Analyze Image**
-3. **Reason Through**
-4. **Validate Result**
-5. **Make Decision**
-6. **Return Final Status** (`Passed`, `Failed`, or `Invalid`)
+```python
+from qasharedinfra.infra.common.services.bini_ai.src.utils.bini_utils import BiniUtils
 
-Each stage updates a central state object (`InitialState`) and appends to a cache for traceability.
+# Initialize BiniUtils with chain of thought and JSON output enabled
+bini_analyzer = BiniUtils(chain_of_thought=True, to_json=True)
 
----
+# Define the prompt and image path
+prompt = "Does this image contain a cat?"
+image_path = "path/to/your/image.jpg"
+sample_image_path = "path/to/your/sample_image.png" # Optional
 
-## 📤 Output (flow_to_json)
+# Run the image analysis flow
+result = bini_analyzer.run(prompt=prompt, image_path=image_path, sample_image=sample_image_path)
 
-Returns a JSON-formatted object like:
+# Print the result (will be a JSON string if to_json was True)
+print(result)
 
-```json
-{
-  "prompt": "...refined prompt...",
-  "data": "...processed data...",
-  "result": "Passed",
-  "cache": "[...full history...]",
-  "status": "Passed"
-}
-```
-
----
-
-## 🚰 Requirements
-
-- Python 3.12+
-- `CrewAI`
-- `Pydantic`
-- Custom agents from `qasharedinfra`
-
----
-
-## 📌 Notes
-
-- This module is designed to be integrated within a larger AI pipeline or service.
-- All agents are assumed to be preconfigured and available via internal imports.
-
+# Finalize the BiniUtils instance
+bini_analyzer.finalize()

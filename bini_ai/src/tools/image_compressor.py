@@ -1,7 +1,7 @@
 import base64
 from typing import Optional
 from langchain_core.messages import HumanMessage
-from qasharedinfra.infra.common.services.bini_ai.src.utils.azure_llm import AzureLLMConfig
+from bini_ai.src.utils.azure_llm import AzureLLMConfig
 
 
 class CompressAndUploadImage(AzureLLMConfig):

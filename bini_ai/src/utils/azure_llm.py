@@ -1,9 +1,9 @@
 import os
-from dotenv import load_dotenv
 from functools import cached_property
 from crewai import LLM
-from langchain_openai import AzureChatOpenAI
 from crewai.telemetry import Telemetry
+from dotenv import load_dotenv
+from langchain_openai import AzureChatOpenAI
 
 
 load_dotenv()

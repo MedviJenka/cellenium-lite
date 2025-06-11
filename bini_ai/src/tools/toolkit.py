@@ -1,6 +1,7 @@
 from typing import Type
 from crewai.tools import BaseTool
 from pydantic import BaseModel
+from crewai_tools import CodeDocsSearchTool
 
 
 class FunctionMappingTool(BaseTool):

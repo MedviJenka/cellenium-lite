@@ -1,0 +1,34 @@
+version: '3.0'
+
+services:
+
+  bini:
+    container_name: bini-service
+    build:
+      context: .
+      target: bini
+
+    env_file:
+      - .env
+    ports:
+      - "9000:9000"
+    networks:
+      - my-network
+      -
+  mcp-server:
+    container_name: mcp-server
+    build:
+      context: .
+      target: mcp-server
+
+    env_file:
+      - .env
+    ports:
+      - "9001:9001"
+    networks:
+      - my-network
+
+
+networks:
+  my-network:
+    driver: bridge

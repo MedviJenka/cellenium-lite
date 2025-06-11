@@ -1,20 +1,23 @@
+import uuid
 from typing import Optional, Union
 from crewai import Agent, Crew, Task, Process
 from crewai.project import CrewBase, agent, crew, task
-from qasharedinfra.infra.common.services.bini_ai.src.tools.image_compressor import CompressAndUploadImage
-from qasharedinfra.infra.common.services.bini_ai.src.utils.infrastructure import AgentInfrastructure
+from bini_ai.src.agents.vision_agent.schemas import DecisionOutput
+from bini_ai.src.tools.image_compressor import CompressAndUploadImage
+from bini_ai.src.utils.infrastructure import AgentInfrastructure
 
 
 @CrewBase
 class ComputerVisionAgent(AgentInfrastructure):
 
-    def __init__(self, debug: Optional[bool] = False) -> None:
-        self.debug = debug
-        super().__init__(debug=self.debug)
+    def __init__(self, chain_of_thought: bool, to_json: bool) -> None:
+        self.chain_of_thought = chain_of_thought
+        self.to_json = to_json
+        super().__init__(chain_of_thought=self.chain_of_thought, to_json=self.to_json)
 
     @agent
     def agent(self) -> Agent:
-        return Agent(config=self.agents_config['agent'], llm=self.llm, verbose=self.debug)
+        return Agent(config=self.agents_config['agent'], llm=self.llm, verbose=self.chain_of_thought)
 
     @task
     def determine_images(self) -> Task:
@@ -29,15 +32,26 @@ class ComputerVisionAgent(AgentInfrastructure):
         return Task(config=self.tasks_config['describe_sample_images'])
 
     @task
-    def chain_of_thought(self) -> Task:
-        return Task(config=self.tasks_config['chain_of_thought'])
+    def conclusion(self) -> Task:
+        return Task(config=self.tasks_config['conclusion'])
+
+    @task
+    def chain_of_thought_output(self) -> Task:
+        return Task(config=self.tasks_config['chain_of_thought_output'])
 
     @task
     def decision(self) -> Task:
-        return Task(config=self.tasks_config['decision'])
+        match self.to_json:
+            case True:
+                return Task(config=self.tasks_config['decision'],
+                            output_json=DecisionOutput,
+                            output_file=fr'output/bini-{uuid.uuid4()}.json')
+            case _:
+                return Task(config=self.tasks_config['decision'])
 
     @crew
     def crew(self) -> Crew:
+        # Consider changing to Process.parallel if tasks are independent for runtime improvement
         return Crew(agents=self.agents, tasks=self.tasks, process=Process.sequential)
 
     def execute(self, prompt: str, image_path: str, sample_image: Optional[Union[list, str]] = '') -> str:

@@ -1,0 +1,4 @@
+Element Name,Element Type,Element Path,Action,Value
+Sign in with Microsoft 365_button,id,login_button,Clicked on Sign in with Microsoft 365,
+_input,id,i0116,Clicked on input,
+_input,id,idSIButton9,Clicked on input,

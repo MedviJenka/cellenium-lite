@@ -17,10 +17,12 @@ grammar:
 
 question_validation:
   agent: agent
+  context: [ grammar ]
   description: |
-    base on the grammar task: {{tasks.grammar.output}}
     **IMPORTANT**
-      - return Invalid Question if the question is not clear.
-      - return the original question from  if the question is valid.
+      - return Invalid Question if the question is not clear, 
+        for example: "123456" or "cat dog".
+    
+      - return the original question if the question is valid.
   expected_output: |
     valid question

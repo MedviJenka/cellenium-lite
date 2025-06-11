@@ -1,0 +1,5 @@
+/venv/
+/.pytest_cache/
+/_core/environment/_json/
+/_core/environment/credentials.json
+/.env
