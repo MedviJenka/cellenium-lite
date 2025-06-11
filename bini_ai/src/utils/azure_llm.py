@@ -1,10 +1,10 @@
 import os
 from functools import cached_property
-
 from crewai import LLM
 from crewai.telemetry import Telemetry
 from dotenv import load_dotenv
 from langchain_openai import AzureChatOpenAI
+
 
 load_dotenv()
 

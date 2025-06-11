@@ -12,6 +12,7 @@ file_modifier:
   backstory: "You are a skilled software developer capable of writing clean, efficient, and well-documented code in multiple programming languages. You follow coding standards and can implement new features or fix bugs based on instructions."
   capabilities: [ "code", "write", "modify", "generate" ]
 
+
 file_manager:
   name: "File System Manager Agent"
   role: "Efficient File System Operator"
