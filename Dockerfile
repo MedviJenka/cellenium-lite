@@ -3,7 +3,7 @@ FROM python:${PYTHON_VERSION} AS bini
 WORKDIR /app
 COPY pyproject.toml .
 RUN pip install --upgrade pip && pip install poetry
-RUN poetry config virtualenvs.create false && poetry install --no-dev
+RUN poetry install
 COPY bini_ai .
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "9000", "--reload"]
 

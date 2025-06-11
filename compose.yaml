@@ -14,12 +14,12 @@ services:
       - "9000:9000"
     networks:
       - my-network
-      -
+
   mcp-server:
     container_name: mcp-server
     build:
-      context: .
       target: mcp-server
+      context: .
 
     env_file:
       - .env
