@@ -31,3 +31,6 @@ class EnglishAgent(AgentInfrastructure):
 
     def execute(self, prompt: str) -> str:
         return self.crew().kickoff(inputs={'prompt': prompt}).raw
+
+
+EnglishAgent(chain_of_thought=True, to_json=True).execute('hi he u are')

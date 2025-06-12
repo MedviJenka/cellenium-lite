@@ -1,22 +1,22 @@
-from dotenv import load_dotenv
-from mcp.server.fastmcp import FastMCP
+import os
+from crewai_tools import MCPServerAdapter
+from mcp import StdioServerParameters
+from bini_ai.src.agents.code_agent.crew import CodeAgent
 
 
-load_dotenv()
+server_params = StdioServerParameters(command="npx",
+                                      args=["-y", "@wonderwhy-er/desktop-commander@latest"],
+                                      cwd=r'C:\Users\evgenyp\PycharmProjects\cellenium-lite\tests',
+                                      env={**os.environ})
 
 
-mcp = FastMCP(name='test', host='0.0.0.0', port='8090')
-
-
-@mcp.tool()
-def add(a: int, b: int) -> int: return a + b
+def main():
+    # Use context manager for proper connection lifecycle
+    with MCPServerAdapter(server_params) as desktop_tools:
+        print(f"Available Desktop Commander tools: {[tool.name for tool in desktop_tools]}")
+        code_agent = CodeAgent(chain_of_thought=True, tools=desktop_tools)
+        code_agent.execute(prompt=r'write 3 tests based on this dir: C:\Users\evgenyp\PycharmProjects\cellenium-lite\tests')
 
 
 if __name__ == "__main__":
-    transport = 'sse'
-    if transport == 'stdio':
-        print("Starting MCP server with stdio transport...")
-        mcp.run(transport='stdio')
-    elif transport:
-        print("Starting MCP server with SSE transport...")
-        mcp.run(transport='sse')
+    main()
