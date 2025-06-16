@@ -1,0 +1,2 @@
+
+CONNECTION_STRING: mongodb+srv://${USER}:${PASSWORD}.${HOST}.mongodb.net/?retryWrites=true&w=majority&appName=aisquad01
