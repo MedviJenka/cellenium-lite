@@ -1,4 +1,5 @@
 import os
+from time import sleep
 from bson import ObjectId
 from pydantic import Field
 from dotenv import load_dotenv
@@ -75,10 +76,10 @@ class MongoDBRepository:
             return list(collection.find())
         return list(collection.find(query))
 
-    def filter_document_by_user_name(self, collection_name: str, user_name: str) -> dict:
+    def filter_document_by_user_name(self, collection_name: str, user_email: str) -> dict:
         """Retrieve data for a specific user from a collection."""
         collection = self.get_collection(collection_name)
-        query = {'_id': user_name}
+        query = {'_id': user_email}
         return collection.find_one(query)
 
     def filter_document_by_meeting_id(self, meeting_id: str) -> dict:
@@ -92,10 +93,58 @@ class MongoDBRepository:
         collection = self.get_collection(collection_name)
         collection.insert_one(document)
 
+    def write_value_in_collection(self, *,
+                                  collection_name: str,
+                                  filter_by: dict,
+                                  path: str,
+                                  new_value: any) -> bool:
+
+        """
+        Updates a specific field value in a MongoDB collection document.
+
+        Finds a document matching the filter criteria and updates the specified
+        field path with a new value. Does not create new documents if no match
+        is found (upsert=False).
+
+        Returns:
+        bool: True if a document was successfully modified, False if no
+             matching document was found or no changes were made.
+
+        Example 1:
+        # Update user's retention period
+        success = db.write_value_in_collection(
+           collection_name="userSettings",
+           filter_by={"_id": "user@example.com"},
+           path="userProfile.retention.period",
+           new_value=30
+        )
+
+        Example 2:
+        # Update user's retention period
+        success = db.write_value_in_collection(
+           collection_name="userSettings",
+           filter_by={"_id": ObjectId("123456789")},
+           path="userProfile.retention.period",
+           new_value=30
+        )
+        """
+
+        result = self.get_collection(collection_name=collection_name).update_one(
+            filter=filter_by,
+            update={'$set': {path: new_value}},
+            upsert=False)  # **:IMPORTANT:** Don't create a new document if user doesn't exist
+
+        if result.modified_count > 0:
+            log.warning(f"Updated retention period to {new_value}")
+            return True
+        else:
+            log.warning(f"No document found}")
+            return False
+
 
 class MongoDBRetentionUtils(MongoDBRepository):
 
-    def get_retention_period_from(self, user_name: str, collection_name: Literal['USER_SETTINGS', 'SYSTEM', 'MEETINGS']) -> int:
+    def get_retention_period_from(self, user_email: str, collection_name: Literal['USER_SETTINGS', 'SYSTEM', 'MEETINGS']) -> int:
         """
         example output:
             {
@@ -111,58 +160,61 @@ class MongoDBRetentionUtils(MongoDBRepository):
                 return collection[0]['retention']
 
             case 'MEETINGS':
-                collection = self.filter_document_by_user_name(user_name=user_name, collection_name="meetings")
+                collection = self.filter_document_by_user_name(user_email=user_email, collection_name="meetings")
                 return collection['retention']['extension']['period']
 
             case 'USER_SETTINGS':
-                collection = self.filter_document_by_user_name(user_name=user_name, collection_name="userSettings")
+                collection = self.filter_document_by_user_name(user_email=user_email, collection_name="userSettings")
                 return collection['userProfile']['retention']['period']
 
             case _:
                 raise ValueError(f"Invalid collection name: {collection_name}. Expected 'SYSTEM' or 'MEETINGS'.")
 
     def set_retention_period_in(self,
-                                user_name: str,
+                                user_email: str,
                                 collection_name: Literal['USER_SETTINGS', 'SYSTEM', 'MEETINGS'],
                                 new_period: int
-                                ) -> int:
+                                ) -> int:  # Changed return type to bool since you're returning True/False
         """
-        example output:
-            {
-                period: 0, < ------------ gets from here
-                canExtend: False,
-                type: 'User'
-            }
+        TODO: ask avi to give me W permissions 
+        Sets the retention period for a user in the specified collection.
+
         """
         match collection_name:
 
             case 'USER_SETTINGS':
 
                 try:
+
                     collection = self.get_collection("userSettings")
+                    document = collection.find_one({'_id': user_email})
 
-                    existing_doc = collection.find_one({'_id': user_name}, {'_id': 1})
-                    if not existing_doc:
-                        log.error(f"User '{user_name}' not found in userSettings collection")
-                        return False
-
-                    result = collection.update_one(upsert=False,  # **important to avoid creating a new document**
-                                                   filter={'_id': user_name},
-                                                   update={'$set': {'retention.period': new_period}})
+                    if not document:
+                        log.error(f"User '{user_email}' not found in userSettings collection")
+                        raise ValueError(f"User '{user_email}' not found in userSettings collection")
+                    # Update the retention period
+                    result = collection.update_one(
+                        filter={'_id': user_email},
+                        update={'$set': {'userProfile.retention.period': new_period}},
+                        upsert=False)  # **:IMPORTANT:** Don't create a new document if user doesn't exist
 
                     if result.modified_count > 0:
-                        log.warning(f"Updated retention period to {new_period} for user {user_name}")
+                        log.warning(f"Updated retention period to {new_period} for user {user_email}")
                         return True
                     else:
-                        log.warning(f"No document found for user {user_name}")
+                        log.warning(f"No document found for user {user_email}")
                         return False
 
                 except Exception as e:
                     log.error(f"Error updating retention period: {e}")
                     return False
 
+                finally:
+                    sleep(1.5)
+
             case _:
-                raise ValueError(f"Invalid collection name: {collection_name}. Expected 'SYSTEM' or 'MEETINGS'.")
+                raise ValueError(
+                    f"Invalid collection name: {collection_name}. Expected 'USER_SETTINGS', 'SYSTEM', or 'MEETINGS'.")
 
     def get_retention_extend_status(self, user_name: str, collection_name: Literal['USER_SETTINGS', 'SYSTEM', 'MEETINGS']) -> int:
         """
@@ -176,7 +228,7 @@ class MongoDBRetentionUtils(MongoDBRepository):
         match collection_name:
 
             case 'USER_SETTINGS':
-                collection = self.filter_document_by_user_name(user_name=user_name, collection_name="userSettings")
+                collection = self.filter_document_by_user_name(user_email=user_name, collection_name="userSettings")
                 return collection['userProfile']['retention']['canExtend']
 
             case _:
@@ -193,7 +245,7 @@ class MongoDBRetentionUtils(MongoDBRepository):
         match collection_name:
 
             case 'USER_SETTINGS':
-                collection = self.filter_document_by_user_name(user_name=user_name, collection_name="userSettings")
+                collection = self.filter_document_by_user_name(user_email=user_name, collection_name="userSettings")
                 return collection['userProfile']['retention']['status']['lastSync']
 
             case _:
