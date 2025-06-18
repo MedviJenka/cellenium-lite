@@ -88,16 +88,12 @@ class MongoDBRepository:
         _id = collection.find_one({'_id': ObjectId(meeting_id)})
         return _id
 
-    def write_document_to_collection(self, *, collection_name: str, document: Dict) -> None:
-        """Write a document to a specific collection."""
-        collection = self.get_collection(collection_name)
-        collection.insert_one(document)
-
-    def write_value_in_collection(self, *,
+    def write_value_in_collection(self,
+                                  *,
                                   collection_name: str,
                                   filter_by: dict,
                                   path: str,
-                                  new_value: any) -> bool:
+                                  new_value: any) -> any:
 
         """
         Updates a specific field value in a MongoDB collection document.
@@ -128,18 +124,19 @@ class MongoDBRepository:
            new_value=30
         )
         """
+        try:
+            result = self.get_collection(collection_name=collection_name).update_one(
+                filter=filter_by,
+                update={'$set': {path: new_value}},
+                upsert=False)  # **:IMPORTANT:** Don't create a new document if user doesn't exist
+            return result
 
-        result = self.get_collection(collection_name=collection_name).update_one(
-            filter=filter_by,
-            update={'$set': {path: new_value}},
-            upsert=False)  # **:IMPORTANT:** Don't create a new document if user doesn't exist
+        except Exception as e:
+            log.error(f"Error updating retention period: {e}")
+            raise
 
-        if result.modified_count > 0:
-            log.warning(f"Updated retention period to {new_value}")
-            return True
-        else:
-            log.warning(f"No document found}")
-            return False
+        finally:
+            sleep(1.5)
 
 
 class MongoDBRetentionUtils(MongoDBRepository):
@@ -174,44 +171,23 @@ class MongoDBRetentionUtils(MongoDBRepository):
                                 user_email: str,
                                 collection_name: Literal['USER_SETTINGS', 'SYSTEM', 'MEETINGS'],
                                 new_period: int
-                                ) -> int:  # Changed return type to bool since you're returning True/False
-        """
-        TODO: ask avi to give me W permissions 
-        Sets the retention period for a user in the specified collection.
-
-        """
+                                ) -> None:  # Changed return type to bool since you're returning True/False
+        """Sets the retention period for a user in the specified collection."""
         match collection_name:
 
             case 'USER_SETTINGS':
+                result = self.write_value_in_collection(
+                    collection_name="userSettings",
+                    filter_by={"_id": user_email},
+                    path="userProfile.retention.period",
+                    new_value=new_period
+                )
+                if result.modified_count > 0:
+                    log.warning(f"Updated retention period to {new_period}")
+                    raise
 
-                try:
-
-                    collection = self.get_collection("userSettings")
-                    document = collection.find_one({'_id': user_email})
-
-                    if not document:
-                        log.error(f"User '{user_email}' not found in userSettings collection")
-                        raise ValueError(f"User '{user_email}' not found in userSettings collection")
-                    # Update the retention period
-                    result = collection.update_one(
-                        filter={'_id': user_email},
-                        update={'$set': {'userProfile.retention.period': new_period}},
-                        upsert=False)  # **:IMPORTANT:** Don't create a new document if user doesn't exist
-
-                    if result.modified_count > 0:
-                        log.warning(f"Updated retention period to {new_period} for user {user_email}")
-                        return True
-                    else:
-                        log.warning(f"No document found for user {user_email}")
-                        return False
-
-                except Exception as e:
-                    log.error(f"Error updating retention period: {e}")
-                    return False
-
-                finally:
-                    sleep(1.5)
-
+                if not result:
+                    raise ValueError(f"Failed to set retention period for {user_email} in {collection_name}")
             case _:
                 raise ValueError(
                     f"Invalid collection name: {collection_name}. Expected 'USER_SETTINGS', 'SYSTEM', or 'MEETINGS'.")
