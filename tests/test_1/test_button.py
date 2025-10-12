@@ -1,5 +1,5 @@
 import pytest
-from bini.engine.utils import BiniUtils
+from bini_ai import BiniUtils
 from infrastructure.engine.driver_engine import DriverEngine
 
 
