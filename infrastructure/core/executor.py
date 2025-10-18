@@ -9,5 +9,4 @@ class Executor(ABC):
     """
 
     @abstractmethod
-    def execute(self, *args: Optional[any], **kwargs: Optional[any]) -> None:
-        ...
+    def execute(self, *args: Optional[any], **kwargs: Optional[any]) -> None: ...

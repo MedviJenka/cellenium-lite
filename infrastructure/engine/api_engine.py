@@ -1,18 +1,18 @@
 import gspread
+from settings import Logfire, Config
 from functools import lru_cache
 from dataclasses import dataclass
-from google.oauth2.service_account import Credentials
-from infrastructure.core.logger import Logger
 from infrastructure.data.constants import SCOPES
+from google.oauth2.service_account import Credentials
 
 
-log = Logger()
+log = Logfire(name='google-sheet-api')
 
 
 @dataclass
 class GoogleAPIAuth:
 
-    sheet_id: str = '1HiBBUWKS_wheb3ANqCGVtOCpZPCFuN3KSae0hZOD0QE'
+    sheet_id: str = Config.GOOGLE_SHEET_ID
     credentials: str = r"C:\Users\medvi\Downloads\credentials_1.json"
 
     def __post_init__(self) -> None:
@@ -41,13 +41,13 @@ def __read_google_sheet(sheet_name: str, value: str, api: GoogleAPIAuth) -> dict
     all_rows = sheet.get_all_values()
     headers = all_rows[0]
 
-    log.log_info(sheet)
-    log.log_info(all_rows)
-    log.log_info(headers)
+    log.fire.log_info(sheet)
+    log.fire.log_info(all_rows)
+    log.fire.log_info(headers)
 
     for row in all_rows[1:]:
         row_dict = dict(zip(headers, row))
-        log.log_info(row_dict)
+        log.fire.log_info(row_dict)
         if row_dict['name'] == value:
             return row_dict
 
