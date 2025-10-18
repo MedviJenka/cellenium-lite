@@ -5,6 +5,7 @@ from bini_ai.src.stories.bini import BiniImage
 
 @dataclass
 class BiniUtils:
+
     """
     Utility class to run Bini image or text analysis flows.
 
@@ -19,7 +20,4 @@ class BiniUtils:
         self.__bini_image = BiniImage(chain_of_thought=self.chain_of_thought, to_json=self.to_json)
 
     def run(self, prompt: str, image_path: str, sample_image: Union[str, list] = '') -> str:
-        return self.run_image(prompt=prompt, image_path=image_path, sample_image=sample_image)
-
-    def run_image(self, prompt: str, image_path: str, sample_image: Union[str, list] = '') -> str:
         return self.__bini_image.kickoff(inputs={'prompt': prompt, 'image': image_path, 'sample_image': sample_image})

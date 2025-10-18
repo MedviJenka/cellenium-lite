@@ -1,10 +1,10 @@
 import base64
 from typing import Optional
 from langchain_core.messages import HumanMessage
-from bini_ai.src.utils.azure_llm import AzureLLMConfig
+from bini_ai.src.utils.azure_llm import LLMConfig
 
 
-class CompressAndUploadImage(AzureLLMConfig):
+class CompressAndUploadImage(LLMConfig):
 
     @staticmethod
     def __encode_image(image_path: str) -> str:
@@ -31,6 +31,6 @@ class CompressAndUploadImage(AzureLLMConfig):
                     "image_url": {"url": f"data:image/jpeg;base64,{self.__encode_image(sample_image)}"}
                 })
 
-        response = self.langchain_llm.invoke([message])
+        response = self.llm.invoke([message])
 
         return str(response)

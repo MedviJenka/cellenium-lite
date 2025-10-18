@@ -45,6 +45,8 @@ class DriverEngine(DriverManager):
                 log.log_info(output)
                 return self.driver.find_element(Type[element_type].value, element_locator)
 
+            return None
+
         except Exception as e:
             # self.attach_screenshot()
             raise e
@@ -80,6 +82,8 @@ class DriverEngine(DriverManager):
 
                 except Exception as e:
                     raise e
+            case _:
+                return None
 
     def wait_for_element(self, name: str, seconds=5) -> callable:
         element_locator = get_locator(self.screen, name)

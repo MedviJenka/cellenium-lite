@@ -1,4 +1,4 @@
-from typing import Union, Optional
+from typing import Union, Optional, Type
 from crewai.flow import Flow, start, listen, router
 from pydantic import BaseModel, Field
 from bini_ai.src.agents.english_agent.crew import EnglishAgent
@@ -21,6 +21,8 @@ class InitialState(BaseModel):
     data: str = ''
     result: str = ''
     cache: dict = Field(default_factory=dict)
+    chain_of_thought: Optional[bool] = True
+    output_schema: Optional[Type[BaseModel]] = None
 
 
 class BiniImage(Flow[InitialState]):
@@ -33,17 +35,11 @@ class BiniImage(Flow[InitialState]):
 
     """
 
-    def __init__(self, chain_of_thought: Optional[bool] = False, to_json: Optional[bool] = False) -> None:
-        super().__init__()
-        self.to_json = to_json
-        self.chain_of_thought = chain_of_thought
-        self.english_agent = EnglishAgent(chain_of_thought=self.chain_of_thought, to_json=self.to_json)
-        self.computer_vision_agent = ComputerVisionAgent(chain_of_thought=self.chain_of_thought, to_json=self.to_json)
-
     @start()
     def refine_prompt(self) -> None:
+        agent = EnglishAgent(chain_of_thought=self.state.chain_of_thought)
         """getting the original prompt and refines to correct english"""
-        self.state.prompt = self.english_agent.execute(prompt=self.state.prompt)
+        self.state.prompt = agent.execute(prompt=self.state.prompt)
 
     # ----------------------------------------------------------------------------------------------------------------------
 
@@ -62,5 +58,10 @@ class BiniImage(Flow[InitialState]):
     @listen('Valid Question')
     def analyze_image(self) -> str:
         """analyzes the image using AI"""
-        return self.computer_vision_agent.execute(prompt=self.state.prompt, image_path=self.state.image,
-                                                  sample_image=self.state.sample_image)
+        agent = ComputerVisionAgent(chain_of_thought=self.state.chain_of_thought, output_schema=self.state.output_schema)
+        return agent.execute(prompt=self.state.prompt,
+                             image_path=self.state.image,
+                             sample_image=self.state.sample_image)
+
+
+BiniImage().kickoff(inputs={'chain_of_thought': True})

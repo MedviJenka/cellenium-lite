@@ -1,20 +1,22 @@
 import pytest
+from settings import Logfire
 from bini_ai import BiniUtils
 from infrastructure.engine.driver_engine import DriverEngine
 
 
 bini = BiniUtils()
 
+log = Logfire(name='test-button')
+
 
 @pytest.fixture
 def engine() -> DriverEngine:
-    return DriverEngine(screen='Google', headless=True)
+    return DriverEngine(screen='Google', headless=False)
 
 
 class TestGoogle:
 
     def test_web(self, engine) -> None:
-
         engine.get_web("https://www.google.com")
         title = engine.driver.title
         engine.get_element('search').send_keys('cats')
@@ -28,4 +30,4 @@ class TestGoogle:
         engine.get_element('button').click()
         screenshot = engine.get_screenshot()
         result = bini.run(image_path=screenshot, prompt='what do you see in this image?')
-        assert 'Passed' and 'Cats' in result
+        assert 'Passed' and 'Cats' in result, log.fire.error('cats were not found in page')

@@ -18,7 +18,8 @@ dependencies = [
     "requests",
     "playwright",
     "pydantic",
-    "pydantic_settings",
+    "pydantic-settings",
     "logfire",
     "langchain-openai>=0.3.35",
+    "gspread>=6.2.1",
 ]
