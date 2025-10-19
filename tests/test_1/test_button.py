@@ -1,3 +1,5 @@
+from typing import AsyncGenerator
+
 import pytest
 from settings import Logfire
 from bini_ai import BiniUtils
@@ -14,6 +16,14 @@ def engine() -> DriverEngine:
     return DriverEngine(screen='Google', headless=False)
 
 
+@pytest.fixture(scope='module')
+async def lifespan(engine) -> AsyncGenerator:
+    log.fire.info('Starting test module setup')
+    yield
+    engine.teardown()
+    log.fire.info('Test module teardown complete')
+
+
 class TestGoogle:
 
     def test_web(self, engine) -> None:
@@ -21,7 +31,6 @@ class TestGoogle:
         title = engine.driver.title
         engine.get_element('search').send_keys('cats')
         engine.get_element('button').click()
-        engine.teardown()
         assert title == 'Google'
 
     def test_cats(self, engine) -> None:

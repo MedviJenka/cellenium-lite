@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     SMITHERY_API_KEY: str = os.getenv('SMITHERY_API_KEY')
     LOGFIRE_TOKEN: str = os.getenv('LOGFIRE_TOKEN')
     GOOGLE_SHEET_ID: str = os.getenv('GOOGLE_SHEET_ID')
+    GOOGLE_CREDENTIALS: str = r"C:\Users\evgenyp\Downloads\credentials_1.json"
+    GOOGLE_SCOPES: list[str] = ['https://www.googleapis.com/auth/spreadsheets']
 
 
 Config = Settings()

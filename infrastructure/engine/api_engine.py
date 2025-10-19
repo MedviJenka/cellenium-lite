@@ -2,7 +2,6 @@ import gspread
 from settings import Logfire, Config
 from functools import lru_cache
 from dataclasses import dataclass
-from infrastructure.data.constants import SCOPES
 from google.oauth2.service_account import Credentials
 
 
@@ -13,14 +12,13 @@ log = Logfire(name='google-sheet-api')
 class GoogleAPIAuth:
 
     sheet_id: str = Config.GOOGLE_SHEET_ID
-    credentials: str = r"C:\Users\medvi\Downloads\credentials_1.json"
 
     def __post_init__(self) -> None:
-        service_account = Credentials.from_service_account_file(filename=self.credentials, scopes=SCOPES)
+        service_account = Credentials.from_service_account_file(filename=Config.GOOGLE_CREDENTIALS, scopes=Config.GOOGLE_SCOPES)
         self.client = gspread.authorize(service_account)
 
     def __hash__(self) -> hash:
-        return hash((self.sheet_id, tuple(SCOPES)))
+        return hash((self.sheet_id, tuple(Config.GOOGLE_SCOPES)))
 
     def get_cached_sheet(self, sheet_name: str) -> gspread.Worksheet:
         return self.get_sheet.worksheet(sheet_name)
