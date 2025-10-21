@@ -39,9 +39,9 @@ def __read_google_sheet(sheet_name: str, value: str, api: GoogleAPIAuth) -> dict
     all_rows = sheet.get_all_values()
     headers = all_rows[0]
 
-    log.fire.log_info(sheet)
-    log.fire.log_info(all_rows)
-    log.fire.log_info(headers)
+    log.fire.info(sheet)
+    log.fire.info(all_rows)
+    log.fire.info(headers)
 
     for row in all_rows[1:]:
         row_dict = dict(zip(headers, row))
