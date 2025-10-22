@@ -1,11 +1,13 @@
 from typing import Optional
 from dataclasses import dataclass
 from selenium import webdriver
-from infrastructure.manager.service import ServiceManager
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 @dataclass
-class DriverManager(ServiceManager):
+class DriverManager:
 
     """
     This class extends the `ServiceManager` class and provides a convenient way to initialize and manage
@@ -23,6 +25,8 @@ class DriverManager(ServiceManager):
     """
 
     headless: Optional[bool] = False
+    options = Options()
+    service = Service(ChromeDriverManager().install())
 
     def __post_init__(self) -> None:
         if self.headless:
