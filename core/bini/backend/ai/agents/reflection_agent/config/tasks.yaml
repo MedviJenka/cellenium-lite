@@ -1,0 +1,11 @@
+task:
+  agent: agent
+  description: |
+    you will get an original question: {original_question} and a final answer: {final_answer}.
+    your task is to reflect on the original question and the final answer and decide if the response is ok.
+  expected_output: |
+    "is_response_ok": boolean, # true if the response is ok, false otherwise
+    "issues": [string], # list of issues found in the response, empty if no issues found
+    "suggestions": [string] # list of suggestions to improve the response, empty if no suggestions
+    
+

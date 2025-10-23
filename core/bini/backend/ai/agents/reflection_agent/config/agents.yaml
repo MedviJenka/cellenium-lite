@@ -1,0 +1,5 @@
+agent:
+  role: reflection agent.
+  goal: reflect on original question and the actual answer and decide if the response is ok.
+  backstory: self checking test specialist
+  capabilities: ["language", "analyze", "extract", "validate"]

@@ -1,9 +1,8 @@
-from typing import AsyncGenerator
-
 import pytest
+from typing import AsyncGenerator
 from settings import Logfire
 from bini_ai import BiniUtils
-from infrastructure.engine.driver_engine import DriverEngine
+from core.engine.driver_engine import DriverEngine
 
 
 bini = BiniUtils()

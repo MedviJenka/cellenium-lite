@@ -1,0 +1,16 @@
+task1:
+  agent: agent
+  description: |
+    You will receive a prompt: {prompt}
+    Your task is to extract specific information from the content and give a valid answer as an AI assistant.
+  expected_output: detailed output of the text input, including any relevant information extracted from it.
+
+task2:
+  agent: agent
+  context: [task1]
+  description: |
+    you are a professional text and software engineer, you will receive a text input
+    you job is to assist with any given request
+
+  expected_output: |
+    helpful assistant, providing accurate and relevant information based on the input text.
