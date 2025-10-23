@@ -76,6 +76,11 @@ def api_client() -> Generator[APIClient, None, None]:
 
 
 class TestAPI:
+
+    @pytest.mark.parametrize('_id', [x for x in range(1, 100)])
+    def test_speed(self, api_client: APIClient, _id) -> None:
+        assert api_client.get_data_by_id(item_id=_id)
+
     @pytest.mark.parametrize("item_id", [1, 5, 10])
     def test_get_data_by_id(self, api_client: APIClient, item_id: int) -> None:
         record = api_client.get_data_by_id(item_id)
