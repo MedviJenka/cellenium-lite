@@ -35,4 +35,5 @@ dependencies = [
     "aiofiles",
     "logfire",
     "pytest",
+    "pytest-rerunfailures>=16.1",
 ]

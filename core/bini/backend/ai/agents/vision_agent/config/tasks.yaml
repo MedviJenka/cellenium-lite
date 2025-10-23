@@ -51,7 +51,7 @@ decision:
   agent: agent
   context: [ chain_of_thought_output, conclusion ]
   description: |
-    Based on the prompt: {prompt}, the image(s): {image} {sample_image}
+    Based on the prompt: {prompt}, the image(s): {image} {sample_image} write a final decision
     **Important:**
       **Always:**
         - Provide a detailed reasoning chain output.

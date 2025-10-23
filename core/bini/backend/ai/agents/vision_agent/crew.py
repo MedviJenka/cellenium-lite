@@ -9,9 +9,9 @@ from core.bini.backend.utils.infrastructure import AgentInfrastructure
 @CrewBase
 class ComputerVisionAgent(AgentInfrastructure):
 
-    def __init__(self, chain_of_thought: bool, schema_output: Optional[Type[BaseModel]] = None) -> None:
+    def __init__(self, chain_of_thought: bool, schema: Optional[Type[BaseModel]] = None) -> None:
         self.chain_of_thought = chain_of_thought
-        self.schema_output = schema_output
+        self.schema = schema
         super().__init__(chain_of_thought=self.chain_of_thought)
 
     @agent
@@ -40,7 +40,7 @@ class ComputerVisionAgent(AgentInfrastructure):
 
     @task
     def decision(self, **kwargs) -> Task:
-        return Task(config=self.tasks_config['decision'], output_pydantic=self.schema_output, **kwargs)
+        return Task(config=self.tasks_config['decision'], output_pydantic=self.schema, **kwargs)
 
     @crew
     def crew(self) -> Crew:

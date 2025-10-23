@@ -3,7 +3,7 @@ from functools import cached_property
 from crewai import LLM
 from crewai.telemetry import Telemetry
 from langchain_openai import AzureChatOpenAI
-from backend.settings import Config
+from settings import Config
 
 
 class TelemetryPatch:

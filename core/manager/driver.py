@@ -14,13 +14,13 @@ class DriverManager:
     a Selenium web driver instance.
 
 
-    :params: driver (webdriver) .................... The Selenium web driver instance.
+    :params: Driver (webdriver) .................... The Selenium web driver instance.
     :args:
-        service (Service) ....................... The service object to use for managing the driver.
+        Service (Service) ....................... The service object to use for managing the driver.
                                                      It should be an instance of
                                                      a class that extends the `Service` class from
 
-        headless: .............................. Testing in background with no UI
+        Headless: .............................. Testing in background with no UI
 
     """
 

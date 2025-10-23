@@ -1,9 +1,9 @@
-from typing import Union
+from typing import Union, Optional, Type
+from pydantic import BaseModel
 from settings import Logfire
 from crewai.flow import Flow, start, listen, router
 from core.bini.backend.ai.flows.states import BiniImageInitialState
 from core.bini.backend.ai.agents.english_agent.crew import EnglishAgent
-from core.bini.backend.ai.agents.reflection_agent.crew import ReflectionAgent
 from core.bini.backend.ai.agents.vision_agent.crew import ComputerVisionAgent
 
 
@@ -25,11 +25,11 @@ class BiniImage(Flow[BiniImageInitialState]):
     8. Handle invalid prompts gracefully.
     """
 
-    def __init__(self, chain_of_thought: bool) -> None:
+    def __init__(self, chain_of_thought: bool, schema: Optional[Type[BaseModel]] = None) -> None:
         self.chain_of_thought = chain_of_thought
+        self.schema = schema
         self.english_agent = EnglishAgent(chain_of_thought=chain_of_thought)
-        self.computer_vision_agent = ComputerVisionAgent(chain_of_thought=chain_of_thought)
-        self.reflection_agent = ReflectionAgent(chain_of_thought=chain_of_thought)
+        self.computer_vision_agent = ComputerVisionAgent(chain_of_thought=chain_of_thought, schema=self.schema)
         super().__init__(chain_of_thought=chain_of_thought)
 
     @start()
@@ -58,28 +58,21 @@ class BiniImage(Flow[BiniImageInitialState]):
     @listen("VALID")
     async def analyze_image(self) -> None:
         """Analyze the image using the Computer Vision agent."""
-        result = self.computer_vision_agent.execute(prompt=self.state.refined_prompt,
-                                                    image_path=self.state.image,
-                                                    sample_image=self.state.sample_image)
-        self.state.result = result
+        self.state.result = self.computer_vision_agent.execute(prompt=self.state.refined_prompt,
+                                                               image_path=self.state.image,
+                                                               sample_image=self.state.sample_image)
         log.fire.info(f'image visualization result: {self.state.result}')
-
-    @listen(analyze_image)
-    async def reflection_decision(self) -> str:
-        """TODO: handle reflection router"""
-        self.state.reflection = self.reflection_agent.execute(original_question=self.state.refined_prompt,
-                                                              final_answer=self.state.result)
-        log.fire.info(f'reflection summary: {self.state.reflection}')
-        return "DONE"
+        return self.state.result
 
 
 async def bini_image(prompt: str,
                      image: str,
                      sample_image: Union[str, list, None] = None,
                      chain_of_thought: bool = True,
+                     schema: Optional[Type[BaseModel]] = None
                      ) -> BiniImage:
 
-    bini = BiniImage(chain_of_thought=chain_of_thought)
+    bini = BiniImage(chain_of_thought=chain_of_thought, schema=schema)
     try:
         response = await bini.kickoff_async({'original_prompt': prompt, 'image': image, 'sample_image': sample_image})
         log.fire.info(f'Refined:, {bini.state.refined_prompt}')

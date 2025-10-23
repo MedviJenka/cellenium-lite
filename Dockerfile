@@ -14,11 +14,11 @@ ENV PYTHONUNBUFFERED=1
 
 RUN pip install uv
 
-COPY pyproject.toml uv.lock ./
+COPY core/bini/pyproject.toml uv.lock ./
 
 RUN uv sync --frozen
 
-COPY . .
+COPY core/bini .
 
 EXPOSE 8081
 

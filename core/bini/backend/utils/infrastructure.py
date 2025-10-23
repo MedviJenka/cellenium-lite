@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Union
 from crewai import Agent, Task
-from backend.utils.azure_llm import AzureLLMConfig
+from core.bini.backend.utils.azure_llm import AzureLLMConfig
 
 
 class AgentInfrastructure(ABC, AzureLLMConfig):
