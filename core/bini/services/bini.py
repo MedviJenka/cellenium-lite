@@ -12,7 +12,7 @@ log = Logfire(name='bini_api_client')
 METADATA = {
     'title': "Bini AI Vision API",
     'description': "Computer Vision Agent API for image analysis",
-    'version':Config.API_VERSION,
+    'version': Config.API_VERSION,
     'lifespan': api.lifespan
 }
 

@@ -4,16 +4,13 @@ services:
 
   bini-service:
     build:
-      context: core/bini
+      context: .
       target: bini
       network: host
     expose:
       - "8081"
     env_file:
-      - .env
-    volumes:
-      - ./output:/app/output
-      - ./logs:/app/logs
+      - ../../.env
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
