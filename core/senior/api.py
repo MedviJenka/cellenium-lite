@@ -68,8 +68,8 @@ class APIClient:
 
 # ------------------- Pytest Fixtures & Tests -------------------
 
-@pytest.fixture(scope="function")
-def api_client() -> Generator[APIClient, None, None]:
+@pytest.fixture(scope="module")
+def api_client() -> Generator:
     log.fire.info("Initializing API client")
     yield APIClient()
     log.fire.info("Tearing down API client")
