@@ -1,8 +1,8 @@
+from settings import Logfire
 from typing import Optional, Type
 from pydantic import BaseModel, Field
 from crewai.flow import Flow, start
-from backend.ai.agents.chat_agent.crew import ChatAgent
-from backend.utils.logger import Logfire
+from core.bini.backend.ai.agents.chat_agent.crew import ChatAgent
 
 
 log = Logfire("bini-chat-flow")

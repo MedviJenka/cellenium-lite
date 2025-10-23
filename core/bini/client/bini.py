@@ -6,8 +6,7 @@ from pathlib import Path
 from typing import Iterable, Optional, Union, Type
 from contextlib import ExitStack
 from pydantic import BaseModel
-from backend.utils.logger import Logfire
-from backend.settings import Config
+from settings import Logfire, Config
 
 
 type PathLike = Union[str, os.PathLike]

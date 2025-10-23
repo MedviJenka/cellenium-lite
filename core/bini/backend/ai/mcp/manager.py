@@ -2,9 +2,9 @@ from pydantic import BaseModel
 from dataclasses import dataclass
 from typing import Optional, Union
 from mcp.types import CallToolResult
-from backend.utils.logger import Logfire
 from mcp import ClientSession, ListToolsResult
 from mcp.client.streamable_http import streamablehttp_client
+from settings import Logfire
 
 
 log = Logfire(name='mcp-manager')

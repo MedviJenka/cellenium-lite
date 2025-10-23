@@ -2,9 +2,9 @@ from typing import List, Optional
 from crewai.tools import BaseTool
 from crewai import Agent, Crew, Task
 from crewai.project import CrewBase, agent, crew, task
-from backend.ai.agents.reflection_agent.schemas import ReflectionOutputSchema
-from backend.utils.infrastructure import AgentInfrastructure
-from backend.utils.logger import Logfire
+from core.bini.backend.ai.agents.reflection_agent.schemas import ReflectionOutputSchema
+from core.bini.backend.utils.infrastructure import AgentInfrastructure
+from settings import Logfire
 
 
 log = Logfire(name='reflection-agent')

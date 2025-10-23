@@ -2,8 +2,8 @@ from pydantic import BaseModel
 from typing import Optional, Union, Type
 from crewai import Agent, Crew, Task, Process
 from crewai.project import CrewBase, agent, crew, task
-from backend.utils.infrastructure import AgentInfrastructure
-from backend.tools.image_compressor import CompressAndUploadImage
+from core.bini.backend.tools.image_compressor import CompressAndUploadImage
+from core.bini.backend.utils.infrastructure import AgentInfrastructure
 
 
 @CrewBase
@@ -12,7 +12,7 @@ class ComputerVisionAgent(AgentInfrastructure):
     def __init__(self, chain_of_thought: bool, schema_output: Optional[Type[BaseModel]] = None) -> None:
         self.chain_of_thought = chain_of_thought
         self.schema_output = schema_output
-        super().__init__(chain_of_thought=self.chain_of_thought, to_json=self.to_json)
+        super().__init__(chain_of_thought=self.chain_of_thought)
 
     @agent
     def agent(self, **kwargs) -> Agent:

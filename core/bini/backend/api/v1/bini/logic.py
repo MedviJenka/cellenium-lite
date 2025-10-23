@@ -1,6 +1,5 @@
 import os
-from backend.settings import Config
-from backend.utils.logger import Logfire
+from settings import Config, Logfire
 from fastapi import APIRouter, HTTPException
 
 

@@ -3,7 +3,7 @@ import requests
 from fastapi import APIRouter
 from dotenv import load_dotenv
 from dataclasses import dataclass
-from backend.utils.logger import Logfire
+from settings import Logfire
 
 
 load_dotenv()

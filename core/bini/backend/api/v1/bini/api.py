@@ -1,18 +1,18 @@
 import os
 import tempfile
-from pydantic import BaseModel, create_model, Field
+from pydantic import BaseModel, create_model
 from fastapi import FastAPI
 from typing import AsyncGenerator, Type, Any, Dict
 from typing import Optional, List
-from backend.settings import Config
-from backend.utils.logger import Logfire
 from contextlib import asynccontextmanager
-from backend.ai.flows.chat import BiniChatFlow
-from backend.api.v1.bini.schemas import AnalysisResponse, ChatRequest
-from backend.api.v1.bini.logic import validate_image_file
-from backend.utils.bini_service import BiniServiceUtils
+
 from fastapi import File, UploadFile, Form, APIRouter, HTTPException
 
+from core.bini.backend.ai.flows.chat import BiniChatFlow
+from core.bini.backend.api.v1.bini.logic import validate_image_file
+from core.bini.backend.api.v1.bini.schemas import AnalysisResponse, ChatRequest
+from core.bini.backend.utils.bini_service import BiniServiceUtils
+from settings import Logfire, Config
 
 log = Logfire(name='bini-api')
 

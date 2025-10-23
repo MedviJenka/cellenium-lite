@@ -1,11 +1,10 @@
 import uvicorn
 from fastapi import FastAPI
-from backend.api.v1.bini import api
-from backend.settings import Config
-from backend.utils.logger import Logfire
+from settings import Logfire, Config
+from core.bini.backend.api.v1.bini import api
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
-from backend.api.health_schema import HealthResponseSchema
+from core.bini.backend.api.health_schema import HealthResponseSchema
 
 
 log = Logfire(name='bini_api_client')

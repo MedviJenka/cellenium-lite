@@ -1,10 +1,10 @@
 from typing import Union
-from backend.utils.logger import Logfire
+from settings import Logfire
 from crewai.flow import Flow, start, listen, router
-from backend.ai.flows.states import BiniImageInitialState
-from backend.ai.agents.english_agent.crew import EnglishAgent
-from backend.ai.agents.reflection_agent.crew import ReflectionAgent
-from backend.ai.agents.vision_agent.crew import ComputerVisionAgent
+from core.bini.backend.ai.flows.states import BiniImageInitialState
+from core.bini.backend.ai.agents.english_agent.crew import EnglishAgent
+from core.bini.backend.ai.agents.reflection_agent.crew import ReflectionAgent
+from core.bini.backend.ai.agents.vision_agent.crew import ComputerVisionAgent
 
 
 log = Logfire(name="bini-flow")

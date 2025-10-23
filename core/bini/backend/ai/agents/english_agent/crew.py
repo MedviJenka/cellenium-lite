@@ -1,6 +1,6 @@
 from crewai import Agent, Crew, Task
 from crewai.project import CrewBase, agent, crew, task
-from backend.utils.infrastructure import AgentInfrastructure
+from core.bini.backend.utils.infrastructure import AgentInfrastructure
 from ..english_agent.schemas import ValidateQuestionSchema
 
 
