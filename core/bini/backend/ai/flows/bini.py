@@ -1,3 +1,4 @@
+import json
 from typing import Union, Optional, Type
 from pydantic import BaseModel
 from settings import Logfire
@@ -70,7 +71,7 @@ async def bini_image(prompt: str,
                      sample_image: Union[str, list, None] = None,
                      chain_of_thought: bool = True,
                      schema: Optional[Type[BaseModel]] = None
-                     ) -> BiniImage:
+                     ) -> BiniImage or dict:
 
     bini = BiniImage(chain_of_thought=chain_of_thought, schema=schema)
     try:
@@ -78,7 +79,7 @@ async def bini_image(prompt: str,
         log.fire.info(f'Refined:, {bini.state.refined_prompt}')
         log.fire.info(f'Result:", {bini.state.result}')
         log.fire.info(f'Reflection:", {bini.state.reflection}')
-        return response
+        return json.loads(response)
 
     except Exception as e:
         log.fire.error(f'error! {e}')

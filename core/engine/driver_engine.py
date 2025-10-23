@@ -53,6 +53,7 @@ class DriverEngine(DriverManager):
             raise e
 
     def get_screenshot(self, name: Optional[str] = None) -> str:
+        """TODO: screenshot a specific element"""
         file_name = f"{name or uuid.uuid4()}.png"
         path = f"{SCREENSHOTS}/{file_name}"
         self.driver.save_screenshot(filename=path)

@@ -3,3 +3,4 @@
 /.poetry.lock
 /tests/test_retention/mongo.env
 /venv/
+/core/data/screenshots
