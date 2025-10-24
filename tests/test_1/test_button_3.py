@@ -43,11 +43,9 @@ class TestLogin:
         ],
     )
     def test_login_flow(self, username, password, prompt, expected):
-        """Validates login flow and visual AI verification with meaningful cases only."""
         self.engine.get_element("username_field").send_keys(username)
         self.engine.get_element("password_field").send_keys(password)
         self.engine.get_element("submit").click()
-
         image = self.engine.get_screenshot()
         result = asyncio.run(bini_image(prompt=prompt, image=image, chain_of_thought=True, schema=ReflectionOutputSchema))
         final_decision = result.get("final_decision")
